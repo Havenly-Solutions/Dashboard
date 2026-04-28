@@ -80,7 +80,7 @@ export default function ResourceCentrePage() {
 
         {/* Support */}
         <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 text-center">
-          <h3 className="font-display font-semibold text-[#1A1A2E] mb-1">Can't find what you're looking for?</h3>
+          <h3 className="font-display font-semibold text-[#1A1A2E] mb-1">Can&apos;t find what you&apos;re looking for?</h3>
           <p className="text-gray-400 text-sm mb-4">Our specialised technical support team is available 24/7 for Chief Officers requiring specific hardware guidance or protocol clarification.</p>
           <button className="px-6 py-2.5 bg-[#1A1A2E] text-white rounded-lg text-sm font-medium hover:bg-[#0f0f1f] transition-colors">
             Open Support Ticket

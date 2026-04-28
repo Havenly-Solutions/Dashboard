@@ -65,7 +65,7 @@ export default function SecuritySettingsPage() {
             <Lock className="w-5 h-5 text-amber-600 mt-0.5" />
             <div>
               <p className="font-bold mb-1">Action Required: Set Production Password</p>
-              <p className="text-amber-700/80">You are currently using a temporary password or haven't set up your final production password. Please change it now to gain full access to the dashboard.</p>
+              <p className="text-amber-700/80">You are currently using a temporary password or haven&apos;t set up your final production password. Please change it now to gain full access to the dashboard.</p>
             </div>
           </div>
         )}
