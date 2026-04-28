@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 97.6%;
+    --foreground: 0 0% 5.1%;
+    --primary: 4 64% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 231 27% 14%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 94%;
+    --accent-foreground: 0 0% 10%;
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 4 64% 47%;
+    --destructive: 4 64% 47%;
+    --destructive-foreground: 0 0% 100%;
+    --radius: 0.5rem;
+    --havenly-red: #C0392B;
+    --havenly-navy: #1A1A2E;
+    --havenly-green: #0B6E4F;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-[#F9F9F9] text-foreground; }
+}
+
+.sidebar-nav-item {
+  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer;
+}
+.sidebar-nav-item:hover { @apply bg-white/10 text-white; }
+.sidebar-nav-item.active { @apply bg-havenly-red text-white; }
+.sidebar-nav-item.inactive { @apply text-white/60; }
+
+.stat-card {
+  @apply bg-white rounded-xl border border-gray-100 p-5 shadow-sm;
+}
+
+.severity-critical { @apply text-red-600 bg-red-50 border border-red-200; }
+.severity-warning { @apply text-amber-600 bg-amber-50 border border-amber-200; }
+.severity-advisory { @apply text-blue-600 bg-blue-50 border border-blue-200; }
+.severity-info { @apply text-gray-600 bg-gray-50 border border-gray-200; }
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fade-in 0.25s ease-out; }
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.animate-live { animation: live-pulse 1.5s ease-in-out infinite; }
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(192, 57, 43, 0.4);
+}

@@ -1,0 +1,91 @@
+'use client'
+import { useState, useEffect } from 'react'
+import Header from '@/components/dashboard/Header'
+import { Incident, SEVERITY_COLORS } from '@/types'
+import { formatDateTime, formatTimeAgo } from '@/lib/utils'
+import { MapPin, AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
+import TimeAgo from '@/components/dashboard/TimeAgo'
+
+export default function SOSAlertsPage() {
+  const [incidents, setIncidents] = useState<Incident[]>([])
+  const [loading, setLoading] = useState(true)
+  const [filter, setFilter] = useState('ALL')
+
+  useEffect(() => {
+    async function load() {
+      const r = await fetch('/api/incidents')
+      const d = await r.json()
+      setIncidents(Array.isArray(d) ? d : [])
+      setLoading(false)
+    }
+    load()
+    const id = setInterval(load, 10000) // Reduced to 10s for more responsive feed
+    return () => clearInterval(id)
+  }, [])
+
+  const filtered = filter === 'ALL' ? incidents : incidents.filter(i => filter === 'ACTIVE' ? i.status === 'ACTIVE' : i.severity === filter)
+  const critical = incidents.filter(i => i.severity === 'CRITICAL').length
+  const active = incidents.filter(i => i.status === 'ACTIVE').length
+  const resolved = incidents.filter(i => i.status === 'RESOLVED').length
+
+  return (
+    <div className="flex flex-col flex-1">
+      <Header title="SOS Alerts" subtitle="Real-Time Emergency Feed" />
+      <main className="flex-1 p-8 space-y-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: 'Total Incidents', value: incidents.length, color: 'text-[#1A1A2E]' },
+            { label: 'Active', value: active, color: 'text-[#C0392B]' },
+            { label: 'Critical', value: critical, color: 'text-red-600' },
+            { label: 'Resolved', value: resolved, color: 'text-emerald-600' },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="stat-card">
+              <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">{label}</div>
+              <div className={`font-display font-bold text-3xl ${color}`}>
+                <AnimatedCounter value={value} />
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex gap-2">
+          {['ALL', 'ACTIVE', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(f => (
+            <button key={f} onClick={() => setFilter(f)}
+              className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${filter === f ? 'bg-[#1A1A2E] text-white' : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
+              {f}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-3">
+          {loading ? <div className="text-center py-8 text-gray-400">Loading alerts...</div>
+            : filtered.length === 0 ? <div className="text-center py-8 text-gray-400">No incidents found</div>
+            : filtered.map(incident => (
+              <div key={incident.id} className={`bg-white rounded-xl border shadow-sm p-5 animate-fade-in ${incident.severity === 'CRITICAL' ? 'border-red-200' : 'border-gray-100'}`}>
+                <div className="flex items-start gap-4">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${incident.severity === 'CRITICAL' ? 'bg-red-50' : incident.severity === 'HIGH' ? 'bg-amber-50' : 'bg-blue-50'}`}>
+                    <AlertCircle size={20} className={incident.severity === 'CRITICAL' ? 'text-red-500' : incident.severity === 'HIGH' ? 'text-amber-500' : 'text-blue-500'} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${SEVERITY_COLORS[incident.severity]}`}>{incident.severity}</span>
+                      <span className={`text-[10px] font-medium uppercase px-2 py-0.5 rounded border ${incident.status === 'ACTIVE' ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`}>{incident.status}</span>
+                      <TimeAgo date={incident.createdAt} className="text-gray-400 text-xs ml-auto" />
+                    </div>
+                    <h3 className="font-semibold text-[#1A1A2E]">{incident.title}</h3>
+                    <p className="text-gray-500 text-sm mt-0.5">{incident.description}</p>
+                    <div className="flex items-center gap-1.5 mt-2 text-gray-400 text-xs">
+                      <MapPin size={11} /><span>{incident.location}</span>
+                      {incident.lat && <span className="font-mono ml-2">{incident.lat.toFixed(4)}° S, {incident.lng?.toFixed(4)}° E</span>}
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-400">{formatDateTime(incident.createdAt)}</div>
+                </div>
+              </div>
+            ))}
+        </div>
+      </main>
+    </div>
+  )
+}
