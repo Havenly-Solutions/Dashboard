@@ -54,13 +54,27 @@ export default function CategoryDetailPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button title="Share resource" className="p-2.5 rounded-lg border border-gray-100 text-gray-400 hover:text-[#C0392B] hover:bg-gray-50 transition-all">
+              <button 
+                type="button"
+                title="Share resource" 
+                aria-label="Share resource"
+                className="p-2.5 rounded-lg border border-gray-100 text-gray-400 hover:text-[#C0392B] hover:bg-gray-50 transition-all"
+              >
                 <Share2 size={18} />
               </button>
-              <button title="Print resource" className="p-2.5 rounded-lg border border-gray-100 text-gray-400 hover:text-[#C0392B] hover:bg-gray-50 transition-all">
+              <button 
+                type="button"
+                title="Print resource" 
+                aria-label="Print resource"
+                className="p-2.5 rounded-lg border border-gray-100 text-gray-400 hover:text-[#C0392B] hover:bg-gray-50 transition-all"
+              >
                 <Printer size={18} />
               </button>
-              <button className="flex items-center gap-2 px-4 py-2.5 bg-[#1A1A2E] text-white rounded-lg text-sm font-medium hover:bg-[#0f0f1f] transition-colors shadow-lg shadow-[#1A1A2E]/10">
+              <button 
+                type="button"
+                aria-label="Export PDF"
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#1A1A2E] text-white rounded-lg text-sm font-medium hover:bg-[#0f0f1f] transition-colors shadow-lg shadow-[#1A1A2E]/10"
+              >
                 <Download size={16} /> Export PDF
               </button>
             </div>
@@ -95,8 +109,13 @@ export default function CategoryDetailPage() {
                   return <h3 key={i} className="text-lg font-bold text-[#1A1A2E] mt-6 mb-2">{line.replace('#### ', '')}</h3>
                 }
                 if (line.startsWith('- ')) {
-                  return <ul key={i} className="my-2"><li className="ml-4 list-disc text-gray-600">{line.replace('- ', '')}</li></ul>
+                  return (
+                    <ul key={i} className="list-disc ml-6 my-2">
+                      <li className="text-gray-600">{line.replace('- ', '')}</li>
+                    </ul>
+                  )
                 }
+                if (line.trim() === '') return <div key={i} className="h-2" />
                 return <p key={i}>{line}</p>
               })}
             </div>
