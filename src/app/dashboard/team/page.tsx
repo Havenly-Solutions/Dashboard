@@ -4,7 +4,7 @@ import Header from '@/components/dashboard/Header'
 import { useSession } from 'next-auth/react'
 import { DashboardUser, Role, ROLE_LABELS, ROLE_BADGE_COLORS } from '@/types'
 import { formatDateTime } from '@/lib/utils'
-import { Plus, Trash2, Edit2, X, Loader2, ShieldAlert, UserCheck } from 'lucide-react'
+import { Plus, Trash2, Edit2, X, Loader2, ShieldAlert, UserCheck, Eye, EyeOff } from 'lucide-react'
 
 const ROLES: Role[] = [Role.PA, Role.MANAGER, Role.DEVELOPER, Role.INVESTOR, Role.NGO_PARTNER]
 
@@ -18,6 +18,7 @@ export default function TeamPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   useEffect(() => {
     if (role !== 'FOUNDER') return
@@ -186,7 +187,6 @@ export default function TeamPage() {
                   { label: 'Full Name', key: 'name', type: 'text', placeholder: 'Jane Smith' },
                   { label: 'Email', key: 'email', type: 'email', placeholder: 'jane@havenly.co.za' },
                   { label: 'Department', key: 'department', type: 'text', placeholder: 'e.g. Operations, Tech, Marketing' },
-                  { label: 'Temporary Password', key: 'password', type: 'password', placeholder: 'Min 8 characters' },
                 ].map(({ label, key, type, placeholder }) => (
                   <div key={key}>
                     <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">{label}</label>
@@ -195,6 +195,28 @@ export default function TeamPage() {
                       className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B] transition-colors" />
                   </div>
                 ))}
+                
+                <div className="relative">
+                  <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Temporary Password</label>
+                  <div className="relative">
+                    <input 
+                      type={showPassword ? 'text' : 'password'} 
+                      value={form.password} 
+                      onChange={e => setForm(f => ({ ...f, password: e.target.value }))} 
+                      required
+                      placeholder="Min 8 characters"
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B] transition-colors pr-10" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
                 <div>
                   <label htmlFor="role-select" className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Role & Portal Access</label>
                   <select 
