@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   description: 'Guardian Command Centre — The Black Sheep Tech Corp LTD (PTY)',
   icons: { icon: '/favicon.ico' },
   robots: {
-    index: false,
-    follow: false,
+    index: true,
+    follow: true,
   },
 }
 
