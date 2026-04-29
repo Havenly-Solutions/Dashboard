@@ -7,15 +7,6 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
   },
-  async rewrites() {
-    const backendUrl = process.env.BACKEND_API_URL || 'http://localhost:3005';
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${backendUrl}/api/:path*`,
-      },
-    ]
-  },
 }
 
 const { withSentryConfig } = require('@sentry/nextjs');
