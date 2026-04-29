@@ -3,12 +3,13 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' }
+    ],
   },
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
-    workerThreads: false,
-    cpus: 1,
   },
   typescript: {
     ignoreBuildErrors: true,
