@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
 import { useCountdown } from '@/hooks/useCountdown'
 import NextLink from 'next/link'
@@ -10,7 +11,15 @@ import Image from 'next/image'
 import * as Sentry from '@sentry/nextjs'
 
 export default function RootLoginPage() {
+  const { data: session, status } = useSession()
   const router = useRouter()
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.push('/dashboard')
+    }
+  }, [status, router])
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)

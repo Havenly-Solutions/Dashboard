@@ -11,10 +11,12 @@ export default withAuth(
       return NextResponse.redirect(new URL('/login', req.url))
     }
 
-    // 4D. Force Password Change Redirection
+    /* 
+    // 4D. Force Password Change Redirection (Moved to Layout Modal for better UX)
     if (token.mustChangePassword && pathname !== '/dashboard/settings/security') {
       return NextResponse.redirect(new URL('/dashboard/settings/security', req.url))
     }
+    */
 
     const role = token.role as keyof typeof ROLE_PERMISSIONS
     const permissions = ROLE_PERMISSIONS[role]

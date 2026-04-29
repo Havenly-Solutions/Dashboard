@@ -50,9 +50,9 @@ export default function SecuritySettingsPage() {
         throw new Error(data.error || 'Failed to update password')
       }
 
-      // Password changed successfully. We need to sign out to force a fresh login with the new credentials.
-      await signOut({ redirect: false })
-      router.push('/login')
+      // Update session to remove the force-change flag without signing out
+      await update({ mustChangePassword: false })
+      router.push('/')
       
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred')
