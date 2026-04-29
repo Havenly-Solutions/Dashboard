@@ -6,6 +6,8 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
+    workerThreads: false,
+    cpus: 1,
   },
 }
 
