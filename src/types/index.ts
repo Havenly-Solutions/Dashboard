@@ -168,7 +168,6 @@ export interface PreRegistration {
   reviewedAt?: string | null;
   reviewNote?: string | null;
   createdAt: string;
-  createdAt: string;
   updatedAt: string;
 }
 
