@@ -7,6 +7,8 @@ import { useCountdown } from '@/hooks/useCountdown'
 import NextLink from 'next/link'
 import Image from 'next/image'
 
+import * as Sentry from '@sentry/nextjs'
+
 export default function RootLoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
@@ -30,12 +32,24 @@ export default function RootLoginPage() {
     try {
       const res = await signIn('credentials', { email, password, redirect: false })
       if (res?.error) {
+        if (res.error !== 'CredentialsSignin') {
+          Sentry.withScope((scope) => {
+            scope.setExtra("email", email);
+            scope.setLevel("warning");
+            Sentry.captureMessage(`Sign in failed: ${res.error}`);
+          });
+        }
         setError(res.error === 'CredentialsSignin' ? 'Invalid email or password' : res.error)
         setLoading(false)
       } else {
         router.push('/dashboard')
       }
     } catch (err) {
+      Sentry.withScope((scope) => {
+        scope.setExtra("email", email);
+        scope.setLevel("error");
+        Sentry.captureException(err);
+      });
       setError('An unexpected authentication error occurred')
       setLoading(false)
     }

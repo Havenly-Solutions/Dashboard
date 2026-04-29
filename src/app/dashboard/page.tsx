@@ -7,6 +7,7 @@ import { formatTimeAgo, formatDateTime } from '@/lib/utils'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
 import TimeAgo from '@/components/dashboard/TimeAgo'
+import Image from 'next/image'
 
 const BRAND_COLORS = {
   red: '#C0392B',
@@ -154,7 +155,7 @@ export default function LiveFeedPage() {
             {/* Tactical Controls */}
             <div className="bg-havenly-navy rounded-xl border border-havenly-navy p-6 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-10">
-                <img src="/logo.png" alt="Havenly Logo" className="w-16 h-16 object-cover rounded-lg" />
+                <Image src="/logo.png" alt="Havenly Logo" width={64} height={64} className="object-cover rounded-lg" />
               </div>
               <div className="relative">
                 <div className="text-white/40 text-[9px] font-bold uppercase tracking-widest mb-4">Tactical Operations</div>
