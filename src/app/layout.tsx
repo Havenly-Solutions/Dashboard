@@ -8,9 +8,14 @@ const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://dashboard.havenly.co.za'),
   title: 'Havenly Solutions Command Centre',
   description: 'Guardian Command Centre — The Black Sheep Tech Corp LTD (PTY)',
   icons: { icon: '/favicon.ico' },
+  robots: {
+    index: false,
+    follow: false,
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

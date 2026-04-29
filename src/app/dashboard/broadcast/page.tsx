@@ -2,8 +2,10 @@
 import { useState, useEffect } from 'react';
 import { Loader2, AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter';
+import { useSession } from 'next-auth/react';
 
 export default function BroadcastPage() {
+  const { data: session } = useSession();
   const [recipientCount, setRecipientCount] = useState<number | null>(null);
   const [rsvpUrl, setRsvpUrl] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
@@ -12,15 +14,17 @@ export default function BroadcastPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Using local API proxy for security and to leverage NextAuth session
-    fetch(`/api/broadcast/recipient-count`)
+    if (!session) return;
+    fetch(`/api/broadcast/recipient-count`, {
+      headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+    })
       .then(r => {
         if (!r.ok) throw new Error('Failed to fetch count');
         return r.json();
       })
       .then(data => setRecipientCount(data.count ?? 0))
       .catch(() => setRecipientCount(0));
-  }, []);
+  }, [session]);
 
   const handleSend = async () => {
     setLoading(true);
@@ -29,7 +33,10 @@ export default function BroadcastPage() {
     try {
       const res = await fetch(`/api/broadcast/july-tour`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
+        },
         body: JSON.stringify({ rsvpUrl: rsvpUrl || undefined }),
       });
       const data = await res.json();

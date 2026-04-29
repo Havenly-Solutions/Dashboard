@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import Header from '@/components/dashboard/Header'
 import { NGOPartner, NGOStatus } from '@/types'
 import { formatDate } from '@/lib/utils'
+import { useSession } from 'next-auth/react'
 import { CheckCircle, XCircle, Clock, Building2, Plus, X, Loader2 } from 'lucide-react'
 
 const STATUS_STYLES: Record<NGOStatus, string> = {
@@ -17,6 +18,7 @@ const STATUS_ICONS: Record<NGOStatus, React.ReactNode> = {
 }
 
 export default function NGOPortalPage() {
+  const { data: session } = useSession()
   const [partners, setPartners] = useState<NGOPartner[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -25,17 +27,36 @@ export default function NGOPortalPage() {
   const [form, setForm] = useState({ orgName: '', liaisonName: '', orgType: 'Registered NGO', email: '', regNumber: '', operatingRegion: '', missionStatement: '' })
 
   useEffect(() => {
-    fetch('/api/ngo-partners').then(r => r.json()).then(d => { setPartners(Array.isArray(d) ? d : []); setLoading(false) })
-  }, [])
+    if (!session) return
+    fetch('/api/ngo-partners', {
+      headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+    })
+    .then(r => r.json())
+    .then(d => { setPartners(Array.isArray(d) ? d : []); setLoading(false) })
+  }, [session])
 
   async function updateStatus(id: string, status: NGOStatus) {
-    const res = await fetch(`/api/ngo-partners/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
+    const res = await fetch(`/api/ngo-partners/${id}`, { 
+      method: 'PATCH', 
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
+      }, 
+      body: JSON.stringify({ status }) 
+    })
     if (res.ok) setPartners(prev => prev.map(p => p.id === id ? { ...p, status } : p))
   }
 
   async function submitApplication(e: React.FormEvent) {
     e.preventDefault(); setSubmitting(true)
-    const res = await fetch('/api/ngo-partners', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+    const res = await fetch('/api/ngo-partners', { 
+      method: 'POST', 
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
+      }, 
+      body: JSON.stringify(form) 
+    })
     const data = await res.json()
     if (res.ok) { setPartners(prev => [data, ...prev]); setSuccess('Application submitted'); setShowForm(false) }
     setSubmitting(false)
@@ -102,8 +123,12 @@ export default function NGOPortalPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <select value={p.status} onChange={e => updateStatus(p.id, e.target.value as NGOStatus)}
-                        className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#C0392B]">
+                      <select 
+                        title="Update status"
+                        value={p.status} 
+                        onChange={e => updateStatus(p.id, e.target.value as NGOStatus)}
+                        className="text-xs border border-gray-200 rounded-lg px-2 py-1 focus:outline-none focus:border-[#C0392B]"
+                      >
                         <option value="PENDING">Pending</option>
                         <option value="APPROVED">Approve</option>
                         <option value="REJECTED">Reject</option>
@@ -121,7 +146,7 @@ export default function NGOPortalPage() {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-fade-in overflow-y-auto max-h-[90vh]">
               <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="font-display font-bold text-[#1A1A2E] text-lg">Partner Application</h3>
-                <button onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><X size={18} /></button>
+                <button title="Close" onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><X size={18} /></button>
               </div>
               <form onSubmit={submitApplication} className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -141,7 +166,7 @@ export default function NGOPortalPage() {
                   ))}
                   <div className="col-span-2">
                     <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Organisation Type</label>
-                    <select value={form.orgType} onChange={e => setForm(f => ({ ...f, orgType: e.target.value }))}
+                    <select title="Select organization type" value={form.orgType} onChange={e => setForm(f => ({ ...f, orgType: e.target.value }))}
                       className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B]">
                       {['Registered NGO', 'Community Watch', 'First Responder', 'University Safety', 'Government Department'].map(t => <option key={t}>{t}</option>)}
                     </select>

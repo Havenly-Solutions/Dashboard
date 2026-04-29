@@ -6,7 +6,7 @@ const BACKEND_URL = process.env.BACKEND_API_URL || 'http://localhost:3005'
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt', maxAge: 24 * 60 * 60 },
-  pages: { signIn: '/login', error: '/login' },
+  pages: { signIn: '/', error: '/' },
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -46,6 +46,7 @@ export const authOptions: NextAuthOptions = {
             id: user.id, 
             name: user.name, 
             email: user.email, 
+            phone: user.phone,
             role: user.role as Role,
             department: user.department,
             mustChangePassword: user.mustChangePassword,
@@ -63,15 +64,18 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.role = (user as any).role
+        token.phone = (user as any).phone
         token.mustChangePassword = (user as any).mustChangePassword
         if ((user as any).accessToken) {
           token.accessToken = (user as any).accessToken
         }
       }
       
-      // Handle session updates (e.g. after password change)
-      if (trigger === "update" && session?.mustChangePassword === false) {
-        token.mustChangePassword = false
+      // Handle session updates (e.g. name/phone change)
+      if (trigger === "update" && session) {
+        if (session.user?.name) token.name = session.user.name
+        if (session.user?.phone) token.phone = session.user.phone
+        if (session.mustChangePassword === false) token.mustChangePassword = false
       }
       
       return token
@@ -80,6 +84,7 @@ export const authOptions: NextAuthOptions = {
       if (token && session.user) {
         (session.user as any).id = token.id as string
         ;(session.user as any).role = token.role as Role
+        ;(session.user as any).phone = token.phone as string
         ;(session.user as any).mustChangePassword = token.mustChangePassword
         ;(session.user as any).accessToken = token.accessToken as string
       }

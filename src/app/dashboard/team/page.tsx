@@ -22,8 +22,12 @@ export default function TeamPage() {
 
   useEffect(() => {
     if (role !== 'FOUNDER') return
-    fetch('/api/users').then(r => r.json()).then(data => { setUsers(Array.isArray(data) ? data : []); setLoading(false) })
-  }, [role])
+    fetch('/api/users', {
+      headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+    })
+    .then(r => r.json())
+    .then(data => { setUsers(Array.isArray(data) ? data : []); setLoading(false) })
+  }, [role, session])
 
   if (role !== 'FOUNDER') return (
     <div className="flex flex-col flex-1">
@@ -41,11 +45,30 @@ export default function TeamPage() {
   async function inviteUser(e: React.FormEvent) {
     e.preventDefault(); setSubmitting(true); setError(''); setSuccess('')
     try {
-      const res = await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
+      const res = await fetch('/api/team/invite', { 
+        method: 'POST', 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
+        }, 
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          role: form.role,
+          department: form.department
+        }) 
+      })
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Failed'); setSubmitting(false); return }
-      setUsers(prev => [data, ...prev])
-      setSuccess(`${data.name} added successfully`)
+      
+      setSuccess(`Invitation sent to ${form.email}`)
+      // Refresh list
+      const listRes = await fetch('/api/users', {
+        headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+      })
+      const newList = await listRes.json()
+      setUsers(newList)
+      
       setForm({ name: '', email: '', role: Role.PA, department: '', password: '' })
       setShowInvite(false)
     } catch { setError('Network error') }
@@ -53,13 +76,23 @@ export default function TeamPage() {
   }
 
   async function updateStatus(id: string, status: string) {
-    const res = await fetch(`/api/users/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status }) })
+    const res = await fetch(`/api/users/${id}`, { 
+      method: 'PATCH', 
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
+      }, 
+      body: JSON.stringify({ status }) 
+    })
     if (res.ok) setUsers(prev => prev.map(u => u.id === id ? { ...u, status: status as any } : u))
   }
 
   async function deleteUser(id: string) {
     if (!confirm('Remove this team member?')) return
-    const res = await fetch(`/api/users/${id}`, { method: 'DELETE' })
+    const res = await fetch(`/api/users/${id}`, { 
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+    })
     if (res.ok) setUsers(prev => prev.filter(u => u.id !== id))
   }
 

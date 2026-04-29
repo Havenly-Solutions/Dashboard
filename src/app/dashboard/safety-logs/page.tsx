@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Header from '@/components/dashboard/Header'
 import { AuditLog } from '@/types'
+import { useSession } from 'next-auth/react'
 import { formatDateTime } from '@/lib/utils'
 import { Download, ShieldCheck, CheckCircle } from 'lucide-react'
 
@@ -19,6 +20,7 @@ const ACTION_COLORS: Record<string, string> = {
 }
 
 export default function SafetyLogsPage() {
+  const { data: session } = useSession()
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
@@ -27,18 +29,21 @@ export default function SafetyLogsPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!session) return
     async function load() {
       setLoading(true)
       try {
-        const r = await fetch(`/api/audit-logs?page=${page}&filter=${filter}`)
+        const r = await fetch(`/api/audit-logs?page=${page}&filter=${filter}`, {
+          headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+        })
         const data = await r.json()
-        setLogs(data.logs || [])
-        setTotal(data.total || 0)
+        setLogs(Array.isArray(data) ? data : (data.logs || []))
+        setTotal(Array.isArray(data) ? data.length : (data.total || 0))
       } catch (e) { console.error(e) }
       setLoading(false)
     }
     load()
-  }, [page, filter])
+  }, [page, filter, session])
 
   return (
     <div className="flex flex-col flex-1">

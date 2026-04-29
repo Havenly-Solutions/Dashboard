@@ -168,5 +168,22 @@ export interface PreRegistration {
   reviewedAt?: string | null;
   reviewNote?: string | null;
   createdAt: string;
+  createdAt: string;
   updatedAt: string;
+}
+
+export interface ProfileRequest {
+  id: string;
+  userId: string;
+  field: string;
+  oldValue: string;
+  newValue: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  reason?: string;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    name: string;
+    email: string;
+  };
 }

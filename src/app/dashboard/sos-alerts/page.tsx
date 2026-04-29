@@ -2,27 +2,34 @@
 import { useState, useEffect } from 'react'
 import Header from '@/components/dashboard/Header'
 import { Incident, SEVERITY_COLORS } from '@/types'
+import { useSession } from 'next-auth/react'
 import { formatDateTime, formatTimeAgo } from '@/lib/utils'
 import { MapPin, AlertCircle, CheckCircle, Clock } from 'lucide-react'
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
 import TimeAgo from '@/components/dashboard/TimeAgo'
 
 export default function SOSAlertsPage() {
+  const { data: session } = useSession()
   const [incidents, setIncidents] = useState<Incident[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('ALL')
 
   useEffect(() => {
+    if (!session) return
     async function load() {
-      const r = await fetch('/api/incidents')
-      const d = await r.json()
-      setIncidents(Array.isArray(d) ? d : [])
+      try {
+        const r = await fetch('/api/incidents', {
+          headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+        })
+        const res = await r.json()
+        setIncidents(res.data || [])
+      } catch (e) { console.error(e) }
       setLoading(false)
     }
     load()
     const id = setInterval(load, 10000) // Reduced to 10s for more responsive feed
     return () => clearInterval(id)
-  }, [])
+  }, [session])
 
   const filtered = filter === 'ALL' ? incidents : incidents.filter(i => filter === 'ACTIVE' ? i.status === 'ACTIVE' : i.severity === filter)
   const critical = incidents.filter(i => i.severity === 'CRITICAL').length

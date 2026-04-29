@@ -23,14 +23,19 @@ export default function PreRegistrationsPage() {
     try {
       const params = new URLSearchParams({ page: String(page) })
       if (region !== 'All Regions') params.set('region', region)
-      const r = await fetch(`/api/pre-registrations?${params}`)
-      const data = await r.json()
-      setRegistrations(data.registrations || [])
-      setTotal(data.total || 0)
-      setByRegion(data.byRegion || [])
+      const r = await fetch(`/api/pre-registrations?${params}`, {
+        headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+      })
+      const res = await r.json()
+      if (res.success) {
+        setRegistrations(res.data || [])
+        setTotal(res.total || 0)
+        // Note: backend doesn't seem to return byRegion yet, we'll keep it as [] or mock if needed
+        setByRegion(res.byRegion || [])
+      }
     } catch (e) { console.error(e) }
     setLoading(false)
-  }, [page, region])
+  }, [page, region, session])
 
   useEffect(() => { load() }, [load])
 
@@ -112,7 +117,12 @@ export default function PreRegistrationsPage() {
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input value={search} onChange={e => setSearch(e.target.value)} className="bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm w-48 focus:outline-none focus:border-[#C0392B]" placeholder="Search..." />
               </div>
-              <select value={region} onChange={e => { setRegion(e.target.value); setPage(1) }} className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none">
+              <select 
+                title="Filter by region"
+                value={region} 
+                onChange={e => { setRegion(e.target.value); setPage(1) }} 
+                className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none"
+              >
                 {REGIONS.map(r => <option key={r}>{r}</option>)}
               </select>
               <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 bg-[#1A1A2E] text-white rounded-lg text-sm hover:bg-[#0f0f1f] transition-colors">

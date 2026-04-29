@@ -41,16 +41,14 @@ export default function ApprovalsHub() {
   const [processing, setProcessing] = useState<string | null>(null)
   const [filter, setFilter] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING')
 
-  useEffect(() => {
-    fetchRequests()
-  }, [filter])
-
-  async function fetchRequests() {
+  const fetchRequests = useCallback(async () => {
     try {
       const url = filter === 'ALL' 
-        ? '/api/admin/profile-requests' 
-        : `/api/admin/profile-requests?status=${filter}`
-      const res = await fetch(url)
+        ? '/api/profile/admin/profile-requests' 
+        : `/api/profile/admin/profile-requests?status=${filter}`
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+      })
       const data = await res.json()
       setRequests(data)
     } catch (e) {
@@ -58,14 +56,21 @@ export default function ApprovalsHub() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filter, session])
+
+  useEffect(() => {
+    fetchRequests()
+  }, [fetchRequests])
 
   async function handleAction(id: string, status: 'APPROVED' | 'REJECTED', note?: string) {
     setProcessing(id)
     try {
-      const res = await fetch(`/api/admin/profile-requests/${id}`, {
+      const res = await fetch(`/api/profile/admin/profile-requests/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
+        },
         body: JSON.stringify({ status, reviewNote: note || `Actioned by ${session?.user?.name}` })
       })
       if (res.ok) {

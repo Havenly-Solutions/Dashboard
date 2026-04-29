@@ -1,14 +1,15 @@
 'use client'
 import Header from '@/components/dashboard/Header'
+import Link from 'next/link'
 import { FileText, Cpu, Users, BookOpen, Radio, Shield, Globe, ExternalLink } from 'lucide-react'
 
 const CATEGORIES = [
-  { title: 'Hardware Ops', icon: Cpu, count: '19 Documents', desc: 'Deep-dive schematics and maintenance actions for Guardian Node clusters' },
-  { title: 'Chief Training', icon: Users, count: '8 Modules', desc: 'Expert-led video modules covering tactical decision making under pressure' },
-  { title: 'SOP Frameworks', icon: FileText, count: '35 Policies', desc: 'Legal guidelines and Standard Operating Procedures for force and civilian evacuation' },
-  { title: 'Comms Linkage', icon: Radio, count: '12 Schematics', desc: 'Technical data on encrypted satellite-uplink and radio frequency management protocols' },
-  { title: 'Cyber Defense', icon: Shield, count: '24 Guides', desc: 'Best practices for terminal security, biometric access control, and digital counter-measures' },
-  { title: 'Civic Liaison', icon: Globe, count: '16 Templates', desc: 'Templates for community outreach, emergency town hall coordination, and civilian liaison training' },
+  { title: 'Hardware Ops', icon: Cpu, count: '19 Documents', desc: 'Deep-dive schematics and maintenance actions for Guardian Node clusters', slug: 'hardware-ops' },
+  { title: 'Chief Training', icon: Users, count: '8 Modules', desc: 'Expert-led video modules covering tactical decision making under pressure', slug: 'chief-training' },
+  { title: 'SOP Frameworks', icon: FileText, count: '35 Policies', desc: 'Legal guidelines and Standard Operating Procedures for force and civilian evacuation', slug: 'sop-frameworks' },
+  { title: 'Comms Linkage', icon: Radio, count: '12 Schematics', desc: 'Technical data on encrypted satellite-uplink and radio frequency management protocols', slug: 'comms-linkage' },
+  { title: 'Cyber Defense', icon: Shield, count: '24 Guides', desc: 'Best practices for terminal security, biometric access control, and digital counter-measures', slug: 'cyber-defense' },
+  { title: 'Civic Liaison', icon: Globe, count: '16 Templates', desc: 'Templates for community outreach, emergency town hall coordination, and civilian liaison training', slug: 'civic-liaison' },
 ]
 
 const UPDATES = [
@@ -62,8 +63,12 @@ export default function ResourceCentrePage() {
         <div>
           <h3 className="font-display font-bold text-[#1A1A2E] mb-4">Technical Categories</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {CATEGORIES.map(({ title, icon: Icon, count, desc }) => (
-              <div key={title} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-[#C0392B]/30 hover:shadow-md transition-all cursor-pointer group">
+            {CATEGORIES.map(({ title, icon: Icon, count, desc, slug }) => (
+              <Link 
+                key={title} 
+                href={`/dashboard/resource-centre/${slug}`}
+                className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-[#C0392B]/30 hover:shadow-md transition-all cursor-pointer group"
+              >
                 <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-3 group-hover:bg-[#C0392B]/10 transition-colors">
                   <Icon size={18} className="text-gray-400 group-hover:text-[#C0392B] transition-colors" />
                 </div>
@@ -73,7 +78,7 @@ export default function ResourceCentrePage() {
                   <span className="text-gray-300 text-[10px] uppercase tracking-widest">{count}</span>
                   <span className="text-[#C0392B] text-xs font-medium group-hover:underline">View →</span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
