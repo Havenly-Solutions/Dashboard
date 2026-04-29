@@ -32,14 +32,14 @@
 }
 
 .sidebar-nav-item {
-  @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 cursor-pointer;
+  @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 cursor-pointer;
 }
-.sidebar-nav-item:hover { @apply bg-white/10 text-white; }
-.sidebar-nav-item.active { @apply bg-havenly-red text-white; }
-.sidebar-nav-item.inactive { @apply text-white/60; }
+.sidebar-nav-item:hover { @apply bg-gray-50 text-[#1A1A2E]; }
+.sidebar-nav-item.active { @apply bg-[#C0392B] text-white shadow-md shadow-red-500/10; }
+.sidebar-nav-item.inactive { @apply text-gray-400 hover:text-[#1A1A2E]; }
 
 .stat-card {
-  @apply bg-white rounded-xl border border-gray-100 p-5 shadow-sm;
+  @apply bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all duration-300;
 }
 
 .severity-critical { @apply text-red-600 bg-red-50 border border-red-200; }
@@ -60,5 +60,13 @@
 .animate-live { animation: live-pulse 1.5s ease-in-out infinite; }
 
 .text-glow {
-  text-shadow: 0 0 10px rgba(192, 57, 43, 0.4);
+  text-shadow: 0 0 10px rgba(192, 57, 43, 0.3);
+}
+
+.card-gradient {
+  background: linear-gradient(145deg, #ffffff 0%, #f9f9f9 100%);
+}
+
+.havenly-btn-red {
+  @apply px-6 py-2.5 bg-[#C0392B] text-white rounded-xl text-sm font-bold hover:bg-[#a93226] transition-all active:scale-[0.98] shadow-lg shadow-red-500/20;
 }

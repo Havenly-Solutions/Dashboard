@@ -25,7 +25,7 @@ export default function ResourceCentrePage() {
         {/* Featured */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 relative bg-[#1A1A2E] rounded-xl overflow-hidden p-6 flex flex-col justify-end min-h-[180px]">
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} />
+            <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_2px_2px,_white_1px,_transparent_0)] bg-[length:24px_24px]" />
             <span className="relative text-[#C0392B] text-[10px] font-bold uppercase tracking-widest mb-2">Priority Protocol</span>
             <h3 className="relative font-display font-bold text-white text-xl mb-1">Emergency Mesh Failure Framework</h3>
             <p className="relative text-white/40 text-sm">Complete guide for maintaining connectivity during full network isolation. Required reading for all Chief Officers.</p>
@@ -51,7 +51,7 @@ export default function ResourceCentrePage() {
                 <span className="text-white font-semibold text-sm">Training Status</span>
               </div>
               <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-1">
-                <div className="h-full bg-[#C0392B] rounded-full" style={{ width: '68%' }} />
+                <div className="h-full bg-[#C0392B] rounded-full w-[68%]" />
               </div>
               <p className="text-white/30 text-xs">You have 3 mandatory modules pending completion</p>
             </div>

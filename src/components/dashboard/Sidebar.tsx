@@ -48,14 +48,14 @@ export default function Sidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#1A1A2E] z-30 flex items-center justify-between px-4 border-b border-white/10 shadow-sm">
+      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white z-30 flex items-center justify-between px-4 border-b border-gray-100 shadow-sm">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
-            <img src="/logo.png" alt="Havenly Logo" className="w-full h-full object-cover" />
+          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 bg-[#1A1A2E] p-1">
+            <img src="/logo.png" alt="Havenly Logo" className="w-full h-full object-contain" />
           </div>
-          <div className="font-display font-bold text-white text-base leading-none">Havenly Solutions</div>
+          <div className="font-display font-bold text-[#1A1A2E] text-base leading-none">Havenly Solutions</div>
         </div>
-        <button onClick={() => setIsOpen(true)} className="text-white/80 hover:text-white p-2" aria-label="Open menu">
+        <button onClick={() => setIsOpen(true)} className="text-[#1A1A2E]/80 hover:text-[#1A1A2E] p-2" aria-label="Open menu">
           <Menu size={24} />
         </button>
       </div>
@@ -67,27 +67,27 @@ export default function Sidebar() {
 
       {/* Sidebar Container */}
       <aside className={cn(
-        "w-60 min-h-screen bg-[#1A1A2E] flex flex-col fixed left-0 top-0 bottom-0 z-50 transition-transform duration-300 md:translate-x-0 overflow-hidden",
+        "w-64 min-h-screen bg-white border-r border-gray-100 flex flex-col fixed left-0 top-0 bottom-0 z-50 transition-transform duration-300 md:translate-x-0 overflow-hidden",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         {/* Logo */}
-        <div className="px-5 pt-6 pb-5 border-b border-white/10 flex items-center justify-between">
+        <div className="px-5 pt-6 pb-5 border-b border-gray-50 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0">
-              <img src="/logo.png" alt="Havenly Logo" className="w-full h-full object-cover" />
+            <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-[#1A1A2E] p-1.5 shadow-sm">
+              <img src="/logo.png" alt="Havenly Logo" className="w-full h-full object-contain" />
             </div>
             <div>
-              <div className="font-display font-bold text-white text-base leading-none">Havenly Solutions</div>
-              <div className="text-white/30 text-[10px] uppercase tracking-widest mt-0.5">Dashboard</div>
+              <div className="font-display font-black text-[#1A1A2E] text-base leading-none tracking-tight">Havenly Solutions</div>
+              <div className="text-gray-400 text-[10px] uppercase tracking-widest font-bold mt-1">Always On.</div>
             </div>
           </div>
-          <button onClick={() => setIsOpen(false)} className="md:hidden text-white/50 p-1" aria-label="Close menu">
+          <button onClick={() => setIsOpen(false)} className="md:hidden text-gray-400 p-1" aria-label="Close menu">
             <X size={20} />
           </button>
         </div>
 
-        {/* PORTAL SWITCHER — Founder-only view toggle (see PortalSwitcher.tsx) */}
-        <div className="px-3 py-3 border-b border-white/10">
+        {/* PORTAL SWITCHER */}
+        <div className="px-3 py-3 border-b border-gray-50 bg-gray-50/30">
           <PortalSwitcher />
         </div>
 
@@ -106,16 +106,16 @@ export default function Sidebar() {
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 pb-4 space-y-0.5 border-t border-white/10 pt-4">
+        <div className="px-3 pb-4 space-y-0.5 border-t border-gray-50 pt-4 bg-gray-50/10">
           <div className="px-3 py-2 mb-2">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#0B6E4F]" />
-              <span className="text-white/30 text-[10px] uppercase tracking-widest">System Active</span>
+              <div className="w-1.5 h-1.5 rounded-full bg-[#0B6E4F] animate-pulse" />
+              <span className="text-gray-400 text-[10px] uppercase tracking-widest font-bold">System Active</span>
             </div>
             {/* Show effective role label */}
-            <div className="mt-2 pt-2 border-t border-white/10">
-              <p className="text-xs text-white/50 mb-1">Current Role</p>
-              <p className="text-sm text-white font-medium">{ROLE_LABELS[effectiveRole]}</p>
+            <div className="mt-2 pt-2 border-t border-gray-50">
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Clearance</p>
+              <p className="text-sm text-[#1A1A2E] font-black">{ROLE_LABELS[effectiveRole]}</p>
             </div>
           </div>
           <button onClick={() => signOut({ callbackUrl: '/login' })} className="sidebar-nav-item inactive w-full">

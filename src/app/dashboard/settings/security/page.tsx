@@ -26,8 +26,8 @@ export default function SecuritySettingsPage() {
       return
     }
 
-    if (newPassword.length < 8) {
-      setError('Password must be at least 8 characters long')
+    if (newPassword.length < 12) {
+      setError('Password must be at least 12 characters long')
       return
     }
 
@@ -37,7 +37,7 @@ export default function SecuritySettingsPage() {
       const res = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword, newPassword }),
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       })
 
       const data = await res.json()
@@ -111,6 +111,9 @@ export default function SecuritySettingsPage() {
                 className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B]" 
                 placeholder="Confirm new password"
               />
+              <p className="mt-2 text-[10px] text-gray-400 leading-tight">
+                Requirements: Min 12 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character (!@#$%^&*).
+              </p>
             </div>
             
             <div className="pt-2">

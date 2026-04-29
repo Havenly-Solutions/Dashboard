@@ -30,13 +30,24 @@ export default function SettingsPage() {
           <h3 className="font-display font-bold text-[#1A1A2E] mb-4">Profile</h3>
           <form onSubmit={save} className="space-y-4">
             <div>
-              <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Display Name</label>
-              <input value={name} onChange={e => setName(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B]" />
+              <label htmlFor="display-name" className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Display Name</label>
+              <input 
+                id="display-name"
+                value={name} 
+                onChange={e => setName(e.target.value)}
+                placeholder="Enter your name"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B]" 
+              />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Email</label>
-              <input value={user?.email || ''} readOnly className="w-full border border-gray-100 rounded-lg px-3 py-2.5 text-sm bg-gray-50 text-gray-400 cursor-not-allowed" />
+              <label htmlFor="email-field" className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Email</label>
+              <input 
+                id="email-field"
+                value={user?.email || ''} 
+                readOnly 
+                placeholder="Email address"
+                className="w-full border border-gray-100 rounded-lg px-3 py-2.5 text-sm bg-gray-50 text-gray-400 cursor-not-allowed" 
+              />
             </div>
             <div>
               <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Role</label>

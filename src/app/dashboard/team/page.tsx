@@ -139,7 +139,10 @@ export default function TeamPage() {
                     <td className="px-6 py-4 text-gray-500 text-xs">{user.department || '—'}</td>
                     <td className="px-6 py-4 text-gray-400 text-xs">{user.lastLogin ? formatDateTime(user.lastLogin) : 'Never'}</td>
                     <td className="px-6 py-4">
-                      <select value={user.status} onChange={e => updateStatus(user.id, e.target.value)}
+                      <select 
+                        title="Change user status"
+                        value={user.status} 
+                        onChange={e => updateStatus(user.id, e.target.value)}
                         className={`text-[10px] px-2 py-1 rounded border font-bold uppercase cursor-pointer focus:outline-none ${user.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : user.status === 'SUSPENDED' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
                         <option value="ACTIVE">Active</option>
                         <option value="SUSPENDED">Suspended</option>
@@ -148,7 +151,11 @@ export default function TeamPage() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <button onClick={() => deleteUser(user.id)} className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors">
+                        <button 
+                          title="Delete team member"
+                          onClick={() => deleteUser(user.id)} 
+                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                        >
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -165,7 +172,13 @@ export default function TeamPage() {
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fade-in">
               <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="font-display font-bold text-[#1A1A2E] text-lg">Add Team Member</h3>
-                <button onClick={() => setShowInvite(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><X size={18} /></button>
+                <button 
+                  title="Close modal"
+                  onClick={() => setShowInvite(false)} 
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X size={18} />
+                </button>
               </div>
               <form onSubmit={inviteUser} className="p-6 space-y-4">
                 {error && <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">{error}</div>}
@@ -183,9 +196,14 @@ export default function TeamPage() {
                   </div>
                 ))}
                 <div>
-                  <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Role & Portal Access</label>
-                  <select value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value as Role }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B]">
+                  <label htmlFor="role-select" className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Role & Portal Access</label>
+                  <select 
+                    id="role-select"
+                    title="Select team member role"
+                    value={form.role} 
+                    onChange={e => setForm(f => ({ ...f, role: e.target.value as Role }))}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B]"
+                  >
                     {ROLES.map(r => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
                   </select>
                 </div>
