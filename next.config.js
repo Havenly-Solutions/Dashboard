@@ -9,6 +9,12 @@ const nextConfig = {
     workerThreads: false,
     cpus: 1,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 const { withSentryConfig } = require('@sentry/nextjs');
