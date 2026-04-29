@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 import Header from '@/components/dashboard/Header'
 import { PreRegistration } from '@/types'
 import { formatDateTime } from '@/lib/utils'
@@ -10,6 +11,7 @@ const REGIONS = ['All Regions', 'Johannesburg / Gauteng', 'Cape Town / Western C
 const PIE_COLORS = ['#C0392B', '#1A1A2E', '#0B6E4F', '#D4A017', '#6B7280', '#9B59B6']
 
 export default function PreRegistrationsPage() {
+  const { data: session } = useSession()
   const [registrations, setRegistrations] = useState<PreRegistration[]>([])
   const [total, setTotal] = useState(0)
   const [byRegion, setByRegion] = useState<{ region: string; _count: number }[]>([])
