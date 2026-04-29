@@ -3,6 +3,7 @@ import { DM_Sans, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import LoadingScreen from '@/components/ui/LoadingScreen'
+import { Analytics } from '@vercel/analytics/next'
 
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${dmSans.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <LoadingScreen />
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   )
