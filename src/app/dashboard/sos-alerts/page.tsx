@@ -13,23 +13,29 @@ export default function SOSAlertsPage() {
   const [incidents, setIncidents] = useState<Incident[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('ALL')
+  const [page, setPage] = useState(1)
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
     if (!session) return
     async function load() {
       try {
-        const r = await fetch('/api/incidents', {
+        const params = new URLSearchParams({ page: String(page) })
+        if (filter !== 'ALL') params.set('filter', filter)
+        
+        const r = await fetch(`/api/incidents?${params}`, {
           headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
         })
         const res = await r.json()
         setIncidents(res.data || [])
+        setTotal(res.total || (res.data?.length || 0))
       } catch (e) { console.error(e) }
       setLoading(false)
     }
     load()
     const id = setInterval(load, 10000) // Reduced to 10s for more responsive feed
     return () => clearInterval(id)
-  }, [session])
+  }, [session, page, filter])
 
   const filtered = filter === 'ALL' ? incidents : incidents.filter(i => filter === 'ACTIVE' ? i.status === 'ACTIVE' : i.severity === filter)
   const critical = incidents.filter(i => i.severity === 'CRITICAL').length
@@ -91,6 +97,29 @@ export default function SOSAlertsPage() {
                 </div>
               </div>
             ))}
+        </div>
+
+        <div className="flex items-center justify-between px-2 pt-4 border-t border-gray-100">
+          <p className="text-xs text-gray-400 font-medium uppercase tracking-widest">
+            Showing {filtered.length} of {total} results
+          </p>
+          <div className="flex items-center gap-2">
+            <button 
+              disabled={page === 1}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all uppercase tracking-wider"
+            >
+              ← Previous
+            </button>
+            <span className="text-[10px] font-bold text-[#1A1A2E] px-2">{page}</span>
+            <button 
+              disabled={filtered.length < 10}
+              onClick={() => setPage(p => p + 1)}
+              className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all uppercase tracking-wider"
+            >
+              Next →
+            </button>
+          </div>
         </div>
       </main>
     </div>
