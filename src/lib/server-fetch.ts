@@ -2,6 +2,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { NextResponse } from 'next/server'
 
+import { headers as getHeaders } from 'next/headers'
+
 const BACKEND_URL = process.env.BACKEND_API_URL || 'http://localhost:3005'
 
 /**
@@ -15,10 +17,16 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
     return null
   }
 
+  const headersList = getHeaders()
+  const forwardedFor = headersList.get('x-forwarded-for') || ''
+  const userAgent = headersList.get('user-agent') || ''
+
   const url = `${BACKEND_URL}${path}`
   const headers: any = {
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${(session.user as any).accessToken}`,
+    'x-forwarded-for': forwardedFor,
+    'user-agent': userAgent,
     ...options.headers,
   }
 

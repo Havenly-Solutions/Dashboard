@@ -14,13 +14,20 @@ export const authOptions: NextAuthOptions = {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null
 
         try {
+          const forwardedFor = req?.headers?.['x-forwarded-for'] || ''
+          const userAgent = req?.headers?.['user-agent'] || ''
+
           const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+              'Content-Type': 'application/json',
+              'x-forwarded-for': forwardedFor,
+              'user-agent': userAgent
+            },
             body: JSON.stringify({
                email: credentials.email,
                password: credentials.password
