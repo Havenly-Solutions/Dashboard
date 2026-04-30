@@ -42,13 +42,15 @@ export default function ForcePasswordChangeModal() {
       const res = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       })
 
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to update password')
+        // Backend returns { message } on most errors, { error } on auth failures
+        throw new Error(data.message || data.error || `Request failed (${res.status})`)
       }
 
       // The backend clears tokens and expects a re-login
