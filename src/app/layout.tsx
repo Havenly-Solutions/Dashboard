@@ -1,11 +1,7 @@
 import type { Metadata } from 'next'
-import { DM_Sans, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import LoadingScreen from '@/components/ui/LoadingScreen'
-
-const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans' })
-const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://dashboard.havenly.co.za'),
@@ -21,7 +17,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${dmSans.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
         <LoadingScreen />
         <Providers>{children}</Providers>
       </body>
