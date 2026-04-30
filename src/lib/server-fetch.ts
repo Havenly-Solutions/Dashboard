@@ -24,7 +24,7 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
   const url = `${BACKEND_URL}${path}`
   const headers: any = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${(session.user as any).accessToken}`,
+    'Authorization': `Bearer ${(session as any).accessToken}`,
     'x-forwarded-for': forwardedFor,
     'user-agent': userAgent,
     ...options.headers,
@@ -41,7 +41,7 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
     if (response.status === 401 && path !== '/api/auth/refresh') {
       console.log(`[serverFetch] 401 detected on ${path}, attempting refresh...`)
       
-      const refreshToken = (session.user as any).refreshToken
+      const refreshToken = (session as any).refreshToken
 
       if (!refreshToken) {
         console.warn(`[serverFetch] No refresh token available in session for ${path}`)

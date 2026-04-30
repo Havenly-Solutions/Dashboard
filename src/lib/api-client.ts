@@ -18,6 +18,9 @@ function onRrefreshed(token: string) {
 export async function apiClient(path: string, options: RequestInit = {}) {
   const session: any = await getSession();
   
+  if (!session) console.warn('[apiClient] No session found for:', path);
+  else if (!session.accessToken) console.warn('[apiClient] No accessToken in session for:', path);
+
   const headers: any = {
     'Content-Type': 'application/json',
     ...(session?.accessToken ? { 'Authorization': `Bearer ${session.accessToken}` } : {}),
@@ -48,11 +51,13 @@ export async function apiClient(path: string, options: RequestInit = {}) {
             isRefreshing = false;
             onRrefreshed(accessToken);
           } else {
+            console.error('[apiClient] Refresh failed:', refreshRes.status);
             isRefreshing = false;
             signOut({ callbackUrl: '/' });
             throw new Error('Session expired');
           }
         } catch (err) {
+          console.error('[apiClient] Refresh exception:', err);
           isRefreshing = false;
           signOut({ callbackUrl: '/' });
           throw err;

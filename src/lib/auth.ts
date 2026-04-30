@@ -84,21 +84,26 @@ export const authOptions: NextAuthOptions = {
       
       // Handle session updates (e.g. name/phone change)
       if (trigger === "update" && session) {
-        if (session.user?.name) token.name = session.user.name
-        if (session.user?.phone) token.phone = session.user.phone
+        const newName = session.user?.name || session.name;
+        const newPhone = session.user?.phone || session.phone;
+        
+        if (newName) token.name = newName
+        if (newPhone) token.phone = newPhone
         if (session.mustChangePassword === false) token.mustChangePassword = false
       }
       
       return token
     },
     async session({ session, token }) {
-      if (token && session.user) {
-        (session.user as any).id = token.id as string
-        ;(session.user as any).role = token.role as Role
-        ;(session.user as any).phone = token.phone as string
-        ;(session.user as any).mustChangePassword = token.mustChangePassword
-        ;(session.user as any).accessToken = token.accessToken as string
-        ;(session.user as any).refreshToken = token.refreshToken as string
+      if (token) {
+        ;(session as any).accessToken = token.accessToken
+        ;(session as any).refreshToken = token.refreshToken
+        if (session.user) {
+          ;(session.user as any).id = token.id
+          ;(session.user as any).role = token.role
+          ;(session.user as any).phone = token.phone
+          ;(session.user as any).mustChangePassword = token.mustChangePassword
+        }
       }
       return session
     },

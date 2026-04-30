@@ -35,10 +35,7 @@ export default function SettingsPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || data.message || 'Failed to update profile')
       
-      await update({
-        ...session,
-        user: { ...session?.user, name, phone }
-      })
+      await update({ name, phone })
       
       toast.success(data.message || 'Profile updated successfully')
     } catch (err: any) {
