@@ -8,7 +8,7 @@ export default withAuth(
     const pathname = req.nextUrl.pathname
     
     if (!token) {
-      return NextResponse.redirect(new URL('/login', req.url))
+      return NextResponse.redirect(new URL('/', req.url))
     }
 
     /* 
@@ -22,7 +22,7 @@ export default withAuth(
     const permissions = ROLE_PERMISSIONS[role]
 
     if (!permissions) {
-      return NextResponse.redirect(new URL('/login', req.url))
+      return NextResponse.redirect(new URL('/', req.url))
     }
 
     // Founder and Chief Officer bypass

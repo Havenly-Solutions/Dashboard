@@ -25,16 +25,11 @@ export default function RootLoginPage() {
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [step, setStep] = useState(1) // 1: Email, 2: Password (Power BI style)
 
   const countdown = useCountdown(process.env.NEXT_PUBLIC_LAUNCH_DATE || '2026-11-24T00:00:00+02:00')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (step === 1 && email) {
-      setStep(2)
-      return
-    }
 
     setLoading(true)
     try {
@@ -91,54 +86,42 @@ export default function RootLoginPage() {
           </div>
 
           <div className="flex-1">
-            <h2 className="text-2xl font-semibold text-[#333] mb-2">
-              {step === 1 ? 'Sign in' : 'Enter password'}
+            <h2 className="text-2xl font-semibold text-[#333] mb-6">
+              Sign in
             </h2>
-            {step === 2 && (
-              <button
-                onClick={() => setStep(1)}
-                className="text-sm text-[#0067b8] hover:underline mb-6 flex items-center gap-1"
-                title="Go back to email step"
-              >
-                ← {email}
-              </button>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              {step === 1 ? (
-                <div className="animate-in slide-in-from-right-4 duration-300">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="Business Email"
-                    title="Enter your business email"
-                    className="w-full border-b border-[#666] py-2 text-[15px] focus:outline-none focus:border-[#0067b8] transition-colors placeholder-[#666]"
-                  />
-                </div>
-              ) : (
-                <div className="animate-in slide-in-from-right-4 duration-300 relative">
-                  <input
-                    type={showPw ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    autoFocus
-                    placeholder="Password"
-                    title="Enter your password"
-                    className="w-full border-b border-[#666] py-2 text-[15px] focus:outline-none focus:border-[#0067b8] transition-colors placeholder-[#666] pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(!showPw)}
-                    className="absolute right-0 top-2 text-[#666] hover:text-[#333]"
-                    title={showPw ? "Hide password" : "Show password"}
-                  >
-                    {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-              )}
+              <div className="animate-in slide-in-from-right-4 duration-300">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="Business Email"
+                  title="Enter your business email"
+                  className="w-full border-b border-[#666] py-2 text-[15px] focus:outline-none focus:border-[#0067b8] transition-colors placeholder-[#666] mb-6"
+                />
+              </div>
+
+              <div className="animate-in slide-in-from-right-4 duration-300 relative">
+                <input
+                  type={showPw ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  placeholder="Password"
+                  title="Enter your password"
+                  className="w-full border-b border-[#666] py-2 text-[15px] focus:outline-none focus:border-[#0067b8] transition-colors placeholder-[#666] pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-0 top-2 text-[#666] hover:text-[#333]"
+                  title={showPw ? "Hide password" : "Show password"}
+                >
+                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
 
               <div className="flex flex-col gap-4">
                 <NextLink href="/forgot-password">
@@ -152,7 +135,7 @@ export default function RootLoginPage() {
                   disabled={loading}
                   className="bg-[#0067b8] hover:bg-[#005da6] text-white px-10 py-1.5 text-[15px] font-medium transition-colors disabled:opacity-50"
                 >
-                  {loading ? <Loader2 size={18} className="animate-spin" /> : step === 1 ? 'Next' : 'Sign in'}
+                  {loading ? <Loader2 size={18} className="animate-spin" /> : 'Sign in'}
                 </button>
               </div>
             </form>
