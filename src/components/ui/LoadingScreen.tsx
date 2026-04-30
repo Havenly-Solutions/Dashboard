@@ -29,8 +29,17 @@ export default function LoadingScreen() {
         <div className="absolute inset-0 scale-125 opacity-40 bg-[#C0392B] rounded-full animate-heartbeat-inner" />
         
         {/* Main Logo */}
-        <div className="relative animate-heartbeat text-[#1A1A2E] font-display font-bold text-2xl tracking-tighter">
-          HAVENLY SOLUTIONS
+        <div className="relative animate-heartbeat flex flex-col items-center">
+          <Image 
+            src="/favicon.ico" 
+            alt="Havenly Logo" 
+            width={80} 
+            height={80} 
+            className="mb-4 object-contain" 
+          />
+          <div className="text-[#1A1A2E] font-display font-bold text-2xl tracking-tighter uppercase">
+            HAVENLY SOLUTIONS
+          </div>
         </div>
       </div>
 

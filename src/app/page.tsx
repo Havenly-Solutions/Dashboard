@@ -85,7 +85,7 @@ export default function RootLoginPage() {
         <div className="flex-1 p-8 md:p-12 flex flex-col">
           <div className="flex items-center gap-2 mb-10">
             <div className="w-8 h-8 bg-[#1A1A2E] rounded flex items-center justify-center p-1.5 relative">
-              <Image src="/logo.png" alt="Havenly Logo" fill className="object-contain p-1.5" />
+              <Image src="/favicon.ico" alt="Havenly Logo" fill className="object-contain p-1.5" />
             </div>
             <span className="font-display font-bold text-[#666] text-sm uppercase tracking-wider">Havenly Solutions</span>
           </div>
@@ -160,10 +160,10 @@ export default function RootLoginPage() {
 
           <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <NextLink href="https://havenly.solutions/terms-of-service">
+              <NextLink href="https://havenly.solutions/Terms">
                 <span className="text-[12px] text-[#666] hover:underline cursor-pointer">Terms of use</span>
               </NextLink>
-              <NextLink href="https://havenly.solutions/privacy-policy">
+              <NextLink href="https://havenly.solutions/PrivacyPolicy">
                 <span className="text-[12px] text-[#666] hover:underline cursor-pointer">Privacy & cookies</span>
               </NextLink>
             </div>
