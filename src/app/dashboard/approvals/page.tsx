@@ -122,7 +122,7 @@ export default function ApprovalsHub() {
 
         {/* Filter Controls */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center bg-white border border-gray-100 rounded-lg p-1 shadow-sm">
+          <div className="flex items-center glass-card border border-gray-100 rounded-lg p-1 shadow-sm">
             {['PENDING', 'APPROVED', 'REJECTED', 'ALL'].map((f) => (
               <button
                 key={f}
@@ -142,7 +142,7 @@ export default function ApprovalsHub() {
              <div className="relative">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input 
-                  className="bg-white border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-xs text-gray-600 placeholder-gray-400 focus:outline-none focus:border-[#C0392B] w-64 shadow-sm"
+                  className="glass-card border border-gray-200 rounded-lg pl-9 pr-4 py-2 text-xs text-gray-600 placeholder-gray-400 focus:outline-none focus:border-[#C0392B] w-64 shadow-sm"
                   placeholder="Seach Personnel..." 
                 />
              </div>
@@ -152,19 +152,19 @@ export default function ApprovalsHub() {
         {/* Request Feed */}
         <div className="grid gap-4">
           {loading ? (
-             <div className="bg-white rounded-xl border border-gray-100 p-12 text-center shadow-sm">
+             <div className="glass-card rounded-xl border border-gray-100 p-12 text-center shadow-sm">
                 <div className="flex justify-center mb-4">
                   <div className="w-6 h-6 border-2 border-[#C0392B] border-t-transparent rounded-full animate-spin" />
                 </div>
                 <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Synchronizing Identity Vault...</p>
              </div>
           ) : requests.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-100 p-12 text-center shadow-sm">
+            <div className="glass-card rounded-xl border border-gray-100 p-12 text-center shadow-sm">
               <CheckCircle2 size={32} className="text-emerald-500 mx-auto mb-4 opacity-20" />
               <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Identity Status: Stable. No pending requests.</p>
             </div>
           ) : requests.map((request) => (
-            <div key={request.id} className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden group hover:border-[#C0392B]/20 transition-all">
+            <div key={request.id} className="glass-card  overflow-hidden group hover:border-[#C0392B]/20 transition-all">
               <div className="flex items-center">
                 {/* Profile Meta */}
                 <div className="px-6 py-5 border-r border-gray-50 min-w-[240px]">
@@ -224,7 +224,7 @@ export default function ApprovalsHub() {
                       <button 
                         onClick={() => handleAction(request.id, 'REJECTED')}
                         disabled={!!processing}
-                        className="p-2.5 bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition-all disabled:opacity-50"
+                        className="p-2.5 glass-card border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-100 hover:bg-red-50 transition-all disabled:opacity-50"
                         title="Reject Change"
                       >
                         <X size={18} />

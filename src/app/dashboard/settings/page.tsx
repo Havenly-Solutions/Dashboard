@@ -58,7 +58,7 @@ export default function SettingsPage() {
         {saved && <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm animate-fade-in">Settings saved successfully</div>}
         {error && <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm animate-fade-in">{error}</div>}
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div className="glass-card">
           <h3 className="font-display font-bold text-[#1A1A2E] mb-4">Profile</h3>
           <form onSubmit={save} className="space-y-4">
             <div>
@@ -102,7 +102,7 @@ export default function SettingsPage() {
           </form>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div className="glass-card">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="font-display font-bold text-[#1A1A2E] mb-1">Security & Access</h3>
@@ -114,7 +114,7 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+        <div className="glass-card">
           <h3 className="font-display font-bold text-[#1A1A2E] mb-1">System</h3>
           <p className="text-xs text-gray-400 mb-4">Command Centre build info</p>
           <div className="space-y-2 text-sm">

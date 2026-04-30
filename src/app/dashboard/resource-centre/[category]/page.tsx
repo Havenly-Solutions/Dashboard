@@ -41,9 +41,9 @@ export default function CategoryDetailPage() {
           <ChevronLeft size={16} /> Back to Library
         </button>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass-card rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Header Area */}
-          <div className="p-8 border-b border-gray-100 bg-white flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="p-8 border-b border-gray-100 glass-card flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-5">
               <div className="w-16 h-16 bg-[#F2F2F2] rounded-2xl flex items-center justify-center text-[#C0392B]">
                 <Icon size={32} />

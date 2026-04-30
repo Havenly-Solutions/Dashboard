@@ -70,7 +70,7 @@ export default function SafetyLogsPage() {
 
         {/* Actions */}
         <div className="flex items-center justify-between">
-          <div className="flex gap-1 bg-white rounded-lg border border-gray-200 p-1">
+          <div className="flex gap-1 glass-card rounded-lg border border-gray-200 p-1">
             {CATEGORIES.map(c => (
               <button key={c} onClick={() => setFilter(c)} className={`px-3 py-1.5 text-sm rounded-md font-medium transition-colors ${filter === c ? 'bg-[#1A1A2E] text-white' : 'text-gray-500 hover:text-gray-700'}`}>
                 {c}
@@ -78,14 +78,14 @@ export default function SafetyLogsPage() {
             ))}
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex gap-1 bg-white rounded-lg border border-gray-200 p-1">
+            <div className="flex gap-1 glass-card rounded-lg border border-gray-200 p-1">
               {DATE_FILTERS.map(d => (
                 <button key={d} onClick={() => setDateFilter(d)} className={`px-3 py-1.5 text-xs rounded-md font-medium transition-colors ${dateFilter === d ? 'bg-gray-100 text-gray-700' : 'text-gray-400'}`}>
                   {d}
                 </button>
               ))}
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 glass-card border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">
               <Download size={14} />Export Audit
             </button>
             <button className="flex items-center gap-2 px-4 py-2 bg-[#1A1A2E] text-white rounded-lg text-sm hover:bg-[#0f0f1f] transition-colors">
@@ -95,7 +95,7 @@ export default function SafetyLogsPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="glass-card  overflow-hidden">
           <table className="w-full text-sm">
             <thead><tr className="text-xs text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
               {['Timestamp (UTC+2)', 'Event Category', 'Description', 'Initiator', 'Integrity Hash', 'Status'].map(h => (
@@ -134,7 +134,7 @@ export default function SafetyLogsPage() {
         </div>
 
         {/* Integrity Policy */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-6 py-4 flex items-center justify-between">
+        <div className="glass-card  px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#1A1A2E] rounded-lg flex items-center justify-center">
               <ShieldCheck size={16} className="text-white" />

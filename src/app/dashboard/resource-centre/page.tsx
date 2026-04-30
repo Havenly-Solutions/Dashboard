@@ -35,7 +35,7 @@ export default function ResourceCentrePage() {
             </button>
           </div>
           <div className="space-y-4">
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+            <div className="glass-card  p-4">
               <h4 className="font-semibold text-[#1A1A2E] text-sm mb-3">Platform Updates</h4>
               <div className="space-y-2">
                 {UPDATES.map(u => (
@@ -51,7 +51,7 @@ export default function ResourceCentrePage() {
                 <BookOpen size={14} className="text-[#C0392B]" />
                 <span className="text-white font-semibold text-sm">Training Status</span>
               </div>
-              <div className="h-2 bg-white/10 rounded-full overflow-hidden mb-1">
+              <div className="h-2 glass-card/10 rounded-full overflow-hidden mb-1">
                 <div className="h-full bg-[#C0392B] rounded-full w-[68%]" />
               </div>
               <p className="text-white/30 text-xs">You have 3 mandatory modules pending completion</p>
@@ -67,7 +67,7 @@ export default function ResourceCentrePage() {
               <Link 
                 key={title} 
                 href={`/dashboard/resource-centre/${slug}`}
-                className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:border-[#C0392B]/30 hover:shadow-md transition-all cursor-pointer group"
+                className="glass-card  p-5 hover:border-[#C0392B]/30 hover:shadow-md transition-all cursor-pointer group"
               >
                 <div className="w-10 h-10 bg-gray-50 rounded-lg flex items-center justify-center mb-3 group-hover:bg-[#C0392B]/10 transition-colors">
                   <Icon size={18} className="text-gray-400 group-hover:text-[#C0392B] transition-colors" />

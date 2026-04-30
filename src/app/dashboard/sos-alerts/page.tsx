@@ -65,7 +65,7 @@ export default function SOSAlertsPage() {
         <div className="flex gap-2">
           {['ALL', 'ACTIVE', 'CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${filter === f ? 'bg-[#1A1A2E] text-white' : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
+              className={`px-3 py-1.5 text-xs rounded-lg font-medium transition-colors ${filter === f ? 'bg-[#1A1A2E] text-white' : 'glass-card border border-gray-200 text-gray-500 hover:bg-gray-50'}`}>
               {f}
             </button>
           ))}
@@ -75,7 +75,7 @@ export default function SOSAlertsPage() {
           {loading ? <div className="text-center py-8 text-gray-400">Loading alerts...</div>
             : filtered.length === 0 ? <div className="text-center py-8 text-gray-400">No incidents found</div>
             : filtered.map(incident => (
-              <div key={incident.id} className={`bg-white rounded-xl border shadow-sm p-5 animate-fade-in ${incident.severity === 'CRITICAL' ? 'border-red-200' : 'border-gray-100'}`}>
+              <div key={incident.id} className={`glass-card rounded-xl border shadow-sm p-5 animate-fade-in ${incident.severity === 'CRITICAL' ? 'border-red-200' : 'border-gray-100'}`}>
                 <div className="flex items-start gap-4">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${incident.severity === 'CRITICAL' ? 'bg-red-50' : incident.severity === 'HIGH' ? 'bg-amber-50' : 'bg-blue-50'}`}>
                     <AlertCircle size={20} className={incident.severity === 'CRITICAL' ? 'text-red-500' : incident.severity === 'HIGH' ? 'text-amber-500' : 'text-blue-500'} />
@@ -107,7 +107,7 @@ export default function SOSAlertsPage() {
             <button 
               disabled={page === 1}
               onClick={() => setPage(p => Math.max(1, p - 1))}
-              className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all uppercase tracking-wider"
+              className="px-3 py-1.5 glass-card border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all uppercase tracking-wider"
             >
               ← Previous
             </button>
@@ -115,7 +115,7 @@ export default function SOSAlertsPage() {
             <button 
               disabled={filtered.length < 10}
               onClick={() => setPage(p => p + 1)}
-              className="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all uppercase tracking-wider"
+              className="px-3 py-1.5 glass-card border border-gray-200 rounded-lg text-[10px] font-bold text-gray-600 hover:bg-gray-50 disabled:opacity-30 transition-all uppercase tracking-wider"
             >
               Next →
             </button>

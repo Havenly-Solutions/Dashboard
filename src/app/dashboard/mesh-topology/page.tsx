@@ -49,7 +49,7 @@ export default function MeshTopologyPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="lg:col-span-2 glass-card  overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-display font-bold text-[#1A1A2E]">Topological Logs</h3>
               <div className="flex items-center gap-2">
@@ -79,7 +79,7 @@ export default function MeshTopologyPage() {
 
           <div className="space-y-4">
             {selected ? (
-              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+              <div className="glass-card  p-5">
                 <h3 className="font-display font-bold text-[#1A1A2E] mb-4">Selected Node: {selected.name}</h3>
                 <div className="space-y-3 text-sm">
                   {[
@@ -102,7 +102,7 @@ export default function MeshTopologyPage() {
                 </button>
               </div>
             ) : (
-              <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 text-center text-gray-400 text-sm">
+              <div className="glass-card  p-5 text-center text-gray-400 text-sm">
                 <Activity size={32} className="mx-auto mb-2 text-gray-200" />
                 Click a node to view details
               </div>
@@ -111,7 +111,7 @@ export default function MeshTopologyPage() {
               <div className="text-white/40 text-xs uppercase tracking-widest mb-3">Optimisation Suite</div>
               <div className="grid grid-cols-2 gap-2">
                 {['Auto-Heal', 'Balancing', 'Sync Keys', 'Power Save'].map(a => (
-                  <button key={a} className="px-3 py-2.5 bg-white/5 text-white/70 text-xs rounded-lg hover:bg-white/10 transition-colors font-medium">{a}</button>
+                  <button key={a} className="px-3 py-2.5 glass-card/5 text-white/70 text-xs rounded-lg hover:glass-card/10 transition-colors font-medium">{a}</button>
                 ))}
               </div>
             </div>

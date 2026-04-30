@@ -92,7 +92,7 @@ export default function NGOPortalPage() {
           </button>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="glass-card !p-0 overflow-hidden">
           <table className="w-full text-sm">
             <thead><tr className="text-xs text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
               {['Organisation', 'Type', 'Liaison', 'Region', 'Applied', 'Status', 'Actions'].map(h =>
@@ -143,7 +143,7 @@ export default function NGOPortalPage() {
 
         {showForm && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg animate-fade-in overflow-y-auto max-h-[90vh]">
+            <div className="portal-container rounded-2xl shadow-2xl w-full max-w-lg animate-fade-in overflow-y-auto max-h-[90vh]">
               <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="font-display font-bold text-[#1A1A2E] text-lg">Partner Application</h3>
                 <button title="Close" onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors"><X size={18} /></button>

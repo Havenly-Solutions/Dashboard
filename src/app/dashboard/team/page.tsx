@@ -126,7 +126,7 @@ export default function TeamPage() {
         </div>
 
         {/* Role portal descriptions */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+        <div className="glass-card mb-6">
           <h3 className="font-display font-semibold text-[#1A1A2E] text-sm mb-4">Portal Access by Role</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {([
@@ -147,7 +147,7 @@ export default function TeamPage() {
         </div>
 
         {/* Team table */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="glass-card !p-0 overflow-hidden">
           <table className="w-full text-sm">
             <thead><tr className="text-xs text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
               {['Member', 'Role', 'Department', 'Last Login', 'Status', 'Actions'].map(h => <th key={h} className="text-left px-6 py-3 font-medium">{h}</th>)}
@@ -203,7 +203,7 @@ export default function TeamPage() {
         {/* Invite Modal */}
         {showInvite && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-fade-in">
+            <div className="portal-container rounded-2xl shadow-2xl w-full max-w-md animate-fade-in">
               <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
                 <h3 className="font-display font-bold text-[#1A1A2E] text-lg">Add Team Member</h3>
                 <button 

@@ -6,7 +6,7 @@ const BACKEND_URL = process.env.BACKEND_API_URL || 'http://localhost:3005'
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt', maxAge: 24 * 60 * 60 },
-  pages: { signIn: '/', error: '/' },
+  pages: { signIn: '/', error: '/', signOut: '/' },
   providers: [
     CredentialsProvider({
       name: 'credentials',

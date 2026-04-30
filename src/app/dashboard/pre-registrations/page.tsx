@@ -86,7 +86,7 @@ export default function PreRegistrationsPage() {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <div className="glass-card  p-5">
             <h3 className="font-display font-semibold text-[#1A1A2E] text-sm mb-4">Registrations by Region</h3>
             <ResponsiveContainer width="100%" height={180}>
               <BarChart data={byRegion.slice(0, 6).map(r => ({ name: r.region.split('/')[0].trim(), count: r._count }))} barSize={20}>
@@ -97,7 +97,7 @@ export default function PreRegistrationsPage() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+          <div className="glass-card  p-5">
             <h3 className="font-display font-semibold text-[#1A1A2E] text-sm mb-4">Distribution</h3>
             <ResponsiveContainer width="100%" height={180}>
               <PieChart>
@@ -111,7 +111,7 @@ export default function PreRegistrationsPage() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
+        <div className="glass-card ">
           <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between flex-wrap gap-3">
             <h3 className="font-display font-bold text-[#1A1A2E] text-base">All Registrations</h3>
             <div className="flex items-center gap-3">

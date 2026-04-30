@@ -119,7 +119,7 @@ export default function Sidebar() {
               <p className="text-sm text-[#1A1A2E] font-black">{ROLE_LABELS[effectiveRole]}</p>
             </div>
           </div>
-          <button onClick={() => signOut({ callbackUrl: '/login' })} className="sidebar-nav-item inactive w-full">
+          <button onClick={() => signOut({ callbackUrl: '/' })} className="sidebar-nav-item inactive w-full">
             <LogOut size={16} />
             <span>Log Out</span>
           </button>

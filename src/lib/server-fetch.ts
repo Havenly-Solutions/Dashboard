@@ -54,6 +54,11 @@ export async function apiProxy(req: Request, path: string) {
     return NextResponse.json({ error: 'Failed to reach backend' }, { status: 502 })
   }
 
-  const data = await res.json()
-  return NextResponse.json(data, { status: res.status })
+  const text = await res.text()
+  try {
+    const data = JSON.parse(text)
+    return NextResponse.json(data, { status: res.status })
+  } catch (e) {
+    return NextResponse.json({ error: text || 'Unknown backend error' }, { status: res.status })
+  }
 }

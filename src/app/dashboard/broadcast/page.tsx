@@ -60,7 +60,7 @@ export default function BroadcastPage() {
         </p>
       </header>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8 transition-all hover:shadow-md">
+      <div className="glass-card  p-6 mb-8 transition-all hover:shadow-md">
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Eligible Recipients</p>
         <div className="text-4xl font-black text-[#1A1A2E]">
           {recipientCount === null ? (
@@ -81,7 +81,7 @@ export default function BroadcastPage() {
           value={rsvpUrl}
           onChange={e => setRsvpUrl(e.target.value)}
           placeholder="https://havenly.solutions/july-tour"
-          className="w-full bg-white border border-gray-100 rounded-xl px-4 py-3 text-[#1A1A2E] placeholder-gray-300 focus:outline-none focus:border-[#C0392B] transition-colors font-medium"
+          className="w-full glass-card border border-gray-100 rounded-xl px-4 py-3 text-[#1A1A2E] placeholder-gray-300 focus:outline-none focus:border-[#C0392B] transition-colors font-medium"
         />
         <p className="text-[10px] text-gray-500 mt-2">Leave blank to use the default campaign destination.</p>
       </div>
@@ -131,7 +131,7 @@ export default function BroadcastPage() {
             </button>
             <button
               onClick={() => setShowConfirm(false)}
-              className="bg-white border border-gray-100 text-gray-500 hover:bg-gray-50 font-bold py-3 rounded-xl transition-colors shadow-sm"
+              className="glass-card border border-gray-100 text-gray-500 hover:bg-gray-50 font-bold py-3 rounded-xl transition-colors shadow-sm"
             >
               Cancel
             </button>

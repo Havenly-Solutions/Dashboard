@@ -63,7 +63,7 @@ export default function LiveFeedPage() {
             { label: 'NGO Partners', value: stats.totalNGOs, isNum: true, sub: 'Ready for Dispatch', icon: Users, color: 'text-blue-600', dot: 'bg-blue-500' },
             { label: 'SAPS API Status', value: 'SYNCED', sub: 'Evidence Link Active', icon: Shield, color: 'text-havenly-red', dark: true },
           ].map(({ label, value, isNum, sub, icon: Icon, color, dot, dark }) => (
-            <div key={label} className={`rounded-xl border p-4 transition-all hover:shadow-md ${dark ? 'bg-havenly-navy border-havenly-navy' : 'bg-white border-gray-100'}`}>
+            <div key={label} className={`rounded-xl border p-4 transition-all hover:shadow-md ${dark ? 'bg-havenly-navy border-havenly-navy' : 'glass-card border-gray-100'}`}>
               <div className="flex items-start justify-between mb-3">
                 <span className={`text-[10px] uppercase tracking-widest font-bold ${dark ? 'text-white/40' : 'text-gray-400'}`}>{label}</span>
                 <Icon size={16} className={dark ? 'text-havenly-red' : color} />
@@ -82,7 +82,7 @@ export default function LiveFeedPage() {
         {/* Main grid */}
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Incident Feed */}
-          <div className="xl:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="xl:col-span-2 glass-card  overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center gap-3">
                 <div className="w-2 h-2 rounded-full bg-havenly-red animate-pulse" />
@@ -121,7 +121,7 @@ export default function LiveFeedPage() {
           {/* Right column */}
           <div className="space-y-6">
             {/* Engagement Depth */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <div className="glass-card  p-6">
               <div className="flex items-center justify-between mb-6">
                 <span className="font-display font-bold text-havenly-navy text-xs uppercase tracking-wider">Engagement Depth</span>
                 <span className="text-[9px] bg-havenly-red text-white px-2 py-0.5 rounded font-bold">LIVE</span>
@@ -165,7 +165,7 @@ export default function LiveFeedPage() {
                     { label: 'Export Evidence Chain', icon: Shield, primary: false },
                     { label: 'Review NGO Credentials', icon: Eye, primary: false },
                   ].map(({ label, icon: Icon, primary }) => (
-                    <button key={label} className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-xs font-bold transition-all ${primary ? 'bg-havenly-red text-white hover:bg-havenly-red shadow-lg shadow-havenly-red/20' : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'}`}>
+                    <button key={label} className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-xs font-bold transition-all ${primary ? 'bg-havenly-red text-white hover:bg-havenly-red shadow-lg shadow-havenly-red/20' : 'glass-card/5 text-white/70 hover:glass-card/10 border border-white/10'}`}>
                       <span>{label}</span>
                       <Icon size={14} />
                     </button>
@@ -177,7 +177,7 @@ export default function LiveFeedPage() {
         </div>
 
         {/* Audit Log Preview */}
-        <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="glass-card  overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
             <div>
               <h3 className="font-display font-bold text-havenly-navy text-sm tracking-tight">System Integrity Audit</h3>
