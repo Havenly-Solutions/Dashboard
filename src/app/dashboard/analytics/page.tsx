@@ -46,12 +46,22 @@ export default function AnalyticsPage() {
   }
 
   useEffect(() => {
+    let stopped = false
+
     async function load() {
       try {
-        // Use local API proxy instead of direct backend fetch to avoid 401 and CORS issues
         const r = await fetch(`/api/analytics`)
-        const d = await r.json()
+        
+        // Stop polling on auth errors — don't hammer the backend on 401/429
+        if (r.status === 401 || r.status === 403) {
+          console.warn('[Analytics] Auth error — stopping poll. Please refresh the page.')
+          stopped = true
+          return
+        }
+        
+        if (!r.ok) return
 
+        const d = await r.json()
         setStats(prev => ({
           ...prev,
           totalRegs: d.totalRegs ?? 0,
@@ -69,9 +79,10 @@ export default function AnalyticsPage() {
         setLoading(false)
       }
     }
+
     load()
-    // Polling every 30s
-    const id = setInterval(load, 30000)
+    // Poll every 30s only if not stopped due to auth error
+    const id = setInterval(() => { if (!stopped) load() }, 30000)
     return () => clearInterval(id)
   }, [])
 
