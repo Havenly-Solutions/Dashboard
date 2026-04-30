@@ -163,7 +163,7 @@ export default function RootLoginPage() {
               <NextLink href="https://havenly.solutions/Terms">
                 <span className="text-[12px] text-[#666] hover:underline cursor-pointer">Terms of use</span>
               </NextLink>
-              <NextLink href="https://havenly.solutions/PrivacyPolicy">
+              <NextLink href="https://havenly.solutions/Privacypolicy">
                 <span className="text-[12px] text-[#666] hover:underline cursor-pointer">Privacy & cookies</span>
               </NextLink>
             </div>
