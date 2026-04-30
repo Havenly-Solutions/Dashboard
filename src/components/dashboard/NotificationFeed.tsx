@@ -6,7 +6,7 @@ import { Bell, X, Check, Info, AlertTriangle, Clock } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
-import { TimeAgo } from './TimeAgo'
+import TimeAgo from './TimeAgo'
 
 interface Notification {
   id: string
