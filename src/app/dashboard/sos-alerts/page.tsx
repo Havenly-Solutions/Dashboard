@@ -5,6 +5,7 @@ import { Incident, SEVERITY_COLORS } from '@/types'
 import { useSession } from 'next-auth/react'
 import { formatDateTime, formatTimeAgo } from '@/lib/utils'
 import { MapPin, AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import { toast } from 'sonner'
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
 import TimeAgo from '@/components/dashboard/TimeAgo'
 
@@ -95,6 +96,53 @@ export default function SOSAlertsPage() {
                   </div>
                   <div className="text-xs text-gray-400">{formatDateTime(incident.createdAt)}</div>
                 </div>
+                
+                {['FOUNDER', 'CHIEF_OFFICER', 'MANAGER', 'SECURITY', 'POLICE'].includes((session?.user as any)?.role) && incident.status === 'ACTIVE' && (
+                  <div className="mt-4 pt-4 border-t border-gray-50 flex justify-end gap-2">
+                    <button 
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`/api/incidents/${incident.id}/status`, {
+                            method: 'PATCH',
+                            headers: { 
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${(session?.user as any)?.accessToken}` 
+                            },
+                            body: JSON.stringify({ status: 'RESOLVED' })
+                          });
+                          if (res.ok) {
+                            setIncidents(prev => prev.map(i => i.id === incident.id ? { ...i, status: 'RESOLVED' } : i));
+                            toast.success('Incident marked as RESOLVED');
+                          }
+                        } catch (e) { toast.error('Failed to update status'); }
+                      }}
+                      className="px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-100 transition-colors"
+                    >
+                      Mark Resolved
+                    </button>
+                    <button 
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(`/api/incidents/${incident.id}/status`, {
+                            method: 'PATCH',
+                            headers: { 
+                              'Content-Type': 'application/json',
+                              'Authorization': `Bearer ${(session?.user as any)?.accessToken}` 
+                            },
+                            body: JSON.stringify({ status: 'DISMISSED' })
+                          });
+                          if (res.ok) {
+                            setIncidents(prev => prev.map(i => i.id === incident.id ? { ...i, status: 'DISMISSED' } : i));
+                            toast.success('Incident DISMISSED');
+                          }
+                        } catch (e) { toast.error('Failed to update status'); }
+                      }}
+                      className="px-3 py-1.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-gray-100 transition-colors"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
         </div>

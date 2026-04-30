@@ -26,18 +26,18 @@ export interface DashboardUser {
 }
 
 export const ROLE_PERMISSIONS: Record<string, string[]> = {
-  [Role.GUEST]: ["/dashboard", "/dashboard/settings", "/dashboard/resource-centre"],
-  [Role.FREE]: ["/dashboard", "/dashboard/settings", "/dashboard/resource-centre"],
-  [Role.PRO]: ["/dashboard", "/dashboard/incidents", "/dashboard/settings", "/dashboard/resource-centre"],
-  [Role.NGO_GOLD]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/ngo-portal", "/dashboard/settings"],
-  [Role.ADMIN]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/mesh-topology", "/dashboard/safety-logs", "/dashboard/ngo-portal", "/dashboard/pre-registrations", "/dashboard/analytics", "/dashboard/broadcast", "/dashboard/settings"],
+  [Role.GUEST]: ["/dashboard", "/dashboard/settings", "/dashboard/resource-centre", "/dashboard/support-tickets"],
+  [Role.FREE]: ["/dashboard", "/dashboard/settings", "/dashboard/resource-centre", "/dashboard/support-tickets"],
+  [Role.PRO]: ["/dashboard", "/dashboard/incidents", "/dashboard/settings", "/dashboard/resource-centre", "/dashboard/support-tickets"],
+  [Role.NGO_GOLD]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/ngo-portal", "/dashboard/settings", "/dashboard/support-tickets"],
+  [Role.ADMIN]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/mesh-topology", "/dashboard/safety-logs", "/dashboard/ngo-portal", "/dashboard/pre-registrations", "/dashboard/analytics", "/dashboard/broadcast", "/dashboard/settings", "/dashboard/support-tickets"],
   [Role.FOUNDER]: ["*"],
   [Role.CHIEF_OFFICER]: ["*"],
-  [Role.PA]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/approvals", "/dashboard/settings"],
-  [Role.MANAGER]: ["/dashboard", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/settings"],
-  [Role.DEVELOPER]: ["/dashboard", "/dashboard/mesh-topology", "/dashboard/analytics", "/dashboard/settings"],
-  [Role.INVESTOR]: ["/dashboard", "/dashboard/analytics", "/dashboard/settings"],
-  [Role.NGO_PARTNER]: ["/dashboard/ngo-portal", "/dashboard/settings"],
+  [Role.PA]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/approvals", "/dashboard/settings", "/dashboard/support-tickets"],
+  [Role.MANAGER]: ["/dashboard", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/settings", "/dashboard/support-tickets"],
+  [Role.DEVELOPER]: ["/dashboard", "/dashboard/mesh-topology", "/dashboard/analytics", "/dashboard/settings", "/dashboard/support-tickets"],
+  [Role.INVESTOR]: ["/dashboard", "/dashboard/analytics", "/dashboard/settings", "/dashboard/support-tickets"],
+  [Role.NGO_PARTNER]: ["/dashboard/ngo-portal", "/dashboard/settings", "/dashboard/support-tickets"],
 }
 
 export const ROLE_LABELS: Record<string, string> = {
@@ -179,6 +179,22 @@ export interface ProfileRequest {
   newValue: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   reason?: string;
+  createdAt: string;
+  updatedAt: string;
+  user?: {
+    name: string;
+    email: string;
+  };
+}
+
+export interface SupportTicket {
+  id: string;
+  userId: string;
+  subject: string;
+  message: string;
+  category: 'HARDWARE' | 'SOFTWARE' | 'PROTOCOL' | 'SECURITY' | 'OTHER';
+  status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
+  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
   createdAt: string;
   updatedAt: string;
   user?: {

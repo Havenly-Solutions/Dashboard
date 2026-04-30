@@ -9,6 +9,7 @@ import NextLink from 'next/link'
 import Image from 'next/image'
 
 import * as Sentry from '@sentry/nextjs'
+import { toast } from 'sonner'
 
 export default function RootLoginPage() {
   const { data: session, status } = useSession()
@@ -24,7 +25,6 @@ export default function RootLoginPage() {
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [step, setStep] = useState(1) // 1: Email, 2: Password (Power BI style)
 
   const countdown = useCountdown(process.env.NEXT_PUBLIC_LAUNCH_DATE || '2026-11-24T00:00:00+02:00')
@@ -37,7 +37,6 @@ export default function RootLoginPage() {
     }
 
     setLoading(true)
-    setError('')
     try {
       const res = await signIn('credentials', { email, password, redirect: false })
       if (res?.error) {
@@ -48,9 +47,10 @@ export default function RootLoginPage() {
             Sentry.captureMessage(`Sign in failed: ${res.error}`);
           });
         }
-        setError(res.error === 'CredentialsSignin' ? 'Invalid email or password' : res.error)
+        toast.error(res.error === 'CredentialsSignin' ? 'Invalid email or password' : res.error)
         setLoading(false)
       } else {
+        toast.success('Login successful. Redirecting...')
         router.push('/dashboard')
       }
     } catch (err) {
@@ -59,7 +59,7 @@ export default function RootLoginPage() {
         scope.setLevel("error");
         Sentry.captureException(err);
       });
-      setError('An unexpected authentication error occurred')
+      toast.error('An unexpected authentication error occurred')
       setLoading(false)
     }
   }
@@ -104,12 +104,6 @@ export default function RootLoginPage() {
               </button>
             )}
 
-            {error && (
-              <div className="mb-4 text-red-600 text-sm bg-red-50 p-2 rounded border border-red-100 animate-shake">
-                {error}
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-6">
               {step === 1 ? (
                 <div className="animate-in slide-in-from-right-4 duration-300">
@@ -145,6 +139,12 @@ export default function RootLoginPage() {
                   </button>
                 </div>
               )}
+
+              <div className="flex flex-col gap-4">
+                <NextLink href="/forgot-password">
+                  <span className="text-[13px] text-[#0067b8] hover:underline cursor-pointer">Forgot password?</span>
+                </NextLink>
+              </div>
 
               <div className="flex justify-end pt-4">
                 <button

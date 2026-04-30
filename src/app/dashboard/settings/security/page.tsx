@@ -1,10 +1,11 @@
 'use client'
-
 import { useState } from 'react'
 import Header from '@/components/dashboard/Header'
 import { Save, Loader2, Lock, Eye, EyeOff } from 'lucide-react'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { apiClient } from '@/lib/api-client'
 
 export default function SecuritySettingsPage() {
   const router = useRouter()
@@ -12,7 +13,6 @@ export default function SecuritySettingsPage() {
   const user = session?.user as any
 
   const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -23,39 +23,38 @@ export default function SecuritySettingsPage() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
 
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match')
+      toast.error('New passwords do not match')
       return
     }
 
     if (newPassword.length < 12) {
-      setError('Password must be at least 12 characters long')
+      toast.error('Password must be at least 12 characters long')
       return
     }
 
     setSaving(true)
 
     try {
-      const res = await fetch('/api/auth/change-password', {
+      const res = await apiClient('/api/auth/change-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       })
 
       const data = await res.json()
 
       if (!res.ok) {
-        throw new Error(data.error || 'Failed to update password')
+        throw new Error(data.message || 'Failed to update password')
       }
 
-      // Update session to remove the force-change flag without signing out
+      toast.success('Password updated successfully')
       await update({ mustChangePassword: false })
-      router.push('/')
+      router.push('/dashboard')
       
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred')
+      toast.error(err.message || 'An unexpected error occurred')
+    } finally {
       setSaving(false)
     }
   }
@@ -71,12 +70,6 @@ export default function SecuritySettingsPage() {
               <p className="font-bold mb-1">Action Required: Set Production Password</p>
               <p className="text-amber-700/80">You are currently using a temporary password or haven&apos;t set up your final production password. Please change it now to gain full access to the dashboard.</p>
             </div>
-          </div>
-        )}
-
-        {error && (
-          <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm animate-fade-in">
-            {error}
           </div>
         )}
 

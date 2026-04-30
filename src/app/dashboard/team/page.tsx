@@ -5,6 +5,8 @@ import { useSession } from 'next-auth/react'
 import { DashboardUser, Role, ROLE_LABELS, ROLE_BADGE_COLORS } from '@/types'
 import { formatDateTime } from '@/lib/utils'
 import { Plus, Trash2, Edit2, X, Loader2, ShieldAlert, UserCheck, Eye, EyeOff } from 'lucide-react'
+import { toast } from 'sonner'
+import { LoadingButton } from '@/components/ui/LoadingButton'
 
 const ROLES: Role[] = [Role.PA, Role.MANAGER, Role.DEVELOPER, Role.INVESTOR, Role.NGO_PARTNER]
 
@@ -43,7 +45,8 @@ export default function TeamPage() {
   )
 
   async function inviteUser(e: React.FormEvent) {
-    e.preventDefault(); setSubmitting(true); setError(''); setSuccess('')
+    e.preventDefault(); setSubmitting(true);
+    const toastId = toast.loading('Sending invitation...');
     try {
       const res = await fetch('/api/team/invite', { 
         method: 'POST', 
@@ -59,41 +62,69 @@ export default function TeamPage() {
         }) 
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error || 'Failed'); setSubmitting(false); return }
+      if (!res.ok) { 
+        toast.error(data.error || 'Failed to send invitation', { id: toastId });
+        setSubmitting(false); 
+        return; 
+      }
       
-      setSuccess(`Invitation sent to ${form.email}`)
+      toast.success(`Invitation sent to ${form.email}`, { id: toastId });
       // Refresh list
       const listRes = await fetch('/api/users', {
         headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
       })
       const newList = await listRes.json()
-      setUsers(newList)
+      setUsers(newList.data || []) // API now returns paginated data
       
       setForm({ name: '', email: '', role: Role.PA, department: '', password: '' })
       setShowInvite(false)
-    } catch { setError('Network error') }
+    } catch { 
+      toast.error('Network error. Please check your connection.', { id: toastId });
+    }
     setSubmitting(false)
   }
 
   async function updateStatus(id: string, status: string) {
-    const res = await fetch(`/api/users/${id}`, { 
-      method: 'PATCH', 
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
-      }, 
-      body: JSON.stringify({ status }) 
-    })
-    if (res.ok) setUsers(prev => prev.map(u => u.id === id ? { ...u, status: status as any } : u))
+    const toastId = toast.loading('Updating status...');
+    try {
+      const res = await fetch(`/api/users/${id}`, { 
+        method: 'PATCH', 
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
+        }, 
+        body: JSON.stringify({ status }) 
+      })
+      if (res.ok) {
+        setUsers(prev => prev.map(u => u.id === id ? { ...u, status: status as any } : u))
+        toast.success('Status updated successfully', { id: toastId });
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Failed to update status', { id: toastId });
+      }
+    } catch {
+      toast.error('Network error', { id: toastId });
+    }
   }
 
   async function deleteUser(id: string) {
-    if (!confirm('Remove this team member?')) return
-    const res = await fetch(`/api/users/${id}`, { 
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
-    })
-    if (res.ok) setUsers(prev => prev.filter(u => u.id !== id))
+    if (!confirm('Are you sure you want to remove this team member? This action will anonymize their account in compliance with POPIA.')) return
+    const toastId = toast.loading('Removing team member...');
+    try {
+      const res = await fetch(`/api/users/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+      })
+      if (res.ok) {
+        setUsers(prev => prev.filter(u => u.id !== id))
+        toast.success('Team member removed and anonymized', { id: toastId });
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Failed to remove member', { id: toastId });
+      }
+    } catch {
+      toast.error('Network error', { id: toastId });
+    }
   }
 
   return (
@@ -264,9 +295,9 @@ export default function TeamPage() {
                 </div>
                 <div className="pt-2 flex gap-3">
                   <button type="button" onClick={() => setShowInvite(false)} className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
-                  <button type="submit" disabled={submitting} className="flex-1 px-4 py-2.5 bg-[#C0392B] text-white rounded-lg text-sm font-medium hover:bg-[#a93226] transition-colors flex items-center justify-center gap-2">
-                    {submitting ? <><Loader2 size={14} className="animate-spin" />Adding...</> : 'Add Member'}
-                  </button>
+                  <LoadingButton type="submit" loading={submitting} className="flex-1 bg-[#C0392B] text-white hover:bg-[#a93226]">
+                    Add Member
+                  </LoadingButton>
                 </div>
               </form>
             </div>

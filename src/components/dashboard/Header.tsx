@@ -1,10 +1,11 @@
 'use client'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Bell, Settings, Search, LogOut, User, ShieldCheck, Loader2 } from 'lucide-react'
+import { Settings, Search, LogOut, User, ShieldCheck, Loader2 } from 'lucide-react'
 import { ROLE_LABELS, ROLE_BADGE_COLORS, Role } from '@/types'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
+import NotificationFeed from './NotificationFeed'
 
 interface HeaderProps { title: string; subtitle?: string }
 
@@ -76,18 +77,7 @@ export default function Header({ title, subtitle }: HeaderProps) {
           <input className="bg-gray-50 border border-gray-100 rounded-lg pl-9 pr-4 py-2 text-xs text-gray-600 placeholder-gray-400 focus:outline-none focus:border-[#C0392B] w-48 transition-colors font-medium" placeholder="System Search..." />
         </div>
         
-        <button 
-          onClick={() => router.push('/dashboard/sos-alerts')}
-          className="relative p-2 text-gray-400 hover:text-[#C0392B] hover:bg-red-50 rounded-lg transition-colors group"
-          title="SOS Alerts"
-        >
-          <Bell size={18} />
-          {activeAlerts > 0 && (
-            <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-[#C0392B] text-white text-[9px] font-black flex items-center justify-center rounded-full ring-2 ring-white px-1">
-              {activeAlerts}
-            </span>
-          )}
-        </button>
+        <NotificationFeed />
 
         <button 
           onClick={() => router.push('/dashboard/settings')}

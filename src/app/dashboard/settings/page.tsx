@@ -4,48 +4,37 @@ import Header from '@/components/dashboard/Header'
 import { useSession } from 'next-auth/react'
 import { ROLE_LABELS, ROLE_BADGE_COLORS, Role } from '@/types'
 import { Save, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { apiClient } from '@/lib/api-client'
 
 export default function SettingsPage() {
   const { data: session, update } = useSession()
   const user = session?.user as any
   const role = user?.role as Role
   const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [error, setError] = useState('')
   const [name, setName] = useState(user?.name || '')
   const [phone, setPhone] = useState(user?.phone || '')
 
   async function save(e: React.FormEvent) {
     e.preventDefault(); 
     setSaving(true)
-    setError('')
     try {
-      const res = await fetch('/api/profile', {
+      const res = await apiClient('/api/profile', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.user?.accessToken}`
-        },
         body: JSON.stringify({ name, phone })
       })
       
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Failed to update profile')
+      if (!res.ok) throw new Error(data.message || 'Failed to update profile')
       
-      // Update local session via next-auth update()
       await update({
         ...session,
-        user: {
-          ...session?.user,
-          name,
-          phone
-        }
+        user: { ...session?.user, name, phone }
       })
       
-      setSaved(true)
-      setTimeout(() => setSaved(false), 2500)
+      toast.success('Profile updated successfully')
     } catch (err: any) {
-      setError(err.message)
+      toast.error(err.message)
     } finally {
       setSaving(false)
     }
@@ -55,8 +44,6 @@ export default function SettingsPage() {
     <div className="flex flex-col flex-1">
       <Header title="Settings" subtitle="Account & Preferences" />
       <main className="flex-1 p-8 max-w-2xl space-y-6">
-        {saved && <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm animate-fade-in">Settings saved successfully</div>}
-        {error && <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm animate-fade-in">{error}</div>}
 
         <div className="glass-card">
           <h3 className="font-display font-bold text-[#1A1A2E] mb-4">Profile</h3>

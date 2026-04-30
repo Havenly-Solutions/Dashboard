@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import Image from 'next/image'
-import { Shield, Radio, FileText, Users, BarChart2, BookOpen, AlertCircle, Network, LogOut, Settings, HelpCircle, ChevronRight, Menu, X, Megaphone } from 'lucide-react'
+import { Shield, Radio, FileText, Users, BarChart2, BookOpen, AlertCircle, Network, LogOut, Settings, HelpCircle, ChevronRight, Menu, X, Megaphone, LifeBuoy } from 'lucide-react'
 import { ROLE_PERMISSIONS, ROLE_LABELS, Role } from '@/types'
 import { cn } from '@/lib/utils'
 import PortalSwitcher, { usePortalView } from '../PortalSwitcher'
@@ -25,6 +25,7 @@ const ALL_NAV_ITEMS = [
   { href: '/dashboard/approvals', label: 'Approvals Hub', icon: LogoIcon },
   { href: '/dashboard/broadcast', label: 'Tour Broadcast', icon: Megaphone },
   { href: '/dashboard/resource-centre', label: 'Resource Centre', icon: BookOpen },
+  { href: '/dashboard/support-tickets', label: 'Support Tickets', icon: LifeBuoy },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 

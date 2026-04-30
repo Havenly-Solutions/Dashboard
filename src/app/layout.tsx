@@ -18,11 +18,14 @@ export const metadata: Metadata = {
   },
 }
 
+import { Toaster } from 'sonner'
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${dmSans.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <LoadingScreen />
+        <Toaster position="top-right" richColors />
         <Providers>{children}</Providers>
       </body>
     </html>

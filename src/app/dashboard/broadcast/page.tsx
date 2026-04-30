@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Loader2, AlertCircle, CheckCircle2, Send } from 'lucide-react';
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter';
 import { useSession } from 'next-auth/react';
+import { toast } from 'sonner';
+import { LoadingButton } from '@/components/ui/LoadingButton';
 
 export default function BroadcastPage() {
   const { data: session } = useSession();
@@ -30,6 +32,7 @@ export default function BroadcastPage() {
     setLoading(true);
     setError('');
     setShowConfirm(false);
+    const toastId = toast.loading('Initiating broadcast...', { description: `Sending to ${recipientCount} recipients` });
     try {
       const res = await fetch(`/api/broadcast/july-tour`, {
         method: 'POST',
@@ -41,9 +44,18 @@ export default function BroadcastPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.error || 'Broadcast failed.');
+      
       setResult(data.results || { sent: 0, failed: 0 });
+      toast.success('Broadcast initiated successfully', { 
+        id: toastId,
+        description: `Sent: ${data.results?.sent} | Failed: ${data.results?.failed}`
+      });
     } catch (err: any) {
       setError(err.message ?? 'Broadcast failed.');
+      toast.error('Broadcast failed', { 
+        id: toastId,
+        description: err.message ?? 'Internal server error'
+      });
     } finally {
       setLoading(false);
     }
@@ -122,13 +134,13 @@ export default function BroadcastPage() {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            <button
+            <LoadingButton
               onClick={handleSend}
-              disabled={loading}
-              className="bg-[#0B6E4F] hover:bg-[#08523b] disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-colors flex items-center justify-center shadow-lg shadow-emerald-500/10"
+              loading={loading}
+              className="bg-[#0B6E4F] hover:bg-[#08523b] text-white font-bold py-3"
             >
-              {loading ? <Loader2 className="animate-spin" /> : 'Yes, Send Now'}
-            </button>
+              Yes, Send Now
+            </LoadingButton>
             <button
               onClick={() => setShowConfirm(false)}
               className="glass-card border border-gray-100 text-gray-500 hover:bg-gray-50 font-bold py-3 rounded-xl transition-colors shadow-sm"

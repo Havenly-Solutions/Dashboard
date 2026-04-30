@@ -5,6 +5,8 @@ import { NGOPartner, NGOStatus } from '@/types'
 import { formatDate } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { CheckCircle, XCircle, Clock, Building2, Plus, X, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { apiClient } from '@/lib/api-client'
 
 const STATUS_STYLES: Record<NGOStatus, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -23,43 +25,58 @@ export default function NGOPortalPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [success, setSuccess] = useState('')
   const [form, setForm] = useState({ orgName: '', liaisonName: '', orgType: 'Registered NGO', email: '', regNumber: '', operatingRegion: '', missionStatement: '' })
 
   useEffect(() => {
     if (!session) return
-    fetch('/api/ngo-partners', {
-      headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
-    })
+    apiClient('/api/ngo-partners')
     .then(r => r.json())
     .then(d => { setPartners(Array.isArray(d) ? d : []); setLoading(false) })
+    .catch(err => {
+      toast.error('Failed to load NGO partners')
+      setLoading(false)
+    })
   }, [session])
 
   async function updateStatus(id: string, status: NGOStatus) {
-    const res = await fetch(`/api/ngo-partners/${id}`, { 
-      method: 'PATCH', 
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
-      }, 
-      body: JSON.stringify({ status }) 
-    })
-    if (res.ok) setPartners(prev => prev.map(p => p.id === id ? { ...p, status } : p))
+    try {
+      const res = await apiClient(`/api/ngo-partners/${id}/status`, { 
+        method: 'PATCH', 
+        body: JSON.stringify({ status }) 
+      })
+      if (res.ok) {
+        setPartners(prev => prev.map(p => p.id === id ? { ...p, status } : p))
+        toast.success(`Partner status updated to ${status}`)
+      } else {
+        const data = await res.json()
+        throw new Error(data.message || 'Update failed')
+      }
+    } catch (err: any) {
+      toast.error(err.message)
+    }
   }
 
   async function submitApplication(e: React.FormEvent) {
-    e.preventDefault(); setSubmitting(true)
-    const res = await fetch('/api/ngo-partners', { 
-      method: 'POST', 
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
-      }, 
-      body: JSON.stringify(form) 
-    })
-    const data = await res.json()
-    if (res.ok) { setPartners(prev => [data, ...prev]); setSuccess('Application submitted'); setShowForm(false) }
-    setSubmitting(false)
+    e.preventDefault(); 
+    setSubmitting(true)
+    try {
+      const res = await apiClient('/api/ngo-partners', { 
+        method: 'POST', 
+        body: JSON.stringify(form) 
+      })
+      const data = await res.json()
+      if (res.ok) { 
+        setPartners(prev => [data, ...prev])
+        toast.success('Application submitted successfully')
+        setShowForm(false) 
+      } else {
+        throw new Error(data.message || 'Submission failed')
+      }
+    } catch (err: any) {
+      toast.error(err.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const approved = partners.filter(p => p.status === 'APPROVED').length
@@ -69,7 +86,6 @@ export default function NGOPortalPage() {
     <div className="flex flex-col flex-1">
       <Header title="NGO Portal" subtitle="Institutional Alliance Management" />
       <main className="flex-1 p-8 space-y-6">
-        {success && <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm animate-fade-in">{success}</div>}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
