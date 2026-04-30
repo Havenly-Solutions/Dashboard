@@ -10,21 +10,21 @@ function subscribeTokenRefresh(cb: (token: string) => void) {
   refreshSubscribers.push(cb);
 }
 
-function onRrefreshed(token: string) {
+function onRefreshed(token: string) {
   refreshSubscribers.map((cb) => cb(token));
   refreshSubscribers = [];
 }
 
 export async function apiClient(path: string, options: RequestInit = {}) {
-  const session: any = await getSession();
+  const session = await getSession() as any;
   
   if (!session) console.warn('[apiClient] No session found for:', path);
   else if (!session.accessToken) console.warn('[apiClient] No accessToken in session for:', path);
 
-  const headers: any = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(session?.accessToken ? { 'Authorization': `Bearer ${session.accessToken}` } : {}),
-    ...options.headers,
+    ...options.headers as any,
   };
 
   const url = `${BACKEND_URL}${path}`;
@@ -49,7 +49,7 @@ export async function apiClient(path: string, options: RequestInit = {}) {
           if (refreshRes.ok) {
             const { accessToken } = await refreshRes.json();
             isRefreshing = false;
-            onRrefreshed(accessToken);
+            onRefreshed(accessToken);
           } else {
             console.error('[apiClient] Refresh failed:', refreshRes.status);
             isRefreshing = false;
