@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SessionProvider } from 'next-auth/react';
 import { useSocket } from '@/hooks/useSocket';
 import { ReactNode, useState } from 'react';
+import { Toaster } from 'sonner';
 
 // ─── Socket initialiser ───────────────────────────────────────────────────────
 // Placed inside SessionProvider so useSession() is available.
@@ -62,6 +63,7 @@ export function AppProviders({ children, session }: AppProvidersProps) {
         {/* Establish socket connection once the user is authenticated */}
         <SocketInit />
         {children}
+        <Toaster position="top-right" richColors />
       </QueryClientProvider>
     </SessionProvider>
   );

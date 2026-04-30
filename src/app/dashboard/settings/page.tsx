@@ -8,12 +8,20 @@ import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
 
 export default function SettingsPage() {
-  const { data: session, update } = useSession()
+  const { data: session, update, status } = useSession()
   const user = session?.user as any
   const role = user?.role as Role
   const [saving, setSaving] = useState(false)
-  const [name, setName] = useState(user?.name || '')
-  const [phone, setPhone] = useState(user?.phone || '')
+  const [name, setName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [initialized, setInitialized] = useState(false)
+
+  // Sync state when session loads
+  if (user && !initialized) {
+    setName(user.name || '')
+    setPhone(user.phone || '')
+    setInitialized(true)
+  }
 
   async function save(e: React.FormEvent) {
     e.preventDefault(); 
@@ -25,19 +33,28 @@ export default function SettingsPage() {
       })
       
       const data = await res.json()
-      if (!res.ok) throw new Error(data.message || 'Failed to update profile')
+      if (!res.ok) throw new Error(data.error || data.message || 'Failed to update profile')
       
       await update({
         ...session,
         user: { ...session?.user, name, phone }
       })
       
-      toast.success('Profile updated successfully')
+      toast.success(data.message || 'Profile updated successfully')
     } catch (err: any) {
       toast.error(err.message)
     } finally {
       setSaving(false)
     }
+  }
+  
+  if (status === 'loading') {
+    return (
+      <div className="flex flex-col flex-1 items-center justify-center p-12">
+        <Loader2 className="animate-spin text-[#C0392B]" size={32} />
+        <p className="text-gray-400 mt-4 font-medium">Synchronizing profile data...</p>
+      </div>
+    )
   }
 
   return (
