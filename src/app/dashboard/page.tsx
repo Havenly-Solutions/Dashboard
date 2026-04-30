@@ -8,6 +8,8 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recha
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
 import TimeAgo from '@/components/dashboard/TimeAgo'
 import Image from 'next/image'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSocket } from '@/hooks/useSocket'
 
 const BRAND_COLORS = {
   red: '#C0392B',
@@ -17,37 +19,40 @@ const BRAND_COLORS = {
 }
 
 export default function LiveFeedPage() {
-  const [incidents, setIncidents] = useState<Incident[]>([])
-  const [auditLogs, setAuditLogs] = useState<AuditLog[]>([])
-  const [stats, setStats] = useState({ totalRegs: 0, totalIncidents: 0, totalNGOs: 0, totalUsers: 0 })
-  const [chartData, setChartData] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient();
+  const { socket } = useSocket();
 
   useEffect(() => {
-    async function load() {
-      try {
-        const response = await fetch('/api/analytics')
-        const data = await response.json()
-        
-        setIncidents(data.recentIncidents || [])
-        setAuditLogs(data.recentLogs || [])
-        setStats({
-          totalRegs: data.totalRegs || 0,
-          totalIncidents: data.activeAlerts || 0,
-          totalNGOs: data.totalNGOs || 0,
-          totalUsers: data.totalUsers || 0
-        })
-        setChartData(data.monthlyData || [])
-      } catch (e) {
-        console.error('FAILED_TO_FETCH_LIVE_INTELLIGENCE:', e)
-      } finally {
-        setLoading(false)
-      }
+    if (!socket) return;
+    
+    function onAlertFired() {
+      queryClient.invalidateQueries({ queryKey: ['live-feed'] });
     }
-    load()
-    const id = setInterval(load, 5000) // Reduced to 5s for live command centre feel
-    return () => clearInterval(id)
-  }, [])
+
+    socket.on('alert_fired', onAlertFired);
+    return () => {
+      socket.off('alert_fired', onAlertFired);
+    };
+  }, [socket, queryClient]);
+
+  const { data, isLoading: loading } = useQuery({
+    queryKey: ['live-feed'],
+    queryFn: async () => {
+      const response = await fetch('/api/analytics')
+      if (!response.ok) throw new Error('Failed to fetch analytics')
+      return response.json()
+    }
+  });
+
+  const incidents: Incident[] = data?.recentIncidents || [];
+  const auditLogs: AuditLog[] = data?.recentLogs || [];
+  const stats = {
+    totalRegs: data?.totalRegs || 0,
+    totalIncidents: data?.activeAlerts || 0,
+    totalNGOs: data?.totalNGOs || 0,
+    totalUsers: data?.totalUsers || 0
+  };
+  const chartData = data?.monthlyData || [];
 
   const critical = incidents.filter(i => i.severity === 'CRITICAL' && i.status === 'ACTIVE').length
 

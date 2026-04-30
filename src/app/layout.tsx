@@ -1,33 +1,33 @@
-import type { Metadata } from 'next'
-import { DM_Sans, Space_Grotesk } from 'next/font/google'
-import './globals.css'
-import { Providers } from './providers'
-import LoadingScreen from '@/components/ui/LoadingScreen'
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { AppProviders } from '@/providers/AppProviders';
+import './globals.css';
 
-const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap', fallback: ['sans-serif'] })
-const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk', display: 'swap', fallback: ['sans-serif'] })
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://dashboard.havenly.co.za'),
-  title: 'Havenly Solutions Dashboard',
-  description: 'Dashboard for Havenly Solutions',
-  icons: { icon: '/favicon.ico' },
-  robots: {
-    index: true,
-    follow: true,
-  },
-}
+  title: 'Havenly Solutions',
+  description: 'Internal operations dashboard',
+};
 
-import { Toaster } from 'sonner'
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  // Pass the server session to AppProviders so NextAuth
+  // doesn't make an extra network call on the client
+  const session = await getServerSession(authOptions);
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${dmSans.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
-        <LoadingScreen />
-        <Toaster position="top-right" richColors />
-        <Providers>{children}</Providers>
+    <html lang="en">
+      <body className={inter.className}>
+        <AppProviders session={session}>
+          {children}
+        </AppProviders>
       </body>
     </html>
-  )
+  );
 }

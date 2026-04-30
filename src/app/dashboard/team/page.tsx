@@ -1,309 +1,226 @@
-'use client'
-import { useState, useEffect } from 'react'
-import Header from '@/components/dashboard/Header'
-import { useSession } from 'next-auth/react'
-import { DashboardUser, Role, ROLE_LABELS, ROLE_BADGE_COLORS } from '@/types'
-import { formatDateTime } from '@/lib/utils'
-import { Plus, Trash2, Edit2, X, Loader2, ShieldAlert, UserCheck, Eye, EyeOff } from 'lucide-react'
-import { toast } from 'sonner'
-import { LoadingButton } from '@/components/ui/LoadingButton'
+'use client';
 
-const ROLES: Role[] = [Role.PA, Role.MANAGER, Role.DEVELOPER, Role.INVESTOR, Role.NGO_PARTNER]
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface TeamMember {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  status: string;
+  mustChangePassword: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+  inviter: { email: string; firstName: string; lastName: string } | null;
+}
+
+// ─── API calls ────────────────────────────────────────────────────────────────
+
+async function fetchTeam(): Promise<TeamMember[]> {
+  const res = await fetch('/api/team');
+  if (!res.ok) throw new Error('Failed to fetch team');
+  const json = await res.json();
+  return json.data;
+}
+
+async function inviteMember(body: {
+  email: string;
+  role: string;
+  firstName: string;
+  lastName: string;
+}) {
+  const res = await fetch('/api/team/invite', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message ?? 'Invite failed');
+  return json;
+}
+
+// ─── Role badge colours ───────────────────────────────────────────────────────
+
+const ROLE_COLOURS: Record<string, string> = {
+  FOUNDER:        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+  CHIEF_OFFICER:  'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  MANAGER:        'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200',
+  DATA_SCIENTIST: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+  PA:             'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
+  NGO_PARTNER:    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  DEVELOPER:      'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+  INVESTOR:       'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+};
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function TeamPage() {
-  const { data: session } = useSession()
-  const role = (session?.user as any)?.role as Role
-  const [users, setUsers] = useState<DashboardUser[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showInvite, setShowInvite] = useState(false)
-  const [form, setForm] = useState({ name: '', email: '', role: Role.PA, department: '', password: '' })
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const { data: session } = useSession();
+  const role = (session?.user as any)?.role;
 
-  useEffect(() => {
-    if (role !== 'FOUNDER') return
-    fetch('/api/users', {
-      headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
-    })
-    .then(r => r.json())
-    .then(data => { setUsers(Array.isArray(data) ? data : []); setLoading(false) })
-  }, [role, session])
+  const queryClient = useQueryClient();
 
-  if (role !== 'FOUNDER') return (
-    <div className="flex flex-col flex-1">
-      <Header title="Team Management" />
-      <main className="flex-1 p-8 flex items-center justify-center">
-        <div className="text-center">
-          <ShieldAlert size={48} className="text-gray-300 mx-auto mb-3" />
-          <h2 className="font-display font-bold text-[#1A1A2E] text-xl mb-1">Access Restricted</h2>
-          <p className="text-gray-400 text-sm">Only the Founder can manage team access.</p>
-        </div>
-      </main>
-    </div>
-  )
+  // React Query: fetch team. Automatically re-fetches when the socket
+  // emits invite_sent / data_updated(team) — no manual refresh needed.
+  const { data: members, isLoading, error } = useQuery({
+    queryKey: ['team'],
+    queryFn: fetchTeam,
+  });
 
-  async function inviteUser(e: React.FormEvent) {
-    e.preventDefault(); setSubmitting(true);
-    const toastId = toast.loading('Sending invitation...');
-    try {
-      const res = await fetch('/api/team/invite', { 
-        method: 'POST', 
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
-        }, 
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          role: form.role,
-          department: form.department
-        }) 
-      })
-      const data = await res.json()
-      if (!res.ok) { 
-        toast.error(data.error || 'Failed to send invitation', { id: toastId });
-        setSubmitting(false); 
-        return; 
-      }
-      
-      toast.success(`Invitation sent to ${form.email}`, { id: toastId });
-      // Refresh list
-      const listRes = await fetch('/api/users', {
-        headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
-      })
-      const newList = await listRes.json()
-      setUsers(newList.data || []) // API now returns paginated data
-      
-      setForm({ name: '', email: '', role: Role.PA, department: '', password: '' })
-      setShowInvite(false)
-    } catch { 
-      toast.error('Network error. Please check your connection.', { id: toastId });
-    }
-    setSubmitting(false)
-  }
+  const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    role: 'MANAGER',
+  });
+  const [inviteError, setInviteError] = useState('');
 
-  async function updateStatus(id: string, status: string) {
-    const toastId = toast.loading('Updating status...');
-    try {
-      const res = await fetch(`/api/users/${id}`, { 
-        method: 'PATCH', 
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
-        }, 
-        body: JSON.stringify({ status }) 
-      })
-      if (res.ok) {
-        setUsers(prev => prev.map(u => u.id === id ? { ...u, status: status as any } : u))
-        toast.success('Status updated successfully', { id: toastId });
-      } else {
-        const data = await res.json();
-        toast.error(data.error || 'Failed to update status', { id: toastId });
-      }
-    } catch {
-      toast.error('Network error', { id: toastId });
-    }
-  }
+  const invite = useMutation({
+    mutationFn: inviteMember,
+    onSuccess: () => {
+      setForm({ firstName: '', lastName: '', email: '', role: 'MANAGER' });
+      setInviteError('');
+      // Optimistically refetch (socket event will also trigger this)
+      queryClient.invalidateQueries({ queryKey: ['team'] });
+    },
+    onError: (err: Error) => setInviteError(err.message),
+  });
 
-  async function deleteUser(id: string) {
-    if (!confirm('Are you sure you want to remove this team member? This action will anonymize their account in compliance with POPIA.')) return
-    const toastId = toast.loading('Removing team member...');
-    try {
-      const res = await fetch(`/api/users/${id}`, { 
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
-      })
-      if (res.ok) {
-        setUsers(prev => prev.filter(u => u.id !== id))
-        toast.success('Team member removed and anonymized', { id: toastId });
-      } else {
-        const data = await res.json();
-        toast.error(data.error || 'Failed to remove member', { id: toastId });
-      }
-    } catch {
-      toast.error('Network error', { id: toastId });
-    }
+  if (role !== 'FOUNDER' && role !== 'CHIEF_OFFICER') {
+    return (
+      <div className="flex h-64 items-center justify-center text-gray-400">
+        You do not have permission to manage the team.
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col flex-1">
-      <Header title="Team Management" subtitle="Founder Control Panel" />
-      <main className="flex-1 p-8 space-y-6">
+    <div className="mx-auto max-w-4xl p-8">
+      <div className="mb-8">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Team</h1>
+        <p className="mt-1 text-sm text-gray-500">
+          Invite members and manage roles. New members appear instantly — no refresh needed.
+        </p>
+      </div>
 
-        {success && <div className="px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm flex items-center gap-2 animate-fade-in"><UserCheck size={16} />{success}</div>}
-        {error && <div className="px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm animate-fade-in">{error}</div>}
-
-        {/* Summary */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {ROLES.map(r => {
-            const count = users.filter(u => u.role === r).length
-            return (
-              <div key={r} className="stat-card">
-                <div className={`text-[10px] px-2 py-0.5 rounded border font-bold uppercase mb-2 inline-block ${ROLE_BADGE_COLORS[r]}`}>{ROLE_LABELS[r]}</div>
-                <div className="font-display font-bold text-2xl text-[#1A1A2E]">{count}</div>
-              </div>
-            )
-          })}
+      {/* ── Invite form ──────────────────────────────────────────────────── */}
+      <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
+        <h2 className="mb-4 text-base font-medium text-gray-900 dark:text-white">
+          Invite a team member
+        </h2>
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            className="col-span-1 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            placeholder="First name"
+            value={form.firstName}
+            onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
+          />
+          <input
+            className="col-span-1 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            placeholder="Last name"
+            value={form.lastName}
+            onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
+          />
+          <input
+            className="col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            type="email"
+            placeholder="Email address"
+            value={form.email}
+            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+          />
+          <select
+            className="col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            value={form.role}
+            onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+          >
+            <option value="CHIEF_OFFICER">Chief officer</option>
+            <option value="MANAGER">Manager</option>
+            <option value="DATA_SCIENTIST">Data scientist</option>
+            <option value="DEVELOPER">Developer</option>
+            <option value="PA">PA</option>
+            <option value="NGO_PARTNER">NGO partner</option>
+            <option value="INVESTOR">Investor</option>
+          </select>
         </div>
 
-        {/* Header bar */}
-        <div className="flex items-center justify-between">
-          <h2 className="font-display font-bold text-[#1A1A2E]">All Team Members ({users.length})</h2>
-          <button onClick={() => setShowInvite(true)} className="flex items-center gap-2 px-4 py-2 bg-[#C0392B] text-white rounded-lg text-sm font-medium hover:bg-[#a93226] transition-colors">
-            <Plus size={16} />Add Team Member
-          </button>
-        </div>
+        {inviteError && (
+          <p className="mt-3 text-sm text-red-500">{inviteError}</p>
+        )}
 
-        {/* Role portal descriptions */}
-        <div className="glass-card mb-6">
-          <h3 className="font-display font-semibold text-[#1A1A2E] text-sm mb-4">Portal Access by Role</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {([
-              { role: 'PA', access: 'Pre-Registrations, Analytics, Settings', desc: 'Manages tour signups, handles scheduling and communications' },
-              { role: 'MANAGER', access: 'Live Feed, SOS Alerts, Safety Logs, Pre-Regs, Analytics, NGO Portal', desc: 'Full operational oversight of tour and community events' },
-              { role: 'DEVELOPER', access: 'Live Feed, SOS Alerts, Mesh Topology, Safety Logs, Resource Centre', desc: 'Technical infrastructure monitoring and system health' },
-              { role: 'INVESTOR', access: 'Analytics, Pre-Registrations, Resource Centre', desc: 'Read-only access to growth metrics and investor materials' },
-              { role: 'NGO_PARTNER', access: 'NGO Portal, Resource Centre', desc: 'Partner onboarding tools and collaborative safety resources' },
-              { role: 'FOUNDER', access: 'Everything + Team Management', desc: 'Full system access, user creation, role assignment and revocation' },
-            ] as { role: Role; access: string; desc: string }[]).map(({ role: r, access, desc }) => (
-              <div key={r} className="border border-gray-100 rounded-lg p-3">
-                <div className={`text-[10px] px-2 py-0.5 rounded border font-bold uppercase mb-2 inline-block ${ROLE_BADGE_COLORS[r]}`}>{ROLE_LABELS[r]}</div>
-                <p className="text-xs text-gray-500 mb-1.5">{desc}</p>
-                <p className="text-[10px] text-gray-400"><span className="font-semibold text-gray-500">Portals: </span>{access}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        <button
+          className="mt-4 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
+          disabled={invite.isPending || !form.email || !form.firstName || !form.lastName}
+          onClick={() => invite.mutate(form)}
+        >
+          {invite.isPending ? 'Sending...' : 'Send invite'}
+        </button>
+      </div>
 
-        {/* Team table */}
-        <div className="glass-card !p-0 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead><tr className="text-xs text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
-              {['Member', 'Role', 'Department', 'Last Login', 'Status', 'Actions'].map(h => <th key={h} className="text-left px-6 py-3 font-medium">{h}</th>)}
-            </tr></thead>
-            <tbody className="divide-y divide-gray-50">
-              {loading ? <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-400">Loading team...</td></tr>
-                : users.map(user => (
-                  <tr key={user.id} className="hover:bg-gray-50/50 animate-fade-in">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-[#1A1A2E] rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                          {user.name?.charAt(0) || 'U'}
-                        </div>
-                        <div>
-                          <div className="font-medium text-[#1A1A2E]">{user.name}</div>
-                          <div className="text-xs text-gray-400">{user.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`text-[10px] px-2 py-0.5 rounded border font-bold uppercase ${ROLE_BADGE_COLORS[user.role]}`}>{ROLE_LABELS[user.role]}</span>
-                    </td>
-                    <td className="px-6 py-4 text-gray-500 text-xs">{user.department || '—'}</td>
-                    <td className="px-6 py-4 text-gray-400 text-xs">{user.lastLogin ? formatDateTime(user.lastLogin) : 'Never'}</td>
-                    <td className="px-6 py-4">
-                      <select 
-                        title="Change user status"
-                        value={user.status} 
-                        onChange={e => updateStatus(user.id, e.target.value)}
-                        className={`text-[10px] px-2 py-1 rounded border font-bold uppercase cursor-pointer focus:outline-none ${user.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : user.status === 'SUSPENDED' ? 'bg-red-50 text-red-700 border-red-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
-                        <option value="ACTIVE">Active</option>
-                        <option value="SUSPENDED">Suspended</option>
-                        <option value="PENDING">Pending</option>
-                      </select>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <button 
-                          title="Delete team member"
-                          onClick={() => deleteUser(user.id)} 
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+      {/* ── Team list ─────────────────────────────────────────────────────── */}
+      {isLoading && (
+        <div className="text-center text-sm text-gray-400">Loading team...</div>
+      )}
+
+      {error && (
+        <div className="text-center text-sm text-red-500">Failed to load team members.</div>
+      )}
+
+      {members && (
+        <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
+              <tr>
+                <th className="px-4 py-3 font-medium">Member</th>
+                <th className="px-4 py-3 font-medium">Role</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Last login</th>
+                <th className="px-4 py-3 font-medium">Invited by</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-gray-900">
+              {members.map((m: any) => (
+                <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                  <td className="px-4 py-3">
+                    <p className="font-medium text-gray-900 dark:text-white">
+                      {m.name}
+                    </p>
+                    <p className="text-xs text-gray-500">{m.email}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${ROLE_COLOURS[m.role] ?? 'bg-gray-100 text-gray-700'}`}>
+                      {m.role.replace('_', ' ')}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {m.mustChangePassword ? (
+                      <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-900 dark:text-amber-200">
+                        Pending setup
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-200">
+                        Active
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500">
+                    {m.lastLogin
+                      ? new Date(m.lastLogin).toLocaleString()
+                      : 'Never'}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500">
+                    {m.invitedBy ? m.invitedBy : '—'}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-
-        {/* Invite Modal */}
-        {showInvite && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="portal-container rounded-2xl shadow-2xl w-full max-w-md animate-fade-in">
-              <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
-                <h3 className="font-display font-bold text-[#1A1A2E] text-lg">Add Team Member</h3>
-                <button 
-                  title="Close modal"
-                  onClick={() => setShowInvite(false)} 
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-              <form onSubmit={inviteUser} className="p-6 space-y-4">
-                {error && <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">{error}</div>}
-                {[
-                  { label: 'Full Name', key: 'name', type: 'text', placeholder: 'Jane Smith' },
-                  { label: 'Email', key: 'email', type: 'email', placeholder: 'jane@havenly.co.za' },
-                  { label: 'Department', key: 'department', type: 'text', placeholder: 'e.g. Operations, Tech, Marketing' },
-                ].map(({ label, key, type, placeholder }) => (
-                  <div key={key}>
-                    <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">{label}</label>
-                    <input type={type} value={(form as any)[key]} onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))} required
-                      placeholder={placeholder}
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B] transition-colors" />
-                  </div>
-                ))}
-                
-                <div className="relative">
-                  <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Temporary Password</label>
-                  <div className="relative">
-                    <input 
-                      type={showPassword ? 'text' : 'password'} 
-                      value={form.password} 
-                      onChange={e => setForm(f => ({ ...f, password: e.target.value }))} 
-                      required
-                      placeholder="Min 8 characters"
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B] transition-colors pr-10" 
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                      title={showPassword ? "Hide password" : "Show password"}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <label htmlFor="role-select" className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">Role & Portal Access</label>
-                  <select 
-                    id="role-select"
-                    title="Select team member role"
-                    value={form.role} 
-                    onChange={e => setForm(f => ({ ...f, role: e.target.value as Role }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#C0392B]"
-                  >
-                    {ROLES.map(r => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
-                  </select>
-                </div>
-                <div className="pt-2 flex gap-3">
-                  <button type="button" onClick={() => setShowInvite(false)} className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors">Cancel</button>
-                  <LoadingButton type="submit" loading={submitting} className="flex-1 bg-[#C0392B] text-white hover:bg-[#a93226]">
-                    Add Member
-                  </LoadingButton>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </main>
+      )}
     </div>
-  )
+  );
 }

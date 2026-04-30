@@ -1,28 +1,45 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Header from '@/components/dashboard/Header'
 import { TrendingUp, Users, Shield, Building2, Target, Loader2 } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from 'recharts'
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
+import { useQuery } from '@tanstack/react-query'
+import { useSocket } from '@/hooks/useSocket'
 
 export default function AnalyticsPage() {
-  const [stats, setStats] = useState({
-    totalRegs: 0,
-    totalLeads: 0,
-    totalApproved: 0,
-    totalIncidents: 0,
-    totalNGOs: 0,
-    totalUsers: 0,
-    incidentsBySeverity: [] as any[],
-    monthlyData: [] as any[]
-  })
-  const [loading, setLoading] = useState(true)
   const [isExporting, setIsExporting] = useState<string | null>(null)
+  
+  // Real-time invalidation via socket
+  useSocket();
+
+  const { data: statsRaw, isLoading: loading } = useQuery({
+    queryKey: ['analytics'],
+    queryFn: async () => {
+      const r = await fetch(`/api/analytics`)
+      if (r.status === 401 || r.status === 403) {
+        throw new Error('Auth error')
+      }
+      if (!r.ok) throw new Error('Failed to fetch analytics')
+      return r.json()
+    },
+    retry: false
+  });
+
+  const stats = {
+    totalRegs: statsRaw?.totalRegs ?? 0,
+    totalLeads: statsRaw?.totalLeads ?? 0,
+    totalApproved: statsRaw?.totalApproved ?? 0,
+    totalIncidents: statsRaw?.activeAlerts ?? statsRaw?.totalIncidents ?? 0,
+    totalNGOs: statsRaw?.totalNGOs ?? 0,
+    totalUsers: statsRaw?.totalUsers ?? 0,
+    incidentsBySeverity: statsRaw?.incidentsBySeverity || [],
+    monthlyData: statsRaw?.monthlyData || []
+  };
 
   const handleExport = async (type: 'audit' | 'alerts' | 'registrations', format: string) => {
     setIsExporting(type)
     try {
-      // Use local dashboard proxy for exports as well
       const endpoint = type === 'audit' ? '/api/export/audit-logs' :
         type === 'alerts' ? '/api/export/alerts' : '/api/export/registrations'
 
@@ -44,47 +61,6 @@ export default function AnalyticsPage() {
       setIsExporting(null)
     }
   }
-
-  useEffect(() => {
-    let stopped = false
-
-    async function load() {
-      try {
-        const r = await fetch(`/api/analytics`)
-        
-        // Stop polling on auth errors — don't hammer the backend on 401/429
-        if (r.status === 401 || r.status === 403) {
-          console.warn('[Analytics] Auth error — stopping poll. Please refresh the page.')
-          stopped = true
-          return
-        }
-        
-        if (!r.ok) return
-
-        const d = await r.json()
-        setStats(prev => ({
-          ...prev,
-          totalRegs: d.totalRegs ?? 0,
-          totalLeads: d.totalLeads ?? 0,
-          totalApproved: d.totalApproved ?? 0,
-          totalIncidents: d.activeAlerts ?? d.totalIncidents ?? 0,
-          totalNGOs: d.totalNGOs ?? 0,
-          totalUsers: d.totalUsers ?? 0,
-          incidentsBySeverity: d.incidentsBySeverity || [],
-          monthlyData: d.monthlyData || []
-        }))
-      } catch (e) {
-        console.error('Failed to load analytics:', e)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    load()
-    // Poll every 30s only if not stopped due to auth error
-    const id = setInterval(() => { if (!stopped) load() }, 30000)
-    return () => clearInterval(id)
-  }, [])
 
   return (
     <div className="flex flex-col flex-1">

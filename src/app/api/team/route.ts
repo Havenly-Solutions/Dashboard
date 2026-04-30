@@ -3,9 +3,5 @@ import { NextRequest } from 'next/server'
 import { apiProxy } from '@/lib/server-fetch'
 
 export async function GET(req: NextRequest) {
-  return apiProxy(req, '/api/pre-registrations')
-}
-
-export async function POST(req: NextRequest) {
-  return apiProxy(req, '/api/pre-registrations')
+  return apiProxy(req, '/api/team')
 }
