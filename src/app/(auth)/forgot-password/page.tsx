@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
       <div className="relative z-20 bg-white w-full max-w-[420px] rounded-sm shadow-2xl p-8 md:p-10 animate-in fade-in zoom-in duration-500">
         <div className="flex items-center gap-2 mb-8">
           <div className="w-8 h-8 bg-[#1A1A2E] rounded flex items-center justify-center p-1.5 relative">
-            <Image src="/favicon.ico" alt="Havenly Logo" fill className="object-contain p-1.5" />
+            <Image src="/favicon.ico" alt="Havenly Solutions Logo" fill className="object-contain p-1.5" />
           </div>
           <span className="font-display font-bold text-[#666] text-sm uppercase tracking-wider">Havenly Solutions</span>
         </div>

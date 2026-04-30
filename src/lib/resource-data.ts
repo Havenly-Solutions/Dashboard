@@ -7,7 +7,7 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
     desc: 'Deep-dive schematics and maintenance actions for Guardian Node clusters.',
     fullContent: `
       ### Guardian Node Infrastructure (V6.2)
-      Guardian Nodes are the backbone of the Havenly offline-first mesh network. 
+      Guardian Nodes are the backbone of the Havenly Solutions offline-first mesh network. 
       
       #### Current Priorities:
       - **Satellite Uplink Calibration**: Required monthly to maintain drift within <2ms.
@@ -85,7 +85,7 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
     desc: 'Best practices for terminal security, biometric access control, and digital counter-measures.',
     fullContent: `
       ### System Hardening & Security
-      Protecting the integrity of the Havenly network and user evidence vaults.
+      Protecting the integrity of the Havenly Solutions network and user evidence vaults.
 
       #### Security Standards:
       - **Encryption**: AES-256-GCM for all data at rest and in transit.

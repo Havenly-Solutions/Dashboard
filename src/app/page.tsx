@@ -65,7 +65,7 @@ export default function RootLoginPage() {
       <div className="absolute inset-0 z-0">
         <Image
           src="/police.jpg"
-          alt="Havenly Security Background"
+          alt="Havenly Solutions Security Background"
           fill
           className="object-cover"
           priority
@@ -80,7 +80,7 @@ export default function RootLoginPage() {
         <div className="flex-1 p-8 md:p-12 flex flex-col">
           <div className="flex items-center gap-2 mb-10">
             <div className="w-8 h-8 bg-[#1A1A2E] rounded flex items-center justify-center p-1.5 relative">
-              <Image src="/favicon.ico" alt="Havenly Logo" fill className="object-contain p-1.5" />
+              <Image src="/favicon.ico" alt="Havenly Solutions Logo" fill className="object-contain p-1.5" />
             </div>
             <span className="font-display font-bold text-[#666] text-sm uppercase tracking-wider">Havenly Solutions</span>
           </div>

@@ -96,7 +96,7 @@ export function useSocket() {
     });
 
     socket.on('connect', () => {
-      console.info('[Socket] Connected to Havenly backend');
+      console.info('[Socket] Connected to Havenly Solutions backend');
     });
 
     socket.on('disconnect', (reason) => {

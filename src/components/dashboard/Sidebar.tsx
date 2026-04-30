@@ -53,7 +53,7 @@ export default function Sidebar() {
       <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white z-30 flex items-center justify-between px-4 border-b border-gray-100 shadow-sm">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 bg-[#1A1A2E] p-1">
-            <Image src="/favicon.ico" alt="Havenly Logo" width={32} height={32} className="w-full h-full object-contain" />
+            <Image src="/favicon.ico" alt="Havenly Solutions Logo" width={32} height={32} className="w-full h-full object-contain" />
           </div>
           <div className="font-display font-bold text-[#1A1A2E] text-base leading-none">Havenly Solutions</div>
         </div>
@@ -76,7 +76,7 @@ export default function Sidebar() {
         <div className="px-5 pt-6 pb-5 border-b border-gray-50 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-[#1A1A2E] p-1.5 shadow-sm">
-              <Image src="/favicon.ico" alt="Havenly Logo" width={36} height={36} className="w-full h-full object-contain" />
+              <Image src="/favicon.ico" alt="Havenly Solutions Logo" width={36} height={36} className="w-full h-full object-contain" />
             </div>
             <div>
               <div className="font-display font-black text-[#1A1A2E] text-base leading-none tracking-tight">Havenly Solutions</div>

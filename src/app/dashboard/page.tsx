@@ -160,7 +160,7 @@ export default function LiveFeedPage() {
             {/* Tactical Controls */}
             <div className="bg-havenly-navy rounded-xl border border-havenly-navy p-6 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Image src="/favicon.ico" alt="Havenly Logo" width={64} height={64} className="object-contain opacity-20" />
+                <Image src="/favicon.ico" alt="Havenly Solutions Logo" width={64} height={64} className="object-contain opacity-20" />
               </div>
               <div className="relative">
                 <div className="text-white/40 text-[9px] font-bold uppercase tracking-widest mb-4">Tactical Operations</div>
