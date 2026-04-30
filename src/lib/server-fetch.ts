@@ -32,6 +32,7 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
 
   try {
     let response = await fetch(url, {
+      cache: 'no-store',
       ...options,
       headers,
     })
@@ -62,6 +63,7 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
         // Retry original request with new token
         headers['Authorization'] = `Bearer ${accessToken}`
         response = await fetch(url, {
+          cache: 'no-store',
           ...options,
           headers,
         })
