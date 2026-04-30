@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import Header from '@/components/dashboard/Header'
 import { Save, Loader2, Lock, Eye, EyeOff } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { apiClient } from '@/lib/api-client'
@@ -48,9 +48,10 @@ export default function SecuritySettingsPage() {
         throw new Error(data.message || 'Failed to update password')
       }
 
-      toast.success('Password updated successfully')
-      await update({ mustChangePassword: false })
-      router.push('/dashboard')
+      toast.success('Password updated successfully. Please sign in again.')
+      setTimeout(() => {
+        signOut({ callbackUrl: '/' })
+      }, 1500)
       
     } catch (err: any) {
       toast.error(err.message || 'An unexpected error occurred')

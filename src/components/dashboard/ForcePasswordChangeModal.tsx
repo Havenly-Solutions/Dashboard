@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Save, Loader2, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 export default function ForcePasswordChangeModal() {
@@ -51,11 +51,9 @@ export default function ForcePasswordChangeModal() {
         throw new Error(data.error || 'Failed to update password')
       }
 
-      // Update session to remove the force-change flag
-      await update({ mustChangePassword: false })
-      
-      // Success - the modal will disappear because mustChangePassword is now false
-      router.refresh()
+      // The backend clears tokens and expects a re-login
+      window.location.href = '/' // Quick redirect
+      await signOut({ callbackUrl: '/' })
       
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred')
