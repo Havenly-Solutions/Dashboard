@@ -68,10 +68,10 @@ export default function RootLoginPage() {
     <div className="min-h-screen bg-[#F2F2F2] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
-        <Image 
-          src="/police.jpg" 
-          alt="Havenly Security Background" 
-          fill 
+        <Image
+          src="/police.jpg"
+          alt="Havenly Security Background"
+          fill
           className="object-cover"
           priority
         />
@@ -160,10 +160,10 @@ export default function RootLoginPage() {
 
           <div className="mt-8 pt-6 border-t border-gray-100 flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <NextLink href="/terms-of-service">
+              <NextLink href="https://havenly.solutions/terms-of-service">
                 <span className="text-[12px] text-[#666] hover:underline cursor-pointer">Terms of use</span>
               </NextLink>
-              <NextLink href="/privacy-policy">
+              <NextLink href="https://havenly.solutions/privacy-policy">
                 <span className="text-[12px] text-[#666] hover:underline cursor-pointer">Privacy & cookies</span>
               </NextLink>
             </div>
