@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function CookiePolicyPage() {
   return (
     <>
-      <style jsx global>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         [data-custom-class='body'], [data-custom-class='body'] * {
           background: transparent !important;
         }
@@ -43,7 +43,7 @@ export default function CookiePolicyPage() {
           font-family: Arial !important;
           word-break: break-word !important;
         }
-      `}</style>
+      `}} />
 
       <div style={{ 
         maxWidth: '900px', 
