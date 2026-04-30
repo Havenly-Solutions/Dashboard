@@ -94,7 +94,8 @@ export async function apiProxy(req: Request, path: string) {
   })
 
   if (!res) {
-    return NextResponse.json({ error: 'Failed to reach backend' }, { status: 502 })
+    // serverFetch returns null either when session is missing OR when fetch completely fails
+    return NextResponse.json({ error: 'Unauthorized or Backend Unreachable' }, { status: 401 })
   }
 
   const text = await res.text()
