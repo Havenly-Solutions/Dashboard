@@ -72,7 +72,10 @@ export default function PreRegistrationsPage() {
             <div className="font-display font-bold text-3xl text-[#1A1A2E]">5,000</div>
             <div className="mt-2">
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div className="h-full bg-[#C0392B] rounded-full transition-all" style={{ width: `${Math.min(100, (total / 5000) * 100)}%` }} />
+                <div 
+                  className="h-full bg-[#C0392B] rounded-full transition-all" 
+                  style={{ width: `${Math.min(100, (total / 5000) * 100)}%` } as any} 
+                />
               </div>
               <div className="text-xs text-gray-400 mt-1">{((total / 5000) * 100).toFixed(1)}% of goal</div>
             </div>

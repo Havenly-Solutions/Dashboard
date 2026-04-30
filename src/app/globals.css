@@ -74,16 +74,16 @@
 /* Glassmorphism Containers with Backdrop */
 .portal-container {
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 .dark .portal-container {
   background: rgba(26, 26, 46, 0.8);
-  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
@@ -97,4 +97,8 @@
 
 .glass-card h1, .glass-card h2, .glass-card h3, .glass-card p, .glass-card div, .glass-card label, .glass-card span {
   color: #000000 !important;
+}
+
+.system-font-stack {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
