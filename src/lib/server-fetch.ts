@@ -40,19 +40,19 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
     if (response.status === 401 && path !== '/api/auth/refresh') {
       console.log(`[serverFetch] 401 detected on ${path}, attempting refresh...`)
       
-      // We need to forward the refreshToken cookie to the backend
-      // Since serverFetch is called from various places, we might not always have access to req.cookies
-      // But in Next.js Server Components/Actions, we can use 'next/headers'
-      const { cookies } = await import('next/headers')
-      const cookieStore = cookies()
-      const refreshToken = cookieStore.get('refreshToken')?.value
+      const refreshToken = (session.user as any).refreshToken
+
+      if (!refreshToken) {
+        console.warn(`[serverFetch] No refresh token available in session for ${path}`)
+        return response
+      }
 
       const refreshRes = await fetch(`${BACKEND_URL}/api/auth/refresh`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Cookie': `refreshToken=${refreshToken}`
-        }
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ refreshToken })
       })
 
       if (refreshRes.ok) {

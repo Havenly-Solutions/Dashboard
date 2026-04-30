@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
             throw new Error(result.error || `Authentication failed (${res.status})`)
           }
           
-          const { user, accessToken } = result
+          const { user, accessToken, refreshToken } = result
           
           return { 
             id: user.id, 
@@ -58,6 +58,7 @@ export const authOptions: NextAuthOptions = {
             department: user.department,
             mustChangePassword: user.mustChangePassword,
             accessToken,
+            refreshToken,
           }
         } catch (error: any) {
           console.error('Authorize Exception:', error.message)
@@ -75,6 +76,9 @@ export const authOptions: NextAuthOptions = {
         token.mustChangePassword = (user as any).mustChangePassword
         if ((user as any).accessToken) {
           token.accessToken = (user as any).accessToken
+        }
+        if ((user as any).refreshToken) {
+          token.refreshToken = (user as any).refreshToken
         }
       }
       
@@ -94,6 +98,7 @@ export const authOptions: NextAuthOptions = {
         ;(session.user as any).phone = token.phone as string
         ;(session.user as any).mustChangePassword = token.mustChangePassword
         ;(session.user as any).accessToken = token.accessToken as string
+        ;(session.user as any).refreshToken = token.refreshToken as string
       }
       return session
     },
