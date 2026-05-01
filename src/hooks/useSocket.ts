@@ -58,39 +58,39 @@ export function useSocket() {
     socketRef.current = socket;
 
     // ── Generic data_updated — invalidate matching React Query keys ────────
-    socket.on('data_updated', (payload: HavenlyEvents['data_updated']) => {
+    socket.on('data_updated', (payload: { entity: string }) => {
       invalidateForEntity(payload.entity);
     });
 
     // ── Specific events — you can add granular handlers here ──────────────
 
-    socket.on('invite_sent', (_payload: HavenlyEvents['invite_sent']) => {
+    socket.on('invite_sent', () => {
       // Invalidate the team list immediately — no polling needed
       queryClient.invalidateQueries({ queryKey: ['team'] });
     });
 
-    socket.on('invite_accepted', (_payload: HavenlyEvents['invite_accepted']) => {
+    socket.on('invite_accepted', () => {
       queryClient.invalidateQueries({ queryKey: ['team'] });
     });
 
-    socket.on('team_member_removed', (_payload: HavenlyEvents['team_member_removed']) => {
+    socket.on('team_member_removed', () => {
       queryClient.invalidateQueries({ queryKey: ['team'] });
     });
 
-    socket.on('role_changed', (_payload: HavenlyEvents['role_changed']) => {
+    socket.on('role_changed', () => {
       queryClient.invalidateQueries({ queryKey: ['team'] });
     });
 
-    socket.on('user_logged_in', (_payload: HavenlyEvents['user_logged_in']) => {
+    socket.on('user_logged_in', () => {
       queryClient.invalidateQueries({ queryKey: ['activity'] });
     });
 
-    socket.on('alert_fired', (_payload: HavenlyEvents['alert_fired']) => {
+    socket.on('alert_fired', () => {
       queryClient.invalidateQueries({ queryKey: ['alerts'] });
       queryClient.invalidateQueries({ queryKey: ['analytics', 'summary'] });
     });
 
-    socket.on('intake_created', (_payload: HavenlyEvents['intake_created']) => {
+    socket.on('intake_created', () => {
       queryClient.invalidateQueries({ queryKey: ['intakes'] });
       queryClient.invalidateQueries({ queryKey: ['analytics', 'summary'] });
     });
