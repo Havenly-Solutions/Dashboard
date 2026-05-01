@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 
 import { headers as getHeaders } from 'next/headers'
 
-const BACKEND_URL = process.env.BACKEND_API_URL || 'http://localhost:3005'
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || 'https://api.havenly.solutions'
 
 /**
  * serverFetch

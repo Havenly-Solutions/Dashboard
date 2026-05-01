@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
     
     try {
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3005'
+      const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.havenly.solutions'
       const res = await fetch(`${BACKEND_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

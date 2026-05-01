@@ -8,7 +8,7 @@ import type { HavenlyEvents } from '@/types/socket';
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:3005';
+const BACKEND_URL = process.env.NEXT_PUBLIC_SOCKET_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'https://api.havenly.solutions';
 
 // ─── Query key registry ───────────────────────────────────────────────────────
 // Maps a socket event's entity to the React Query keys that should be

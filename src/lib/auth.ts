@@ -2,7 +2,7 @@ import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { Role } from '@/types'
 
-const BACKEND_URL = process.env.BACKEND_API_URL || 'http://localhost:3005'
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || 'https://api.havenly.solutions'
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt', maxAge: 24 * 60 * 60 },
