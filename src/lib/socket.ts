@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3005';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.havenly.solutions';
 
 let socket: Socket | null = null;
 

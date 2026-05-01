@@ -97,7 +97,12 @@ export default function ForcePasswordChangeModal() {
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C0392B] pr-10" 
                 placeholder="••••••••••••"
               />
-              <button type="button" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <button 
+                type="button" 
+                onClick={() => setShowCurrent(!showCurrent)} 
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                aria-label={showCurrent ? "Hide password" : "Show password"}
+              >
                 {showCurrent ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
@@ -114,7 +119,12 @@ export default function ForcePasswordChangeModal() {
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C0392B] pr-10" 
                 placeholder="New secure password"
               />
-              <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <button 
+                type="button" 
+                onClick={() => setShowNew(!showNew)} 
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                aria-label={showNew ? "Hide password" : "Show password"}
+              >
                 {showNew ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>
@@ -131,7 +141,12 @@ export default function ForcePasswordChangeModal() {
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C0392B] pr-10" 
                 placeholder="Confirm new password"
               />
-              <button type="button" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+              <button 
+                type="button" 
+                onClick={() => setShowConfirm(!showConfirm)} 
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                aria-label={showConfirm ? "Hide password" : "Show password"}
+              >
                 {showConfirm ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
             </div>

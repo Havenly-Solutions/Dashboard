@@ -91,6 +91,8 @@ export default function Header({ title, subtitle }: HeaderProps) {
           <button 
             onClick={() => setShowProfile(!showProfile)}
             className="flex items-center gap-2.5 pl-3 border-l border-gray-100 group"
+            aria-label="User profile menu"
+            aria-expanded={showProfile}
           >
             <div className="w-8 h-8 rounded-lg bg-[#1A1A2E] flex items-center justify-center text-white text-[10px] font-bold group-hover:scale-105 transition-transform shadow-sm">
               {user?.name?.split(' ').map((n: string) => n[0]).join('') || 'US'}

@@ -94,6 +94,8 @@ export default function RootLoginPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="animate-in slide-in-from-right-4 duration-300">
                 <input
+                  id="login-email"
+                  name="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -106,6 +108,8 @@ export default function RootLoginPage() {
 
               <div className="animate-in slide-in-from-right-4 duration-300 relative">
                 <input
+                  id="login-password"
+                  name="password"
                   type={showPw ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

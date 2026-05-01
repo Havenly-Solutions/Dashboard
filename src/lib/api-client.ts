@@ -1,7 +1,7 @@
 import { getSession, signOut } from 'next-auth/react';
 import * as Sentry from '@sentry/nextjs';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3005';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.havenly.solutions';
 
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
