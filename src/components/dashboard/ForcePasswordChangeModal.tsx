@@ -53,9 +53,8 @@ export default function ForcePasswordChangeModal() {
         throw new Error(data.message || data.error || `Request failed (${res.status})`)
       }
 
-      // The backend clears tokens and expects a re-login
-      window.location.href = '/' // Quick redirect
-      await signOut({ callbackUrl: '/' })
+      // Sign out and redirect to login
+      await signOut({ callbackUrl: '/', redirect: true })
       
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred')
