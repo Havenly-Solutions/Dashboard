@@ -38,8 +38,7 @@ const nextConfig = {
               "img-src 'self' data: https: https://*.havenly.solutions",
               "connect-src 'self' https://*.havenly.solutions wss://*.havenly.solutions https://api.havenly.solutions wss://api.havenly.solutions https://*.sentry.io https://sentry.io https://*.ingest.sentry.io https://vercel.live",
               "frame-src 'self' https://vercel.live",
-              "frame-ancestors 'self' https://havenly.solutions https://dashboard.havenly.solutions",
-              "require-trusted-types-for 'script'"
+              "frame-ancestors 'self' https://havenly.solutions https://dashboard.havenly.solutions"
             ].join('; ')
           },
         ],
