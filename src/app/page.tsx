@@ -69,6 +69,7 @@ export default function RootLoginPage() {
           fill
           className="object-cover"
           priority
+          sizes="100vw"
         />
       </div>
       <div className="absolute inset-0 z-10 bg-[#1A1A2E]/80 backdrop-blur-[2px]" />
@@ -79,10 +80,10 @@ export default function RootLoginPage() {
         {/* Left Side: Form */}
         <div className="flex-1 p-8 md:p-12 flex flex-col">
           <div className="flex items-center gap-2 mb-10">
-            <div className="w-8 h-8 bg-[#1A1A2E] rounded flex items-center justify-center p-1.5 relative">
-              <Image src="/favicon.ico" alt="Havenly Solutions Logo" fill className="object-contain p-1.5" />
+            <div className="w-8 h-8 bg-[#1A1A2E] rounded flex items-center justify-center relative overflow-hidden">
+              <Image src="/logo.png" alt="Havenly Solutions Logo" fill className="object-contain p-1.5" />
             </div>
-            <span className="font-display font-bold text-[#666] text-sm uppercase tracking-wider">Havenly Solutions</span>
+            <span className="font-display font-bold text-[#444] text-sm uppercase tracking-wider">Havenly Solutions</span>
           </div>
 
           <div className="flex-1">
@@ -99,7 +100,7 @@ export default function RootLoginPage() {
                   required
                   placeholder="Business Email"
                   title="Enter your business email"
-                  className="w-full border-b border-[#666] py-2 text-[15px] focus:outline-none focus:border-[#0067b8] transition-colors placeholder-[#666] mb-6"
+                  className="w-full border-b border-[#444] py-3 text-[15px] focus:outline-none focus:border-[#0067b8] transition-colors placeholder-[#444] mb-6"
                 />
               </div>
 
@@ -111,15 +112,15 @@ export default function RootLoginPage() {
                   required
                   placeholder="Password"
                   title="Enter your password"
-                  className="w-full border-b border-[#666] py-2 text-[15px] focus:outline-none focus:border-[#0067b8] transition-colors placeholder-[#666] pr-10"
+                  className="w-full border-b border-[#444] py-3 text-[15px] focus:outline-none focus:border-[#0067b8] transition-colors placeholder-[#444] pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw(!showPw)}
-                  className="absolute right-0 top-2 text-[#666] hover:text-[#333]"
-                  title={showPw ? "Hide password" : "Show password"}
+                  className="absolute right-0 top-1 p-2 text-[#444] hover:text-[#333]"
+                  aria-label={showPw ? "Hide password" : "Show password"}
                 >
-                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
 
@@ -150,7 +151,7 @@ export default function RootLoginPage() {
                 <span className="text-[12px] text-[#666] hover:underline cursor-pointer">Privacy & cookies</span>
               </NextLink>
             </div>
-            <span className="text-[15px] text-[#666]">...</span>
+            <span className="text-[15px] text-[#444]">...</span>
           </div>
         </div>
 

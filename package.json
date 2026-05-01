@@ -38,5 +38,11 @@
     "tailwindcss": "^3.4.14",
     "ts-node": "^10.9.2",
     "typescript": "^5.6.3"
-  }
+  },
+  "browserslist": [
+    "last 3 versions",
+    "> 0.5%",
+    "not dead",
+    "not ie 11"
+  ]
 }
