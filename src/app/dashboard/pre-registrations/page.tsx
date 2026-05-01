@@ -65,7 +65,7 @@ export default function PreRegistrationsPage() {
               <Users size={16} className="text-[#C0392B]" />
             </div>
             <div className="font-display font-bold text-3xl text-[#1A1A2E]">{total.toLocaleString()}</div>
-            <div className="flex items-center gap-1 text-emerald-600 text-xs mt-1"><TrendingUp size={12} />+14% this week</div>
+            <div className="flex items-center gap-1 text-emerald-600 text-xs mt-1"></div>
           </div>
           <div className="stat-card">
             <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">Tour Target</div>

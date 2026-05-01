@@ -50,18 +50,26 @@ const ROLE_COLOURS: Record<string, string> = {
   FOUNDER:        'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
   CHIEF_OFFICER:  'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
   MANAGER:        'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200',
-  DATA_SCIENTIST: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
   PA:             'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-200',
   NGO_PARTNER:    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
   DEVELOPER:      'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
   INVESTOR:       'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
 };
 
+const ALLOWED_ROLES = [
+  'CHIEF_OFFICER',
+  'MANAGER',
+  'DEVELOPER',
+  'PA',
+  'NGO_PARTNER',
+  'INVESTOR',
+];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function TeamPage() {
   const { data: session } = useSession();
-  const role = (session?.user as any)?.role;
+  const userRole = (session?.user as any)?.role;
 
   const queryClient = useQueryClient();
 
@@ -79,6 +87,7 @@ export default function TeamPage() {
     role: 'MANAGER',
   });
   const [inviteError, setInviteError] = useState('');
+  const [actionError, setActionError] = useState('');
 
   const invite = useMutation({
     mutationFn: inviteMember,
@@ -91,7 +100,37 @@ export default function TeamPage() {
     onError: (err: Error) => setInviteError(err.message),
   });
 
-  if (role !== 'FOUNDER' && role !== 'CHIEF_OFFICER') {
+  const removeMember = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/team/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Delete failed');
+      return res.json();
+    },
+    onSuccess: () => {
+      setActionError('');
+      queryClient.invalidateQueries({ queryKey: ['team'] });
+    },
+    onError: (err: Error) => setActionError(err.message),
+  });
+
+  const roleChange = useMutation({
+    mutationFn: async ({ id, role }: { id: string; role: string }) => {
+      const res = await fetch(`/api/team/${id}/role`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role }),
+      });
+      if (!res.ok) throw new Error('Role change failed');
+      return res.json();
+    },
+    onSuccess: () => {
+      setActionError('');
+      queryClient.invalidateQueries({ queryKey: ['team'] });
+    },
+    onError: (err: Error) => setActionError(err.message),
+  });
+
+  if (userRole !== 'FOUNDER' && userRole !== 'CHIEF_OFFICER') {
     return (
       <div className="flex h-64 items-center justify-center text-gray-400">
         You do not have permission to manage the team.
@@ -138,18 +177,18 @@ export default function TeamPage() {
             value={form.role}
             onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
           >
-            <option value="CHIEF_OFFICER">Chief officer</option>
-            <option value="MANAGER">Manager</option>
-            <option value="DATA_SCIENTIST">Data scientist</option>
-            <option value="DEVELOPER">Developer</option>
-            <option value="PA">PA</option>
-            <option value="NGO_PARTNER">NGO partner</option>
-            <option value="INVESTOR">Investor</option>
+            {ALLOWED_ROLES.map(r => (
+              <option key={r} value={r}>{r.replace('_', ' ').toLowerCase()}</option>
+            ))}
           </select>
         </div>
 
         {inviteError && (
           <p className="mt-3 text-sm text-red-500">{inviteError}</p>
+        )}
+
+        {actionError && (
+          <p className="mt-3 text-sm text-red-500">{actionError}</p>
         )}
 
         <button
@@ -180,6 +219,7 @@ export default function TeamPage() {
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Last login</th>
                 <th className="px-4 py-3 font-medium">Invited by</th>
+                {userRole === 'FOUNDER' && <th className="px-4 py-3 font-medium">Actions</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 bg-white dark:divide-gray-800 dark:bg-gray-900">
@@ -187,14 +227,27 @@ export default function TeamPage() {
                 <tr key={m.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
                   <td className="px-4 py-3">
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {m.name}
+                      {m.firstName} {m.lastName}
                     </p>
                     <p className="text-xs text-gray-500">{m.email}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${ROLE_COLOURS[m.role] ?? 'bg-gray-100 text-gray-700'}`}>
-                      {m.role.replace('_', ' ')}
-                    </span>
+                    {userRole === 'FOUNDER' && m.role !== 'FOUNDER' ? (
+                      <select
+                        className="rounded-lg border border-gray-300 px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                        value={m.role}
+                        onChange={(e) => roleChange.mutate({ id: m.id, role: e.target.value })}
+                        disabled={roleChange.isPending}
+                      >
+                        {ALLOWED_ROLES.map(r => (
+                          <option key={r} value={r}>{r.replace('_', ' ')}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${ROLE_COLOURS[m.role] ?? 'bg-gray-100 text-gray-700'}`}>
+                        {m.role.replace('_', ' ')}
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     {m.mustChangePassword ? (
@@ -208,13 +261,30 @@ export default function TeamPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-500">
-                    {m.lastLogin
-                      ? new Date(m.lastLogin).toLocaleString()
+                    {m.lastLoginAt
+                      ? new Date(m.lastLoginAt).toLocaleString()
                       : 'Never'}
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-500">
-                    {m.invitedBy ? m.invitedBy : '—'}
+                    {m.inviter ? `${m.inviter.firstName} ${m.inviter.lastName}` : '—'}
                   </td>
+                  {userRole === 'FOUNDER' && (
+                    <td className="px-4 py-3">
+                      {m.role !== 'FOUNDER' && (
+                        <button
+                          onClick={() => {
+                            if (window.confirm('Are you sure you want to remove this member?')) {
+                              removeMember.mutate(m.id);
+                            }
+                          }}
+                          className="text-xs font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
+                          disabled={removeMember.isPending}
+                        >
+                          Delete
+                        </button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>

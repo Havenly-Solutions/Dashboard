@@ -139,8 +139,11 @@ export default function LiveFeedPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-[9px] text-gray-400 uppercase tracking-widest mb-1.5 font-bold">Growth Rate</div>
-                  <div className="font-display font-bold text-havenly-green text-2xl tracking-tighter">+14.2%</div>
+                  <div className="font-display font-bold text-havenly-green text-2xl tracking-tighter">
+                    {data?.weeklyGrowth !== undefined 
+                      ? (data.weeklyGrowth > 0 ? `+${data.weeklyGrowth}%` : `${data.weeklyGrowth}%`) 
+                      : '—'}
+                  </div>
                 </div>
               </div>
               <div className="h-40">
