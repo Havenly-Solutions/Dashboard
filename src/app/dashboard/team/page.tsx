@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { apiClient } from '@/lib/apiClient';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -22,9 +23,7 @@ interface TeamMember {
 // ─── API calls ────────────────────────────────────────────────────────────────
 
 async function fetchTeam(): Promise<TeamMember[]> {
-  const res = await fetch('/api/team');
-  if (!res.ok) throw new Error('Failed to fetch team');
-  const json = await res.json();
+  const json = await apiClient('/api/team');
   return json.data;
 }
 
@@ -34,14 +33,10 @@ async function inviteMember(body: {
   firstName: string;
   lastName: string;
 }) {
-  const res = await fetch('/api/team/invite', {
+  return apiClient('/api/team/invite', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.message ?? 'Invite failed');
-  return json;
 }
 
 // ─── Role badge colours ───────────────────────────────────────────────────────
@@ -102,9 +97,7 @@ export default function TeamPage() {
 
   const removeMember = useMutation({
     mutationFn: async (id: string) => {
-      const res = await fetch(`/api/team/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Delete failed');
-      return res.json();
+      return apiClient(`/api/team/${id}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       setActionError('');
@@ -115,13 +108,10 @@ export default function TeamPage() {
 
   const roleChange = useMutation({
     mutationFn: async ({ id, role }: { id: string; role: string }) => {
-      const res = await fetch(`/api/team/${id}/role`, {
+      return apiClient(`/api/team/${id}/role`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role }),
       });
-      if (!res.ok) throw new Error('Role change failed');
-      return res.json();
     },
     onSuccess: () => {
       setActionError('');

@@ -5,6 +5,7 @@ import { Settings, Search, LogOut, User, ShieldCheck, Loader2 } from 'lucide-rea
 import { ROLE_LABELS, ROLE_BADGE_COLORS, Role } from '@/types'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
+import { apiClient } from '@/lib/apiClient'
 import NotificationFeed from './NotificationFeed'
 
 interface HeaderProps { title: string; subtitle?: string }
@@ -31,8 +32,7 @@ export default function Header({ title, subtitle }: HeaderProps) {
   useEffect(() => {
     async function fetchAlerts() {
       try {
-        const res = await fetch('/api/analytics')
-        const data = await res.json()
+        const data = await apiClient('/api/analytics')
         setActiveAlerts(data.activeAlerts || 0)
       } catch (e) {
         // Silently fail for header polling

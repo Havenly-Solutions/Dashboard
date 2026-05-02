@@ -11,6 +11,11 @@ const nextConfig = {
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs'],
   },
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
