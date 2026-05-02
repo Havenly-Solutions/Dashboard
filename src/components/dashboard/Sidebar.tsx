@@ -69,63 +69,51 @@ export default function Sidebar() {
 
       {/* Sidebar Container */}
       <aside className={cn(
-        "w-64 min-h-screen bg-white border-r border-gray-100 flex flex-col fixed left-0 top-0 bottom-0 z-50 transition-transform duration-300 md:translate-x-0 overflow-hidden",
+        "w-64 min-h-screen bg-white border-r border-[#dadce0] flex flex-col fixed left-0 top-0 bottom-0 z-50 transition-transform duration-300 md:translate-x-0 overflow-hidden",
         isOpen ? "translate-x-0" : "-translate-x-full"
       )}>
-        {/* Logo */}
-        <div className="px-5 pt-6 pb-5 border-b border-gray-50 flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-[#1A1A2E] p-1.5 shadow-sm">
-              <Image src="/favicon.ico" alt="Havenly Solutions Logo" width={36} height={36} className="w-full h-full object-contain" />
-            </div>
-            <div>
-              <div className="font-display font-black text-[#1A1A2E] text-base leading-none tracking-tight">Havenly Solutions</div>
-              <div className="text-gray-400 text-[10px] uppercase tracking-widest font-bold mt-1">Always On.</div>
-            </div>
+        {/* Logo Section - Google Style */}
+        <div className="px-6 h-[64px] flex items-center gap-3 border-b border-[#dadce0]">
+          <Image src="/favicon.ico" alt="Havenly Logo" width={24} height={24} className="object-contain" />
+          <div className="text-[18px] font-medium text-[#5f6368] tracking-tight">
+            Havenly <span className="font-normal text-[#80868b]">Solutions</span>
           </div>
-          <button onClick={() => setIsOpen(false)} className="md:hidden text-gray-400 p-1" aria-label="Close menu">
+          <button onClick={() => setIsOpen(false)} className="md:hidden ml-auto text-[#5f6368] p-1">
             <X size={20} />
           </button>
         </div>
 
         {/* PORTAL SWITCHER */}
-        <div className="px-3 py-3 border-b border-gray-50 bg-gray-50/30">
+        <div className="px-4 py-3 bg-[#f8f9fa] border-b border-[#dadce0]">
           <PortalSwitcher />
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 overflow-y-auto space-y-0.5">
+        <nav className="flex-1 py-4 overflow-y-auto pr-2">
           {visibleItems.map(({ href, label, icon: Icon, exact }) => {
             const active = exact ? pathname === href : pathname.startsWith(href)
             return (
               <Link key={href} href={href} onClick={() => setIsOpen(false)} className={cn('sidebar-nav-item', active ? 'active' : 'inactive')}>
-                <Icon size={16} />
-                <span>{label}</span>
-                {active && <ChevronRight size={14} className="ml-auto opacity-60" />}
+                <Icon size={20} />
+                <span className="truncate">{label}</span>
               </Link>
             )
           })}
         </nav>
 
         {/* Bottom */}
-        <div className="px-3 pb-4 space-y-0.5 border-t border-gray-50 pt-4 bg-gray-50/10">
-          <div className="px-3 py-2 mb-2">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#0B6E4F] animate-pulse" />
-              <span className="text-gray-400 text-[10px] uppercase tracking-widest font-bold">System Active</span>
-            </div>
-            {/* Show effective role label */}
-            <div className="mt-2 pt-2 border-t border-gray-50">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Clearance</p>
-              <p className="text-sm text-[#1A1A2E] font-black">{ROLE_LABELS[effectiveRole]}</p>
-            </div>
+        <div className="pb-4 border-t border-[#dadce0] pt-4">
+          <div className="px-6 py-2 mb-2">
+            <p className="text-[11px] text-[#5f6368] font-medium mb-1">Clearance Level</p>
+            <p className="text-[13px] text-[#202124] font-medium">{ROLE_LABELS[effectiveRole]}</p>
           </div>
-          <button onClick={() => signOut({ callbackUrl: '/' })} className="sidebar-nav-item inactive w-full">
-            <LogOut size={16} />
+          <button onClick={() => signOut({ callbackUrl: '/' })} className="sidebar-nav-item inactive w-[calc(100%-8px)]">
+            <LogOut size={20} />
             <span>Log Out</span>
           </button>
         </div>
       </aside>
+
     </>
   )
 }

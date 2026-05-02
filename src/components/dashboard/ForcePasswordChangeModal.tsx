@@ -63,103 +63,103 @@ export default function ForcePasswordChangeModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
-        <div className="bg-[#C0392B] p-6 text-white text-center">
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8" />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#202124]/30 p-4">
+      <div className="bg-white w-full max-w-md rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in duration-200">
+        <div className="p-8 pb-4 text-center">
+          <div className="w-12 h-12 bg-[#e8f0fe] rounded-full flex items-center justify-center mx-auto mb-4">
+            <Lock className="w-6 h-6 text-[#1a73e8]" />
           </div>
-          <h2 className="text-xl font-bold font-display">Security Required</h2>
-          <p className="text-white/80 text-sm mt-1">Set your final production password</p>
+          <h2 className="text-[20px] font-normal text-[#202124]">Account Security</h2>
+          <p className="text-[#5f6368] text-[14px] mt-1">Please set your permanent password</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="flex gap-3 p-3 bg-amber-50 border border-amber-100 rounded-lg text-amber-800 text-[11px] leading-relaxed">
-            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0" />
-            <p>You are using a temporary or founder password. You must set a unique 12+ character password before you can continue.</p>
+        <form onSubmit={handleSubmit} className="p-8 pt-4 space-y-5">
+          <div className="p-4 bg-[#fef7e0] border border-[#feefc3] rounded-[4px] text-[#202124] text-[13px] leading-relaxed flex gap-3">
+            <AlertCircle className="w-5 h-5 text-[#fbbc04] shrink-0" />
+            <p>To secure your account, you must update your temporary password to a unique 12+ character phrase.</p>
           </div>
 
           {error && (
-            <div className="px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-medium">
+            <div className="px-3 py-2 bg-[#fce8e6] border border-[#fad2cf] rounded-[4px] text-[#ea4335] text-[13px] font-medium">
               {error}
             </div>
           )}
 
           <div>
-            <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5 font-bold">Current Password</label>
+            <label className="block text-[12px] text-[#5f6368] font-medium mb-1.5">Current Password</label>
             <div className="relative">
               <input 
                 type={showCurrent ? 'text' : 'password'}
                 required
                 value={currentPassword} 
                 onChange={e => setCurrentPassword(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C0392B] pr-10" 
-                placeholder="••••••••••••"
+                className="w-full border border-[#dadce0] rounded-[4px] px-3 py-2 text-[14px] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8]/20 pr-10" 
+                placeholder="Current password"
               />
               <button 
                 type="button" 
                 onClick={() => setShowCurrent(!showCurrent)} 
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                aria-label={showCurrent ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5f6368]"
               >
-                {showCurrent ? <EyeOff size={14} /> : <Eye size={14} />}
+                {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5 font-bold">New Password</label>
+            <label className="block text-[12px] text-[#5f6368] font-medium mb-1.5">New Password</label>
             <div className="relative">
               <input 
                 type={showNew ? 'text' : 'password'}
                 required
                 value={newPassword} 
                 onChange={e => setNewPassword(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C0392B] pr-10" 
-                placeholder="New secure password"
+                className="w-full border border-[#dadce0] rounded-[4px] px-3 py-2 text-[14px] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8]/20 pr-10" 
+                placeholder="New password"
               />
               <button 
                 type="button" 
                 onClick={() => setShowNew(!showNew)} 
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                aria-label={showNew ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5f6368]"
               >
-                {showNew ? <EyeOff size={14} /> : <Eye size={14} />}
+                {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] text-gray-500 uppercase tracking-widest mb-1.5 font-bold">Confirm New Password</label>
+            <label className="block text-[12px] text-[#5f6368] font-medium mb-1.5">Confirm New Password</label>
             <div className="relative">
               <input 
                 type={showConfirm ? 'text' : 'password'}
                 required
                 value={confirmPassword} 
                 onChange={e => setConfirmPassword(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#C0392B] pr-10" 
-                placeholder="Confirm new password"
+                className="w-full border border-[#dadce0] rounded-[4px] px-3 py-2 text-[14px] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8]/20 pr-10" 
+                placeholder="Confirm password"
               />
               <button 
                 type="button" 
                 onClick={() => setShowConfirm(!showConfirm)} 
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
-                aria-label={showConfirm ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5f6368]"
               >
-                {showConfirm ? <EyeOff size={14} /> : <Eye size={14} />}
+                {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            disabled={saving} 
-            className="w-full flex items-center justify-center gap-2 py-3 bg-[#1A1A2E] text-white rounded-lg text-sm font-bold hover:bg-[#2a2a4a] transition-all disabled:opacity-50"
-          >
-            {saving ? <><Loader2 size={16} className="animate-spin" />Securing Account...</> : <><Save size={16} />Update & Continue</>}
-          </button>
+          <div className="pt-2">
+            <button 
+              type="submit" 
+              disabled={saving} 
+              className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#1a73e8] text-white rounded-[4px] text-[14px] font-medium hover:bg-[#1557b0] transition-all disabled:opacity-50"
+            >
+              {saving ? <><Loader2 size={18} className="animate-spin" />Processing...</> : <><Save size={18} />Update Password</>}
+            </button>
+          </div>
         </form>
       </div>
     </div>
+
   )
 }

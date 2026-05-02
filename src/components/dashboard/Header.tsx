@@ -46,94 +46,77 @@ export default function Header({ title, subtitle }: HeaderProps) {
   const clearance = role ? CLEARANCE_LEVELS[role] || CLEARANCE_LEVELS[Role.GUEST] : CLEARANCE_LEVELS[Role.GUEST]
 
   return (
-    <header className="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between sticky top-0 z-30">
+    <header className="bg-white border-b border-[#dadce0] px-6 h-[64px] flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center gap-6">
         <div>
-          <h1 className="font-display font-bold text-[#1A1A2E] text-2xl leading-tight">{title}</h1>
-          {subtitle && <p className="text-gray-400 text-[10px] uppercase tracking-widest font-bold mt-0.5">{subtitle}</p>}
+          <h1 className="text-[22px] font-normal text-[#202124] leading-tight">{title}</h1>
+          {subtitle && <p className="text-[12px] text-[#5f6368] mt-0.5">{subtitle}</p>}
         </div>
         
-        {/* Safety Context / Clearance Badge */}
+        {/* Status indicator - Google Style */}
         {role && (
-          <div className="hidden lg:flex items-center gap-3 pl-6 border-l border-gray-100">
-            <div className={cn("flex flex-col items-start")}>
-              <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">Safety Context</span>
-              <div className="flex items-center gap-2">
-                <span className={cn('text-[9px] px-2 py-0.5 rounded border font-bold uppercase tracking-tighter', clearance.color)}>
-                  {clearance.label}
-                </span>
-                <span className="text-[10px] font-semibold text-[#1A1A2E] uppercase">
-                   {user?.department || 'Active Duty'}
-                </span>
-              </div>
+          <div className="hidden lg:flex items-center gap-3 pl-6 border-l border-[#dadce0]">
+            <div className="flex items-center gap-2">
+              <span className={cn('text-[11px] px-2 py-0.5 rounded-full border font-medium', clearance.color.replace('bg-black', 'bg-white').replace('text-[#C0392B]', 'text-[#ea4335]'))}>
+                {clearance.label}
+              </span>
+              <span className="text-[12px] font-normal text-[#5f6368]">
+                 {user?.department || 'Active'}
+              </span>
             </div>
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="relative hidden md:block">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          <input className="bg-gray-50 border border-gray-100 rounded-lg pl-9 pr-4 py-2 text-xs text-gray-600 placeholder-gray-400 focus:outline-none focus:border-[#C0392B] w-48 transition-colors font-medium" placeholder="System Search..." />
+      <div className="flex items-center gap-2">
+        <div className="relative hidden md:block mr-2">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#5f6368]" />
+          <input className="bg-[#f1f3f4] border-transparent rounded-lg pl-10 pr-4 py-2 text-[14px] text-[#202124] placeholder-[#5f6368] focus:bg-white focus:border-[#1a73e8] focus:ring-0 w-64 transition-all" placeholder="Search report..." />
         </div>
         
         <NotificationFeed />
 
         <button 
           onClick={() => router.push('/dashboard/settings')}
-          className="p-2 text-gray-400 hover:text-[#1A1A2E] hover:bg-gray-50 rounded-lg transition-colors px-3"
+          className="p-2 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full transition-colors"
           title="Settings"
         >
-          <Settings size={18} />
+          <Settings size={20} />
         </button>
 
-        <div className="relative">
+        <div className="relative ml-2">
           <button 
             onClick={() => setShowProfile(!showProfile)}
-            className="flex items-center gap-2.5 pl-3 border-l border-gray-100 group"
-            aria-label="User profile menu"
-            aria-expanded={showProfile}
+            className="flex items-center gap-2 pl-3 border-l border-[#dadce0] group"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#1A1A2E] flex items-center justify-center text-white text-[10px] font-bold group-hover:scale-105 transition-transform shadow-sm">
-              {user?.name?.split(' ').map((n: string) => n[0]).join('') || 'US'}
-            </div>
-            <div className="hidden sm:block text-left">
-              <div className="text-xs font-bold text-[#1A1A2E] leading-none">{user?.name}</div>
-              <div className="flex items-center gap-1 mt-1">
-                <span className={cn('text-[8px] font-bold uppercase', role === Role.FOUNDER ? 'text-[#C0392B]' : 'text-gray-400')}>
-                  {ROLE_LABELS[role]}
-                </span>
-                {role === Role.FOUNDER && <ShieldCheck size={8} className="text-[#C0392B]" />}
-              </div>
+            <div className="w-8 h-8 rounded-full bg-[#5f6368] flex items-center justify-center text-white text-[12px] font-medium">
+              {user?.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
             </div>
           </button>
 
           {showProfile && (
-            <div className="absolute right-0 mt-3 w-56 bg-white border border-gray-100 rounded-xl shadow-2xl py-2 z-50 animate-in fade-in zoom-in-95">
-              <div className="px-4 py-3 border-b border-gray-50">
-                <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Connected Session</p>
-                <p className="text-xs font-bold truncate text-[#1A1A2E]">{user?.email}</p>
+            <div className="absolute right-0 mt-2 w-72 bg-white border border-[#dadce0] rounded-lg shadow-[0_2px_10px_rgba(0,0,0,0.2)] py-4 z-50">
+              <div className="px-6 pb-4 border-b border-[#f1f3f4] text-center">
+                <div className="w-16 h-16 rounded-full bg-[#5f6368] flex items-center justify-center text-white text-2xl font-medium mx-auto mb-2">
+                  {user?.name?.split(' ').map((n: string) => n[0]).join('') || 'U'}
+                </div>
+                <p className="text-[16px] font-medium text-[#202124]">{user?.name}</p>
+                <p className="text-[14px] text-[#5f6368]">{user?.email}</p>
               </div>
-              <div className="py-1">
+              <div className="py-2">
                 <button 
                   onClick={() => router.push('/dashboard/settings')}
-                   className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
+                   className="w-full flex items-center gap-3 px-6 py-2 text-[14px] text-[#202124] hover:bg-[#f8f9fa]"
                 >
-                  <User size={14} className="text-gray-400" /> Account Intelligence
-                </button>
-                <button 
-                  onClick={() => router.push('/dashboard/settings')}
-                   className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors"
-                >
-                  <ShieldCheck size={14} className="text-gray-400" /> Security Protocol
+                  <User size={18} className="text-[#5f6368]" /> Manage Account
                 </button>
               </div>
-              <div className="border-t border-gray-50 mt-1 pt-1">
+              <div className="border-t border-[#f1f3f4] pt-2">
                 <button 
                   onClick={() => router.push('/api/auth/signout')}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-red-500 hover:bg-red-50 transition-colors"
+                  className="w-full flex items-center gap-3 px-6 py-2 text-[14px] text-[#ea4335] hover:bg-[#f8f9fa]"
                 >
-                  <LogOut size={14} /> Terminate Session
+                  <LogOut size={18} /> Sign out
                 </button>
               </div>
             </div>
@@ -141,5 +124,6 @@ export default function Header({ title, subtitle }: HeaderProps) {
         </div>
       </div>
     </header>
+
   )
 }

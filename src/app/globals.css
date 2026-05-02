@@ -4,101 +4,117 @@
 
 @layer base {
   :root {
-    --background: 0 0% 97.6%;
-    --foreground: 0 0% 5.1%;
-    --primary: 4 64% 47%;
+    /* GSC Color Palette */
+    --background: 210 17% 95%; /* #f1f3f4 */
+    --foreground: 225 6% 13%; /* #202124 */
+    --primary: 217 89% 51%; /* #1a73e8 */
     --primary-foreground: 0 0% 100%;
-    --secondary: 231 27% 14%;
+    --secondary: 213 6% 39%; /* #5f6368 */
     --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 90%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 0 0% 94%;
-    --accent-foreground: 0 0% 10%;
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 4 64% 47%;
-    --destructive: 4 64% 47%;
+    --muted: 210 17% 95%; /* #f1f3f4 */
+    --muted-foreground: 210 7% 52%; /* #80868b */
+    --accent: 214 82% 96%; /* #e8f0fe */
+    --accent-foreground: 217 89% 51%; /* #1a73e8 */
+    --border: 214 9% 87%; /* #dadce0 */
+    --input: 214 9% 87%; /* #dadce0 */
+    --ring: 217 89% 51% / 0.2; /* #1a73e8 with alpha */
+    --destructive: 5 81% 56%; /* #ea4335 */
     --destructive-foreground: 0 0% 100%;
-    --radius: 0.5rem;
-    --havenly-red: #C0392B;
-    --havenly-navy: #1A1A2E;
-    --havenly-green: #0B6E4F;
+    --radius: 4px;
+
+    /* Extra colors */
+    --success: 140 52% 43%; /* #34a853 */
+    --warning: 45 97% 50%; /* #fbbc04 */
+    
+    /* Legacy override */
+    --havenly-red: #ea4335;
+    --havenly-navy: #202124;
+    --havenly-green: #34a853;
   }
 }
 
 @layer base {
   * { @apply border-border; }
-  body { @apply bg-[#F9F9F9] text-foreground; }
+  body { 
+    @apply bg-[#f1f3f4] text-foreground; 
+    font-family: 'Google Sans', 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+  
+  h1 {
+    @apply text-[22px] font-normal text-[#202124] leading-normal;
+  }
+  
+  h2 {
+    @apply text-[16px] font-medium text-[#202124] leading-normal;
+  }
 }
 
 .sidebar-nav-item {
-  @apply flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-150 cursor-pointer;
+  @apply flex items-center gap-4 px-6 h-[40px] rounded-r-full text-[14px] font-normal transition-all duration-200 cursor-pointer;
 }
-.sidebar-nav-item:hover { @apply bg-gray-50 text-[#1A1A2E]; }
-.sidebar-nav-item.active { @apply bg-[#C0392B] text-white shadow-md shadow-red-500/10; }
-.sidebar-nav-item.inactive { @apply text-gray-400 hover:text-[#1A1A2E]; }
+.sidebar-nav-item:hover { @apply bg-[#f1f3f4] text-[#202124]; }
+.sidebar-nav-item.active { @apply bg-[#e8f0fe] text-[#1a73e8] font-medium; }
+.sidebar-nav-item.inactive { @apply text-[#202124] hover:bg-[#f1f3f4]; }
+.sidebar-nav-item svg { @apply w-5 h-5; }
 
-.stat-card {
-  @apply bg-white rounded-2xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-all duration-300;
+.stat-card, .card {
+  @apply bg-white rounded-lg border border-[#dadce0] p-6 shadow-none transition-shadow duration-200;
 }
-
-.severity-critical { @apply text-red-600 bg-red-50 border border-red-200; }
-.severity-warning { @apply text-amber-600 bg-amber-50 border border-amber-200; }
-.severity-advisory { @apply text-blue-600 bg-blue-50 border border-blue-200; }
-.severity-info { @apply text-gray-600 bg-gray-50 border border-gray-200; }
-
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in { animation: fade-in 0.25s ease-out; }
-
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
-}
-.animate-live { animation: live-pulse 1.5s ease-in-out infinite; }
-
-.text-glow {
-  text-shadow: 0 0 10px rgba(192, 57, 43, 0.3);
+.stat-card:hover, .card:hover {
+  @apply shadow-[0_1px_3px_rgba(60,64,67,0.3),0_4px_8px_rgba(60,64,67,0.15)];
 }
 
-.card-gradient {
-  background: linear-gradient(145deg, #ffffff 0%, #f9f9f9 100%);
-}
+.severity-critical { @apply text-[#ea4335] bg-[#fce8e6] border-[#fad2cf]; }
+.severity-warning { @apply text-[#fbbc04] bg-[#fef7e0] border-[#feefc3]; }
+.severity-advisory { @apply text-[#1a73e8] bg-[#e8f0fe] border-[#d2e3fc]; }
+.severity-info { @apply text-[#5f6368] bg-[#f8f9fa] border-[#dadce0]; }
 
 .havenly-btn-red {
-  @apply px-6 py-2.5 bg-[#C0392B] text-white rounded-xl text-sm font-bold hover:bg-[#a93226] transition-all active:scale-[0.98] shadow-lg shadow-red-500/20;
+  @apply px-6 py-2 bg-[#1a73e8] text-white rounded-[4px] text-sm font-medium hover:bg-[#1557b0] transition-colors shadow-none;
 }
 
-/* Glassmorphism Containers with Backdrop */
 .portal-container {
-  background: rgba(255, 255, 255, 0.85);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-}
-
-.dark .portal-container {
-  background: rgba(26, 26, 46, 0.8);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  @apply bg-white border border-[#dadce0] rounded-lg shadow-none;
 }
 
 .glass-card {
-  @apply backdrop-blur-md rounded-2xl p-6 transition-all duration-300;
-  background: #f2e9e4;
-  border: 1.5px solid #000000;
-  color: #000000;
+  @apply bg-white border border-[#dadce0] rounded-lg p-6 shadow-none;
 }
 
-.glass-card h1, .glass-card h2, .glass-card h3, .glass-card p, .glass-card div, .glass-card label, .glass-card span {
-  color: #000000 !important;
+/* Tables */
+table {
+  @apply w-full border-collapse;
+}
+thead tr {
+  @apply bg-[#f8f9fa] border-b border-[#dadce0];
+}
+th {
+  @apply px-4 py-3 text-[12px] font-medium text-[#5f6368] text-left normal-case tracking-normal;
 }
 
-.system-font-stack {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+tbody tr {
+  @apply border-b border-[#f1f3f4] hover:bg-[#f8f9fa] transition-colors;
 }
+td {
+  @apply px-4 py-3 text-[14px] text-[#202124];
+}
+
+/* Inputs */
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  @apply border border-[#dadce0] rounded-[4px] px-3 py-2 text-[14px] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 transition-all;
+}
+
+/* Progress Bar */
+.loading-bar {
+  @apply h-1 bg-[#e8f0fe] overflow-hidden relative w-full;
+}
+.loading-bar-inner {
+  @apply h-full bg-[#1a73e8] absolute top-0 left-0;
+  animation: progress 1.5s ease-in-out infinite;
+}
+@keyframes progress {
+  0% { left: -100%; width: 100%; }
+  100% { left: 100%; width: 100%; }
+}
+

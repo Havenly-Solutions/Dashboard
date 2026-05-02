@@ -12,10 +12,14 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSocket } from '@/hooks/useSocket'
 
 const BRAND_COLORS = {
-  red: '#C0392B',
-  darkRed: '#a93226',
-  navy: '#1A1A2E',
-  gray: '#9B9B9B'
+  blue: '#1a73e8',
+  green: '#34a853',
+  yellow: '#fbbc04',
+  red: '#ea4335',
+  text: '#202124',
+  secondary: '#5f6368',
+  border: '#dadce0',
+  grey: '#f1f3f4'
 }
 
 export default function LiveFeedPage() {
@@ -58,25 +62,25 @@ export default function LiveFeedPage() {
 
   return (
     <div className="flex flex-col flex-1">
-      <Header title="Guardian Command Centre" subtitle="Live Intelligence Feed" />
-      <main className="flex-1 p-8 space-y-6">
-        {/* Top Stats */}
+      <Header title="Performance Overview" subtitle="System Intelligence Feed" />
+      <main className="flex-1 p-6 space-y-4">
+        {/* Top Stats - GSC Style Property Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'GSM Network', value: 'OPERATIONAL', sub: 'Standard Frequency', icon: Radio, color: 'text-emerald-600', dot: 'bg-emerald-500' },
-            { label: 'Cloud Status', value: 'ACTIVE', sub: 'High Availability', icon: Activity, color: 'text-emerald-500', dot: 'bg-emerald-500' },
-            { label: 'NGO Partners', value: stats.totalNGOs, isNum: true, sub: 'Ready for Dispatch', icon: Users, color: 'text-blue-600', dot: 'bg-blue-500' },
-            { label: 'SAPS API Status', value: 'SYNCED', sub: 'Evidence Link Active', icon: Shield, color: 'text-havenly-red', dark: true },
-          ].map(({ label, value, isNum, sub, icon: Icon, color, dot, dark }) => (
-            <div key={label} className={`rounded-xl border p-4 transition-all hover:shadow-md ${dark ? 'bg-havenly-navy border-havenly-navy' : 'glass-card border-gray-100'}`}>
-              <div className="flex items-start justify-between mb-3">
-                <span className={`text-[10px] uppercase tracking-widest font-bold ${dark ? 'text-white/40' : 'text-gray-400'}`}>{label}</span>
-                <Icon size={16} className={dark ? 'text-havenly-red' : color} />
+            { label: 'GSM Network', value: 'OPERATIONAL', sub: 'Standard Frequency', icon: Radio, color: 'text-[#34a853]', dot: 'bg-[#34a853]' },
+            { label: 'Cloud Status', value: 'ACTIVE', sub: 'High Availability', icon: Activity, color: 'text-[#34a853]', dot: 'bg-[#34a853]' },
+            { label: 'NGO Partners', value: stats.totalNGOs, isNum: true, sub: 'Verified Dispatch', icon: Users, color: 'text-[#1a73e8]', dot: 'bg-[#1a73e8]' },
+            { label: 'Evidence API', value: 'SYNCED', sub: 'Real-time Link', icon: Shield, color: 'text-[#1a73e8]', dot: 'bg-[#1a73e8]' },
+          ].map(({ label, value, isNum, sub, icon: Icon, color, dot }) => (
+            <div key={label} className="card p-6 bg-white border border-[#dadce0] rounded-lg">
+              <div className="flex items-start justify-between mb-2">
+                <span className="text-[12px] text-[#5f6368] font-medium">{label}</span>
+                <Icon size={18} className={color} />
               </div>
-              <div className={`font-display font-bold text-xl ${dark ? 'text-white' : 'text-havenly-navy'}`}>
+              <div className="text-[20px] font-medium text-[#202124]">
                 {isNum ? <AnimatedCounter value={Number(value)} /> : value}
               </div>
-              <div className={`text-[10px] mt-1 flex items-center gap-1.5 ${dark ? 'text-white/30' : 'text-gray-400'}`}>
+              <div className="text-[12px] mt-1 flex items-center gap-1.5 text-[#5f6368]">
                 {dot && <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />}
                 {sub}
               </div>
@@ -85,36 +89,35 @@ export default function LiveFeedPage() {
         </div>
 
         {/* Main grid */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
           {/* Incident Feed */}
-          <div className="xl:col-span-2 glass-card  overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <div className="xl:col-span-2 card p-0 overflow-hidden bg-white border border-[#dadce0] rounded-lg">
+            <div className="px-6 py-4 border-b border-[#f1f3f4] flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-havenly-red animate-pulse" />
-                <span className="font-display font-bold text-havenly-navy text-sm">Live Incident Feed</span>
+                <span className="text-[16px] font-medium text-[#202124]">Activity Logs</span>
               </div>
-              {critical > 0 && <span className="text-[10px] bg-havenly-red text-white px-2 py-0.5 rounded font-bold">CRITICAL: {critical}</span>}
+              {critical > 0 && <span className="text-[12px] bg-[#fce8e6] text-[#ea4335] px-2 py-0.5 rounded-full border border-[#fad2cf] font-medium">Critical: {critical}</span>}
             </div>
-            <div className="divide-y divide-gray-50 max-h-[500px] overflow-y-auto">
+            <div className="divide-y divide-[#f1f3f4] max-h-[500px] overflow-y-auto">
               {loading ? (
-                <div className="p-12 text-center text-gray-400 text-sm">Synchronizing with Guardian Protocol...</div>
+                <div className="p-12 text-center text-[#5f6368] text-sm">Loading intelligence data...</div>
               ) : incidents.length === 0 ? (
-                <div className="p-12 text-center text-gray-400 text-sm">Zero critical incidents in current perimeter.</div>
+                <div className="p-12 text-center text-[#5f6368] text-sm">No active alerts detected.</div>
               ) : incidents.map(incident => (
-                <div key={incident.id} className="px-6 py-5 hover:bg-gray-50/50 transition-colors">
+                <div key={incident.id} className="px-6 py-5 hover:bg-[#f8f9fa] transition-colors cursor-pointer">
                   <div className="flex items-start gap-4">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1.5">
-                        <span className={`text-[9px] font-bold uppercase px-2 py-0.5 rounded border ${SEVERITY_COLORS[incident.severity]}`}>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[11px] font-medium uppercase px-2 py-0.5 rounded-full border ${SEVERITY_COLORS[incident.severity]}`}>
                           {incident.severity}
                         </span>
-                        <TimeAgo date={incident.createdAt} className="text-gray-400 text-[10px]" />
+                        <TimeAgo date={incident.createdAt} className="text-[#5f6368] text-[12px]" />
                       </div>
-                      <div className="font-bold text-havenly-navy text-sm">{incident.title}</div>
-                      <div className="text-gray-500 text-xs mt-1 line-clamp-2 leading-relaxed">{incident.description}</div>
-                      <div className="flex items-center gap-1.5 mt-2.5 text-gray-400 text-[10px]">
-                        <MapPin size={10} />
-                        <span>{incident.location || 'Unknown Coordinates'}</span>
+                      <div className="text-[14px] font-medium text-[#202124]">{incident.title}</div>
+                      <div className="text-[#5f6368] text-[13px] mt-1 line-clamp-2">{incident.description}</div>
+                      <div className="flex items-center gap-1.5 mt-2 text-[#80868b] text-[12px]">
+                        <MapPin size={12} />
+                        <span>{incident.location || 'Unknown'}</span>
                       </div>
                     </div>
                   </div>
@@ -124,90 +127,89 @@ export default function LiveFeedPage() {
           </div>
 
           {/* Right column */}
-          <div className="space-y-6">
-            {/* Engagement Depth */}
-            <div className="glass-card  p-6">
-              <div className="flex items-center justify-between mb-6">
-                <span className="font-display font-bold text-havenly-navy text-xs uppercase tracking-wider">Engagement Depth</span>
-                <span className="text-[9px] bg-havenly-red text-white px-2 py-0.5 rounded font-bold">LIVE</span>
+          <div className="space-y-4">
+            {/* Engagement Depth - GSC Graph Style */}
+            <div className="card p-6 bg-white border border-[#dadce0] rounded-lg">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-[14px] font-medium text-[#202124]">Engagement Performance</span>
+                <span className="text-[11px] text-[#34a853] font-medium flex items-center gap-1">
+                  <TrendingUp size={12} />
+                  LIVE
+                </span>
               </div>
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                  <div className="text-[9px] text-gray-400 uppercase tracking-widest mb-1.5 font-bold">Pre-Registrations</div>
-                  <div className="font-display font-bold text-havenly-navy text-2xl tracking-tighter">
+                  <div className="text-[12px] text-[#5f6368] mb-1">Total Conversions</div>
+                  <div className="text-[22px] font-normal text-[#202124]">
                     <AnimatedCounter value={stats.totalRegs} />
                   </div>
                 </div>
-                <div>
-                  <div className="font-display font-bold text-havenly-green text-2xl tracking-tighter">
+                <div className="text-right">
+                  <div className="text-[12px] text-[#5f6368] mb-1">Growth</div>
+                  <div className="text-[22px] font-normal text-[#34a853]">
                     {data?.weeklyGrowth !== undefined 
                       ? (data.weeklyGrowth > 0 ? `+${data.weeklyGrowth}%` : `${data.weeklyGrowth}%`) 
                       : '—'}
                   </div>
                 </div>
               </div>
-              <div className="h-40">
+              <div className="h-44">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData}>
-                    <XAxis dataKey="month" tick={{ fontSize: 9, fontWeight: 700, fill: BRAND_COLORS.gray }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 10, fill: '#5f6368' }} axisLine={false} tickLine={false} />
                     <Tooltip 
-                      contentStyle={{ fontSize: 11, border: 'none', borderRadius: 8, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                      cursor={{ fill: 'rgba(0,0,0,0.02)' }}
+                      contentStyle={{ fontSize: 12, border: '1px solid #dadce0', borderRadius: 4, boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
+                      cursor={{ fill: '#f8f9fa' }}
                     />
-                    <Bar dataKey="registrations" fill={BRAND_COLORS.red} radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="registrations" fill="#1a73e8" radius={[2, 2, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {/* Tactical Controls */}
-            <div className="bg-havenly-navy rounded-xl border border-havenly-navy p-6 shadow-xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Image src="/favicon.ico" alt="Havenly Solutions Logo" width={64} height={64} className="object-contain opacity-20" />
-              </div>
-              <div className="relative">
-                <div className="text-white/40 text-[9px] font-bold uppercase tracking-widest mb-4">Tactical Operations</div>
-                <div className="space-y-2.5">
-                  {[
-                    { label: 'Broadcast Perimeter Alert', icon: Zap, primary: true },
-                    { label: 'Export Evidence Chain', icon: Shield, primary: false },
-                    { label: 'Review NGO Credentials', icon: Eye, primary: false },
-                  ].map(({ label, icon: Icon, primary }) => (
-                    <button key={label} className={`w-full flex items-center justify-between px-4 py-3 rounded-lg text-xs font-bold transition-all ${primary ? 'bg-havenly-red text-white hover:bg-havenly-red shadow-lg shadow-havenly-red/20' : 'glass-card/5 text-white/70 hover:glass-card/10 border border-white/10'}`}>
-                      <span>{label}</span>
-                      <Icon size={14} />
-                    </button>
-                  ))}
-                </div>
+            {/* Tactical Controls - GSC Action List Style */}
+            <div className="card p-6 bg-white border border-[#dadce0] rounded-lg">
+              <div className="text-[14px] font-medium text-[#202124] mb-4">Quick Actions</div>
+              <div className="space-y-2">
+                {[
+                  { label: 'Broadcast Perimeter Alert', icon: Zap, primary: true },
+                  { label: 'Export Evidence Chain', icon: Shield, primary: false },
+                  { label: 'Review NGO Credentials', icon: Eye, primary: false },
+                ].map(({ label, icon: Icon, primary }) => (
+                  <button key={label} className={`w-full flex items-center justify-between px-4 py-2.5 rounded-[4px] text-[13px] font-medium transition-all ${primary ? 'bg-[#1a73e8] text-white hover:bg-[#1557b0]' : 'bg-transparent text-[#1a73e8] border border-[#dadce0] hover:bg-[#1a73e8]/05'}`}>
+                    <span>{label}</span>
+                    <Icon size={14} />
+                  </button>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Audit Log Preview */}
-        <div className="glass-card  overflow-hidden">
-          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+        {/* Audit Log Preview - GSC Table Style */}
+        <div className="card p-0 overflow-hidden bg-white border border-[#dadce0] rounded-lg">
+          <div className="px-6 py-5 border-b border-[#f1f3f4] flex items-center justify-between">
             <div>
-              <h3 className="font-display font-bold text-havenly-navy text-sm tracking-tight">System Integrity Audit</h3>
-              <p className="text-gray-400 text-[10px] mt-0.5 font-medium uppercase tracking-wide">Cryptographically Signed Administrative Trail</p>
+              <h3 className="text-[16px] font-medium text-[#202124]">Security Audit</h3>
+              <p className="text-[#5f6368] text-[12px] mt-0.5">Verified administrative performance log</p>
             </div>
-            <button className="text-havenly-red text-[10px] font-bold hover:underline uppercase tracking-widest">Full Record Access →</button>
+            <button className="text-[#1a73e8] text-[13px] font-medium hover:bg-[#e8f0fe] px-3 py-1.5 rounded-[4px]">Full Report</button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
-              <thead><tr className="text-[9px] text-gray-400 uppercase tracking-widest border-b border-gray-50 bg-gray-50/20">
-                {['Timestamp', 'Action', 'Module', 'Origin', 'Signature'].map(h => <th key={h} className="px-6 py-4 font-bold">{h}</th>)}
+              <thead><tr className="bg-[#f8f9fa] border-b border-[#dadce0]">
+                {['Timestamp', 'Action', 'Module', 'Origin', 'Signature'].map(h => <th key={h} className="px-6 py-3 text-[12px] font-medium text-[#5f6368]">{h}</th>)}
               </tr></thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-[#f1f3f4]">
                 {auditLogs.length === 0 ? (
-                  <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-400 text-xs">Awaiting first administrative event...</td></tr>
+                  <tr><td colSpan={5} className="px-6 py-12 text-center text-[#5f6368] text-sm">No recent security events.</td></tr>
                 ) : auditLogs.slice(0, 5).map(log => (
-                  <tr key={log.id} className="hover:bg-gray-50/30 transition-colors">
-                    <td className="px-6 py-4 text-gray-500 font-mono text-[10px]">{formatDateTime(log.createdAt)}</td>
-                    <td className="px-6 py-4"><span className="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 rounded font-mono font-bold">{log.action}</span></td>
-                    <td className="px-6 py-4 text-havenly-navy font-bold text-[10px] uppercase">{log.module}</td>
-                    <td className="px-6 py-4 text-gray-500 text-[10px]">{log.origin}</td>
-                    <td className="px-6 py-4 font-mono text-[9px] text-gray-300 max-w-[120px] truncate">{log.hashSig}</td>
+                  <tr key={log.id} className="hover:bg-[#f8f9fa] transition-colors">
+                    <td className="px-6 py-4 text-[#5f6368] font-mono text-[11px]">{formatDateTime(log.createdAt)}</td>
+                    <td className="px-6 py-4"><span className="text-[11px] bg-[#e8f0fe] text-[#1a73e8] px-2 py-0.5 rounded-full border border-[#d2e3fc] font-medium">{log.action}</span></td>
+                    <td className="px-6 py-4 text-[#202124] font-medium text-[13px]">{log.module}</td>
+                    <td className="px-6 py-4 text-[#5f6368] text-[13px]">{log.origin}</td>
+                    <td className="px-6 py-4 font-mono text-[11px] text-[#80868b] max-w-[120px] truncate">{log.hashSig}</td>
                   </tr>
                 ))}
               </tbody>

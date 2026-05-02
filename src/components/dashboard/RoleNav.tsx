@@ -4,17 +4,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import {
-  LayoutDashboard,
-  Users,
-  BarChart2,
+  Bell,
+  Activity,
   AlertTriangle,
+  BarChart2,
+  Database,
   FileText,
   Globe,
+  LayoutDashboard,
   Settings,
-  Activity,
-  Database,
-  Bell,
+  Users,
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
 
 // ─── Nav item definition ──────────────────────────────────────────────────────
 
@@ -107,10 +109,10 @@ export function RoleNav() {
   const items = NAV_BY_ROLE[role] ?? DEFAULT_NAV;
 
   return (
-    <nav className="flex flex-col gap-1 px-3 py-4">
-      {/* Role badge */}
-      <div className="mb-4 px-3">
-        <span className="inline-block rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+    <nav className="flex flex-col py-4 pr-4">
+      {/* Role badge - GSC Style Chip */}
+      <div className="mb-4 px-6">
+        <span className="inline-block rounded-full bg-[#e8f0fe] px-3 py-1 text-[11px] font-medium text-[#1a73e8] border border-[#d2e3fc]">
           {role.replace('_', ' ')}
         </span>
       </div>
@@ -125,18 +127,17 @@ export function RoleNav() {
           <Link
             key={item.href}
             href={item.href}
-            className={[
-              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
-              isActive
-                ? 'bg-teal-50 text-teal-800 dark:bg-teal-900/30 dark:text-teal-200'
-                : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800',
-            ].join(' ')}
+            className={cn(
+              'sidebar-nav-item',
+              isActive ? 'active' : 'inactive'
+            )}
           >
-            <item.icon className="h-4 w-4 shrink-0" />
-            {item.label}
+            <item.icon className="h-5 w-5 shrink-0" />
+            <span className="text-[14px]">{item.label}</span>
           </Link>
         );
       })}
     </nav>
   );
 }
+

@@ -40,18 +40,21 @@ module.exports = {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        havenly: {
-          red: "#C0392B",
-          navy: "#1A1A2E",
-          green: "#0B6E4F",
-          gold: "#D4A017",
-          bg: "#F9F9F9",
-        },
+        success: "#34a853",
+        warning: "#fbbc04",
+        error: "#ea4335",
+        "gsc-blue": "#1a73e8",
+        "gsc-hover": "#1557b0",
+        "gsc-grey": "#f1f3f4",
+        "gsc-text": "#202124",
+        "gsc-secondary": "#5f6368",
+        "gsc-border": "#dadce0",
       },
       fontFamily: {
-        sans: ["var(--font-dm-sans)", "sans-serif"],
-        display: ["var(--font-space-grotesk)", "sans-serif"],
+        sans: ["'Google Sans'", "Roboto", "Inter", "sans-serif"],
+        display: ["'Google Sans'", "Roboto", "sans-serif"],
       },
+
       keyframes: {
         "pulse-red": {
           "0%, 100%": { boxShadow: "0 0 0 0 rgba(192, 57, 43, 0.4)" },

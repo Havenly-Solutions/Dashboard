@@ -96,12 +96,12 @@ export default function NotificationFeed() {
     <div className="relative">
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-400 hover:text-[#C0392B] hover:bg-red-50 rounded-lg transition-colors group"
+        className="relative p-2 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full transition-colors group"
         title="Notifications"
       >
-        <Bell size={18} />
+        <Bell size={20} />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-[#C0392B] text-white text-[9px] font-black flex items-center justify-center rounded-full ring-2 ring-white px-1">
+          <span className="absolute top-1 right-1 min-w-[16px] h-4 bg-[#ea4335] text-white text-[10px] font-medium flex items-center justify-center rounded-full ring-2 ring-white px-1">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -115,71 +115,70 @@ export default function NotificationFeed() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 z-40 bg-black/5"
+              className="fixed inset-0 z-40 bg-black/0"
             />
             <motion.div
               initial={{ opacity: 0, y: 10, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 10, scale: 0.95 }}
-              className="absolute right-0 mt-3 w-80 sm:w-96 bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 overflow-hidden"
+              className="absolute right-0 mt-2 w-[400px] bg-white border border-[#dadce0] rounded-lg shadow-[0_2px_10px_rgba(0,0,0,0.2)] z-50 overflow-hidden"
             >
-              <div className="px-5 py-4 border-b border-gray-50 flex items-center justify-between bg-gray-50/50">
+              <div className="px-5 py-3 border-b border-[#f1f3f4] flex items-center justify-between">
                 <div>
-                  <h3 className="text-sm font-bold text-[#1A1A2E]">Activity Feed</h3>
-                  <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Real-time Intelligence</p>
+                  <h3 className="text-[14px] font-medium text-[#202124]">Notifications</h3>
+                  <p className="text-[11px] text-[#5f6368]">Recent system updates</p>
                 </div>
                 {unreadCount > 0 && (
                   <button 
                     onClick={markAllAsRead}
-                    className="text-[10px] font-bold text-[#C0392B] hover:underline uppercase tracking-wider"
+                    className="text-[12px] font-medium text-[#1a73e8] hover:bg-[#e8f0fe] px-2 py-1 rounded"
                   >
-                    Mark all read
+                    Mark all as read
                   </button>
                 )}
               </div>
 
-              <div className="max-h-[400px] overflow-y-auto">
+              <div className="max-h-[480px] overflow-y-auto">
                 {notifications.length === 0 ? (
                   <div className="py-12 flex flex-col items-center justify-center text-center px-6">
-                    <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mb-3">
-                      <Bell size={20} className="text-gray-300" />
+                    <div className="w-12 h-12 bg-[#f8f9fa] rounded-full flex items-center justify-center mb-3">
+                      <Bell size={24} className="text-[#dadce0]" />
                     </div>
-                    <p className="text-sm font-medium text-gray-400">All quiet at the moment.</p>
-                    <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-widest">System standby</p>
+                    <p className="text-[14px] text-[#5f6368]">No new notifications</p>
                   </div>
                 ) : (
                   notifications.map((n) => (
                     <div 
                       key={n.id}
-                      className={`px-5 py-4 border-b border-gray-50 flex gap-4 transition-colors relative group ${n.isRead ? 'opacity-60' : 'bg-blue-50/10'}`}
+                      className={`px-5 py-4 border-b border-[#f1f3f4] flex gap-4 transition-colors relative group ${n.isRead ? 'bg-white' : 'bg-[#e8f0fe]/30'}`}
                     >
-                      <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center ${
-                        n.type === 'ERROR' || n.type === 'ALERT' ? 'bg-red-50 text-red-600' :
-                        n.type === 'SUCCESS' ? 'bg-green-50 text-green-600' :
-                        n.type === 'WARNING' ? 'bg-orange-50 text-orange-600' :
-                        'bg-blue-50 text-blue-600'
+                      <div className={`w-10 h-10 rounded-full shrink-0 flex items-center justify-center ${
+                        n.type === 'ERROR' || n.type === 'ALERT' ? 'bg-[#fce8e6] text-[#ea4335]' :
+                        n.type === 'SUCCESS' ? 'bg-[#e6f4ea] text-[#34a853]' :
+                        n.type === 'WARNING' ? 'bg-[#fef7e0] text-[#fbbc04]' :
+                        'bg-[#e8f0fe] text-[#1a73e8]'
                       }`}>
-                        {n.type === 'SUCCESS' ? <Check size={16} /> :
-                         n.type === 'WARNING' ? <AlertTriangle size={16} /> :
-                         <Info size={16} />}
+                        {n.type === 'SUCCESS' ? <Check size={20} /> :
+                         n.type === 'WARNING' ? <AlertTriangle size={20} /> :
+                         <Info size={20} />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-start gap-2">
-                          <p className={`text-xs font-bold truncate ${n.isRead ? 'text-gray-600' : 'text-[#1A1A2E]'}`}>{n.title}</p>
+                          <p className={`text-[14px] truncate ${n.isRead ? 'text-[#5f6368]' : 'text-[#202124] font-medium'}`}>{n.title}</p>
                           <div className="flex items-center gap-2">
-                            {!n.isRead && <div className="w-1.5 h-1.5 bg-[#C0392B] rounded-full" />}
+                            {!n.isRead && <div className="w-2 h-2 bg-[#1a73e8] rounded-full" />}
                             <button 
-                              onClick={() => deleteNotification(n.id)}
-                              className="opacity-0 group-hover:opacity-100 p-1 text-gray-300 hover:text-red-500 transition-all"
+                              onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+                              className="opacity-0 group-hover:opacity-100 p-1 text-[#80868b] hover:bg-[#f1f3f4] rounded-full transition-all"
                             >
-                              <X size={12} />
+                              <X size={14} />
                             </button>
                           </div>
                         </div>
-                        <p className="text-[11px] text-gray-500 line-clamp-2 mt-0.5 leading-relaxed">{n.message}</p>
+                        <p className="text-[13px] text-[#5f6368] line-clamp-2 mt-0.5">{n.message}</p>
                         <div className="flex items-center gap-1.5 mt-2">
-                          <Clock size={10} className="text-gray-300" />
-                          <span className="text-[10px] font-medium text-gray-400">
+                          <Clock size={12} className="text-[#80868b]" />
+                          <span className="text-[11px] text-[#80868b]">
                              <TimeAgo date={n.createdAt} />
                           </span>
                         </div>
@@ -188,7 +187,6 @@ export default function NotificationFeed() {
                         <button 
                           onClick={() => markAsRead(n.id)}
                           className="absolute inset-0 z-10"
-                          title="Mark as read"
                         />
                       )}
                     </div>
@@ -196,13 +194,14 @@ export default function NotificationFeed() {
                 )}
               </div>
 
-              <div className="px-5 py-3 border-t border-gray-50 text-center bg-gray-50/30">
-                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-[0.2em]">End of feed</p>
+              <div className="px-5 py-3 border-t border-[#f1f3f4] text-center bg-[#f8f9fa]">
+                <p className="text-[11px] text-[#80868b] font-medium uppercase">End of notifications</p>
               </div>
             </motion.div>
           </>
         )}
       </AnimatePresence>
     </div>
+
   )
 }
