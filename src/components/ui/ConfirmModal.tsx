@@ -47,7 +47,11 @@ export default function ConfirmModal({
           <motion.div initial={{ opacity: 0, scale: 0.95, y: 16 }} animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }} transition={{ type: 'spring', damping: 25, stiffness: 350 }}
             className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 z-10">
-            <button onClick={onCancel} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+            <button 
+              onClick={onCancel} 
+              title="Close Modal"
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
               <X size={18} />
             </button>
             <div className={`w-11 h-11 ${s.bg} rounded-xl flex items-center justify-center mb-4`}>

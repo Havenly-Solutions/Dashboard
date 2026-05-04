@@ -9,7 +9,7 @@ interface ConfirmDeleteState {
   message: string;
   confirmLabel: string;
   onConfirm: () => void;
-  isLoading?: boolean;
+  isLoading: boolean;
 }
 
 export function useConfirmDelete() {

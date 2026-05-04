@@ -6,9 +6,6 @@ import Header from '@/components/dashboard/Header'
 import { 
   CheckCircle2, 
   Clock, 
-  User, 
-  Mail, 
-  Phone, 
   ArrowRight,
   ShieldAlert,
   Search,
@@ -74,14 +71,6 @@ export default function ApprovalsHub() {
       toast.error('Action failed', { description: e?.message || 'Please try again' });
     } finally {
       setProcessing(null);
-    }
-  }
-
-  const getFieldIcon = (field: 'name' | 'email' | 'phone') => {
-    switch (field) {
-      case 'email': return <Mail size={14} />
-      case 'phone': return <Phone size={14} />
-      default: return <User size={14} />
     }
   }
 

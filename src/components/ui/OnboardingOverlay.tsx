@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, X, CheckCircle2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { ONBOARDING_CONTENT, OnboardingStep } from '@/lib/onboarding-steps';
+import { ONBOARDING_CONTENT } from '@/lib/onboarding-steps';
 import { apiClient } from '@/lib/apiClient';
 
 export default function OnboardingOverlay() {
@@ -17,33 +17,32 @@ export default function OnboardingOverlay() {
   const hasCompleted = (session?.user as any)?.hasCompletedOnboarding;
 
   useEffect(() => {
-    if (session?.user && !hasCompleted && steps.length > 0) {
-      // Delay to ensure DOM is ready
-      const timer = setTimeout(() => setIsVisible(true), 1500);
-      return () => clearTimeout(timer);
-    }
+    if (!session?.user || hasCompleted || steps.length === 0) return;
+
+    const timer = setTimeout(() => setIsVisible(true), 1500);
+    return () => clearTimeout(timer);
   }, [session, hasCompleted, steps.length]);
 
   useEffect(() => {
-    if (isVisible && steps[currentStep]) {
-      const updateCoords = () => {
-        const el = document.querySelector(steps[currentStep].target);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          setCoords({
-            top: rect.top + window.scrollY,
-            left: rect.left + window.scrollX,
-            width: rect.width,
-            height: rect.height,
-          });
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      };
+    if (!isVisible || !steps[currentStep]) return;
 
-      updateCoords();
-      window.addEventListener('resize', updateCoords);
-      return () => window.removeEventListener('resize', updateCoords);
-    }
+    const updateCoords = () => {
+      const el = document.querySelector(steps[currentStep].target);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        setCoords({
+          top: rect.top + window.scrollY,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+          height: rect.height,
+        });
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+
+    updateCoords();
+    window.addEventListener('resize', updateCoords);
+    return () => window.removeEventListener('resize', updateCoords);
   }, [isVisible, currentStep, steps]);
 
   const handleNext = () => {
@@ -126,7 +125,11 @@ export default function OnboardingOverlay() {
             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
               Step {currentStep + 1} of {steps.length}
             </span>
-            <button onClick={() => setIsVisible(false)} className="text-gray-400 hover:text-black">
+            <button 
+              onClick={() => setIsVisible(false)} 
+              title="Close Onboarding"
+              className="text-gray-400 hover:text-black"
+            >
               <X size={16} />
             </button>
           </div>

@@ -84,7 +84,11 @@ export default function SystemBanner() {
                 <p className="text-xs mt-0.5 opacity-80 leading-relaxed">{banner.description}</p>
               )}
             </div>
-            <button onClick={() => dismiss(banner.id)} className="opacity-50 hover:opacity-100 transition-opacity ml-1 shrink-0">
+            <button 
+              onClick={() => dismiss(banner.id)} 
+              title="Dismiss Notification"
+              className="opacity-50 hover:opacity-100 transition-opacity ml-1 shrink-0"
+            >
               <X size={14} />
             </button>
           </motion.div>

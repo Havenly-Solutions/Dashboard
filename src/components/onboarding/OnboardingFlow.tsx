@@ -84,7 +84,6 @@ export function OnboardingFlow() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
-  const userRole = session?.user?.role as string;
   const portalId = (session?.user as any)?.portalId as string || 'DASHBOARD';
   const hasCompleted = (session?.user as any)?.hasCompletedOnboarding;
 

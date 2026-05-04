@@ -9,7 +9,7 @@ const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes
 const WARNING_THRESHOLD = 2 * 60 * 1000; // 2 minutes warning
 
 export default function SessionManager() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [showWarning, setShowWarning] = useState(false);
   const [remainingSeconds, setRemainingSeconds] = useState(WARNING_THRESHOLD / 1000);
   const timerRef = useRef<NodeJS.Timeout | null>(null);

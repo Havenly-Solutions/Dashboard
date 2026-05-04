@@ -1,10 +1,10 @@
 'use client'
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Clapperboard, Upload, Filter, Search, MoreVertical, Play, Download, Trash2, Tag, FileText, Image as ImageIcon, Video as VideoIcon, RefreshCw } from 'lucide-react'
+import { Upload, Search, Play, Download, Trash2, FileText, Image as ImageIcon, Video as VideoIcon, RefreshCw } from 'lucide-react'
 import Uppy from '@uppy/core'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-const UppyDashboardModal = dynamic(() => import('@uppy/react/dashboard-modal'), { ssr: false }) as any
+const UppyDashboardModal = dynamic((() => import('@uppy/react/dashboard-modal')) as any, { ssr: false }) as any;
 import AwsS3 from '@uppy/aws-s3'
 import '@uppy/core/css/style.min.css'
 import '@uppy/dashboard/css/style.min.css'
@@ -38,6 +38,23 @@ export default function MediaVaultPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   
   const { confirm, modal } = useConfirmDelete()
+
+  const fetchAssets = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      const query = new URLSearchParams({
+        ...(filterType !== 'all' ? { assetType: filterType } : {}),
+        ...(searchQuery ? { search: searchQuery } : {}),
+        ...(viewMode === 'bin' ? { showDeleted: 'true' } : {})
+      })
+      const result = await apiClient(`/api/media?${query.toString()}`);
+      setAssets(result.data || [])
+    } catch (error) {
+      toast.error('Failed to load media vault')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [filterType, searchQuery, viewMode])
 
   const uppy = useMemo(() => {
     return new Uppy({
@@ -110,23 +127,6 @@ export default function MediaVaultPage() {
   useEffect(() => {
     fetchAssets()
   }, [fetchAssets])
-
-  const fetchAssets = useCallback(async () => {
-    try {
-      setIsLoading(true)
-      const query = new URLSearchParams({
-        ...(filterType !== 'all' ? { assetType: filterType } : {}),
-        ...(searchQuery ? { search: searchQuery } : {}),
-        ...(viewMode === 'bin' ? { showDeleted: 'true' } : {})
-      })
-      const result = await apiClient(`/api/media?${query.toString()}`);
-      setAssets(result.data || [])
-    } catch (error) {
-      toast.error('Failed to load media vault')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [filterType, searchQuery, viewMode])
 
   const handleDelete = async (id: string) => {
     try {
@@ -451,6 +451,7 @@ export default function MediaVaultPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl animate-in fade-in duration-300">
           <button 
             onClick={() => setSelectedAsset(null)}
+            title="Close Preview"
             className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all active:scale-90"
           >
             <Trash2 className="w-6 h-6 rotate-45" />
@@ -514,6 +515,7 @@ export default function MediaVaultPage() {
               return (
                 <select 
                   id={fieldID}
+                  title="Select Media Category"
                   value={value} 
                   onChange={(e) => onChange(e.target.value)}
                   className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm"

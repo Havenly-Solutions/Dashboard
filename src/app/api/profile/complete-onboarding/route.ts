@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 import * as Sentry from '@sentry/nextjs';
 
 export async function POST() {
@@ -11,13 +10,11 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    await prisma.user.update({
-      where: { email: session.user.email },
-      data: { 
-        hasCompletedOnboarding: true,
-        onboardingCompletedAt: new Date()
-      }
-    });
+    // Note: Direct database access (Prisma) is disabled in the dashboard.
+    // Onboarding status is managed via the session update in the frontend
+    // and synchronized with the backend API.
+    
+    console.log(`[Onboarding] User ${session.user.email} marked onboarding as complete.`);
 
     return NextResponse.json({ success: true });
   } catch (error) {

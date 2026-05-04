@@ -3,7 +3,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, ChevronLeft, CheckCircle2 } from 'lucide-react';
+import { X, ChevronRight } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { apiClient } from '@/lib/apiClient';
 
