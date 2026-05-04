@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { Role } from '@/types'
-import { apiClient } from '@/lib/apiClient'
+import { baseApiClient } from '@/lib/apiClient'
 
 
 
@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
           const forwardedFor = req?.headers?.['x-forwarded-for'] || ''
           const userAgent = req?.headers?.['user-agent'] || ''
 
-          const result = await apiClient(`/api/auth/login`, {
+          const result = await baseApiClient(`/api/auth/login`, {
             method: 'POST',
             headers: { 
               'x-forwarded-for': forwardedFor,
