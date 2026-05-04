@@ -1,55 +1,47 @@
-import { withAuth } from 'next-auth/middleware'
+import { getToken } from 'next-auth/jwt'
 import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { ROLE_PERMISSIONS } from '@/types'
 
-export default withAuth(
-  function middleware(req) {
-    const token = req.nextauth.token
-    const pathname = req.nextUrl.pathname
-    
-    if (!token) {
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req })
+  const pathname = req.nextUrl.pathname
+
+  // 1. If no token and trying to access dashboard, redirect to login WITHOUT callbackUrl
+  if (!token) {
+    if (pathname.startsWith('/dashboard')) {
       return NextResponse.redirect(new URL('/', req.url))
     }
-
-    /* 
-    // 4D. Force Password Change Redirection (Moved to Layout Modal for better UX)
-    if (token.mustChangePassword && pathname !== '/dashboard/settings/security') {
-      return NextResponse.redirect(new URL('/dashboard/settings/security', req.url))
-    }
-    */
-
-    const role = token.role as keyof typeof ROLE_PERMISSIONS
-    const permissions = ROLE_PERMISSIONS[role]
-
-    if (!permissions) {
-      return NextResponse.redirect(new URL('/', req.url))
-    }
-
-    // Founder and Chief Officer bypass
-    if (permissions.includes('*')) {
-      return NextResponse.next()
-    }
-
-    const isAllowed = permissions.some(
-      (p) => pathname === p || pathname.startsWith(p + '/')
-    )
-
-    if (!isAllowed) {
-      const defaultRoute = permissions[0] || '/dashboard'
-      return NextResponse.redirect(new URL(defaultRoute, req.url))
-    }
-
     return NextResponse.next()
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-    pages: {
-      signIn: '/',
-    },
   }
-)
+
+  // 2. If token exists but role is invalid
+  const role = token.role as keyof typeof ROLE_PERMISSIONS
+  const permissions = ROLE_PERMISSIONS[role]
+
+  if (!permissions) {
+    return NextResponse.redirect(new URL('/', req.url))
+  }
+
+  // 3. Founder and Chief Officer bypass
+  if (permissions.includes('*')) {
+    return NextResponse.next()
+  }
+
+  // 4. Check specific path permissions
+  const isAllowed = permissions.some(
+    (p) => pathname === p || pathname.startsWith(p + '/')
+  )
+
+  if (!isAllowed) {
+    const defaultRoute = permissions[0] || '/dashboard'
+    // Avoid redirect loops if default route is current route
+    if (pathname === defaultRoute) return NextResponse.next()
+    return NextResponse.redirect(new URL(defaultRoute, req.url))
+  }
+
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: ['/dashboard/:path*'],
