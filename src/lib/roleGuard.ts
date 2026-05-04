@@ -8,6 +8,8 @@ const roleHierarchy: Record<Role, number> = {
   [Role.NGO_GOLD]: 4,
   [Role.INVESTOR]: 4,
   [Role.PA]: 5,
+  [Role.VIDEOGRAPHER]: 5,
+  [Role.CONTENT_CREATOR]: 5,
   [Role.MANAGER]: 6,
   [Role.DEVELOPER]: 7,
   [Role.ADMIN]: 8,

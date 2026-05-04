@@ -4,10 +4,15 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.have
 
 let socket: Socket | null = null;
 
-export const getSocket = (accessToken?: string) => {
+export const getSocket = (accessToken?: string, portalId?: string, userId?: string, role?: string) => {
   if (!socket && accessToken) {
     socket = io(BACKEND_URL, {
-      auth: { token: accessToken },
+      auth: { 
+        token: accessToken,
+        portalId,
+        userId,
+        role
+      },
       transports: ['websocket'],
       reconnectionAttempts: 5,
     });

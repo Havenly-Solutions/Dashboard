@@ -1,11 +1,23 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { Role } from '@/types'
+import { apiClient } from '@/lib/apiClient'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || 'https://api.havenly.solutions'
+
 
 export const authOptions: NextAuthOptions = {
-  session: { strategy: 'jwt', maxAge: 24 * 60 * 60 },
+  session: { strategy: 'jwt', maxAge: 30 * 60 }, // 30 minutes max session age
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   pages: { signIn: '/', error: '/', signOut: '/' },
   providers: [
     CredentialsProvider({
@@ -21,10 +33,9 @@ export const authOptions: NextAuthOptions = {
           const forwardedFor = req?.headers?.['x-forwarded-for'] || ''
           const userAgent = req?.headers?.['user-agent'] || ''
 
-          const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
+          const result = await apiClient(`/api/auth/login`, {
             method: 'POST',
             headers: { 
-              'Content-Type': 'application/json',
               'x-forwarded-for': forwardedFor,
               'user-agent': userAgent
             },
@@ -33,32 +44,21 @@ export const authOptions: NextAuthOptions = {
                password: credentials.password
             }),
           })
-
-          const body = await res.text()
-          let result: any = {}
-          try {
-            result = JSON.parse(body)
-          } catch (e) {
-            console.error('Failed to parse auth response as JSON:', body)
-          }
-
-          if (!res.ok) {
-            console.error('Auth Backend Error:', res.status, body)
-            throw new Error(result.error || `Authentication failed (${res.status})`)
-          }
           
           const { user, accessToken, refreshToken } = result
           
           return { 
             id: user.id, 
             name: user.name, 
-            email: user.email, 
+            email: user.email,
             phone: user.phone,
             role: user.role as Role,
+            portalId: user.portalId,
             department: user.department,
-            mustChangePassword: user.mustChangePassword,
             accessToken,
             refreshToken,
+            mustChangePassword: user.mustChangePassword,
+            hasCompletedOnboarding: user.hasCompletedOnboarding
           }
         } catch (error: any) {
           console.error('Authorize Exception:', error.message)
@@ -72,8 +72,10 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.role = (user as any).role
+        token.portalId = (user as any).portalId // Persist portalId
         token.phone = (user as any).phone
         token.mustChangePassword = (user as any).mustChangePassword
+        token.hasCompletedOnboarding = (user as any).hasCompletedOnboarding
         if ((user as any).accessToken) {
           token.accessToken = (user as any).accessToken
         }
@@ -90,6 +92,7 @@ export const authOptions: NextAuthOptions = {
         if (newName) token.name = newName
         if (newPhone) token.phone = newPhone
         if (session.mustChangePassword === false) token.mustChangePassword = false
+        if (session.user?.hasCompletedOnboarding === true) token.hasCompletedOnboarding = true
       }
       
       return token
@@ -101,8 +104,10 @@ export const authOptions: NextAuthOptions = {
         if (session.user) {
           ;(session.user as any).id = token.id
           ;(session.user as any).role = token.role
+          ;(session.user as any).portalId = token.portalId // Expose portalId to frontend
           ;(session.user as any).phone = token.phone
           ;(session.user as any).mustChangePassword = token.mustChangePassword
+          ;(session.user as any).hasCompletedOnboarding = token.hasCompletedOnboarding
         }
       }
       return session

@@ -10,7 +10,9 @@ export enum Role {
   DEVELOPER = "DEVELOPER",
   INVESTOR = "INVESTOR",
   NGO_PARTNER = "NGO_PARTNER",
-  CHIEF_OFFICER = "CHIEF_OFFICER"
+  CHIEF_OFFICER = "CHIEF_OFFICER",
+  VIDEOGRAPHER = "VIDEOGRAPHER",
+  CONTENT_CREATOR = "CONTENT_CREATOR"
 }
 
 export interface DashboardUser {
@@ -38,6 +40,19 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [Role.DEVELOPER]: ["/dashboard", "/dashboard/mesh-topology", "/dashboard/analytics", "/dashboard/settings", "/dashboard/support-tickets"],
   [Role.INVESTOR]: ["/dashboard", "/dashboard/analytics", "/dashboard/settings", "/dashboard/support-tickets"],
   [Role.NGO_PARTNER]: ["/dashboard/ngo-portal", "/dashboard/settings", "/dashboard/support-tickets"],
+  [Role.VIDEOGRAPHER]: [
+    "media:read", "media:write", 
+    "resource-centre:read", "resource-centre:write", 
+    "broadcast:read",
+    "/dashboard/media", "/dashboard/resource-centre", "/dashboard/settings"
+  ],
+  [Role.CONTENT_CREATOR]: [
+    "broadcast:read", "broadcast:write", 
+    "analytics:read", 
+    "pre-registrations:read", 
+    "resource-centre:read", "resource-centre:write",
+    "/dashboard/editor", "/dashboard/analytics", "/dashboard/pre-registrations", "/dashboard/resource-centre", "/dashboard/broadcast", "/dashboard/settings"
+  ],
 }
 
 export const ROLE_LABELS: Record<string, string> = {
@@ -53,6 +68,8 @@ export const ROLE_LABELS: Record<string, string> = {
   [Role.DEVELOPER]: "Developer",
   [Role.INVESTOR]: "Investor",
   [Role.NGO_PARTNER]: "NGO Partner",
+  [Role.VIDEOGRAPHER]: "Videographer",
+  [Role.CONTENT_CREATOR]: "Content Creator",
 }
 
 export const ROLE_BADGE_COLORS: Record<string, string> = {
@@ -68,6 +85,8 @@ export const ROLE_BADGE_COLORS: Record<string, string> = {
   [Role.DEVELOPER]: "bg-orange-100 text-orange-700 border-orange-200",
   [Role.INVESTOR]: "bg-teal-100 text-teal-700 border-teal-200",
   [Role.NGO_PARTNER]: "bg-emerald-50 text-emerald-600 border-emerald-100",
+  [Role.VIDEOGRAPHER]: "bg-indigo-100 text-indigo-700 border-indigo-200",
+  [Role.CONTENT_CREATOR]: "bg-rose-100 text-rose-700 border-rose-200",
 }
 
 export type IncidentSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';

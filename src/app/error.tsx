@@ -1,61 +1,63 @@
-'use client'
-
-import { useEffect } from 'react'
-import { AlertTriangle, RefreshCw } from 'lucide-react'
+'use client';
+import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
+import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
+import Link from 'next/link';
 
 export default function GlobalError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
-    console.error('Global Error Boundary caught:', error)
-  }, [error])
+    // Log the error to Sentry
+    Sentry.captureException(error);
+    console.error('CRITICAL_DASHBOARD_ERROR:', error);
+  }, [error]);
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full border border-red-100 text-center relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-red-500" />
+    <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-6 font-sans">
+      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-gray-100 p-10 text-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-[#C0392B]" />
         
-        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-          <AlertTriangle className="text-red-500" size={32} />
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <AlertTriangle className="text-[#C0392B]" size={40} />
         </div>
         
-        <h2 className="font-display font-bold text-[#1A1A2E] text-2xl mb-2">Platform Exception</h2>
-        <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-          The Guardian Protocol encountered an unexpected fault state. System engineers have been notified via secure channels.
+        <h1 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">
+          Systems Interrupted
+        </h1>
+        <p className="text-gray-600 text-sm mb-8 leading-relaxed">
+          The dashboard encountered an unexpected failure. This incident has been logged for cryptographic audit and engineering review.
         </p>
 
-        <div className="bg-gray-50 rounded-lg p-4 mb-6 text-left border border-gray-100">
-          <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Diagnostic Output</p>
-          <p className="text-xs text-red-600 font-mono break-words">
-            {error.message || 'Unknown runtime exception'}
-          </p>
-          {error.digest && (
-            <p className="text-[10px] text-gray-400 font-mono mt-2 pt-2 border-t border-gray-200">
-              Trace ID: {error.digest}
-            </p>
-          )}
-        </div>
-
-        <div className="flex gap-3">
-          <button
-            onClick={() => window.location.href = '/dashboard'}
-            className="flex-1 px-4 py-3 bg-gray-100 text-gray-600 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-all"
-          >
-            Return to Feed
-          </button>
+        <div className="space-y-3">
           <button
             onClick={() => reset()}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-[#1A1A2E] text-white rounded-xl text-sm font-semibold hover:bg-black transition-all shadow-lg shadow-black/10"
+            className="w-full flex items-center justify-center gap-2 bg-[#1A1A2E] text-white font-bold py-4 rounded-xl hover:bg-black transition-all shadow-lg"
           >
-            <RefreshCw size={16} />
-            Reinitialize
+            <RefreshCcw size={18} /> Re-Initialize Application
           </button>
+          
+          <Link 
+            href="/dashboard"
+            className="w-full flex items-center justify-center gap-2 bg-gray-100 text-gray-700 font-bold py-4 rounded-xl hover:bg-gray-200 transition-all text-sm"
+          >
+            <Home size={18} /> Return to Home
+          </Link>
+        </div>
+
+        <div className="mt-10 pt-6 border-t border-gray-50 flex flex-col items-center">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            Diagnostic ID
+          </p>
+          <code className="text-[10px] text-gray-500 font-mono mt-1 px-2 py-1 bg-gray-50 rounded">
+            {error.digest || 'UNSET_HASH_BLOCK'}
+          </code>
         </div>
       </div>
     </div>
-  )
+  );
 }

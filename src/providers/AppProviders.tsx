@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { useSocket } from '@/hooks/useSocket';
 import { ReactNode, useState } from 'react';
 import { Toaster } from 'sonner';
+import { TourProvider } from '@/components/onboarding/GuidedTour';
 
 // ─── Socket initialiser ───────────────────────────────────────────────────────
 // Placed inside SessionProvider so useSession() is available.
@@ -58,12 +59,14 @@ export function AppProviders({ children, session }: AppProvidersProps) {
   const [queryClient] = useState(() => getQueryClient());
 
   return (
-    <SessionProvider session={session}>
+    <SessionProvider session={session ?? null}>
       <QueryClientProvider client={queryClient}>
-        {/* Establish socket connection once the user is authenticated */}
-        <SocketInit />
-        {children}
-        <Toaster position="top-right" richColors />
+        <TourProvider>
+          {/* Establish socket connection once the user is authenticated */}
+          <SocketInit />
+          {children}
+          <Toaster position="top-right" richColors />
+        </TourProvider>
       </QueryClientProvider>
     </SessionProvider>
   );

@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+
+import { apiClient } from '@/lib/apiClient'
 import { Loader2, ArrowLeft, Send } from 'lucide-react'
 import NextLink from 'next/link'
 import Image from 'next/image'
@@ -17,20 +18,12 @@ export default function ForgotPasswordPage() {
     setLoading(true)
     
     try {
-      const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.havenly.solutions'
-      const res = await fetch(`${BACKEND_URL}/api/auth/forgot-password`, {
+      await apiClient(`/api/auth/forgot-password`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       })
-
-      if (res.ok) {
-        setSubmitted(true)
-        toast.success('Reset link sent if account exists')
-      } else {
-        const data = await res.json().catch(() => ({}))
-        toast.error(data.message || 'Failed to send reset link')
-      }
+      setSubmitted(true)
+      toast.success('Reset link sent if account exists')
     } catch (err) {
       Sentry.captureException(err)
       toast.error('An unexpected error occurred')

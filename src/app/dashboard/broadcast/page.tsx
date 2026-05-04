@@ -1,13 +1,19 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Loader2, AlertCircle, CheckCircle2, Send } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle2, Send, PenTool } from 'lucide-react';
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter';
 import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { LoadingButton } from '@/components/ui/LoadingButton';
+import { apiClient } from '@/lib/apiClient';
+import { ROLE_PERMISSIONS, Role } from '@/types';
 
 export default function BroadcastPage() {
   const { data: session } = useSession();
+  const router = useRouter();
+  const role = (session?.user as any)?.role as Role;
+  const permissions = role ? ROLE_PERMISSIONS[role] : [];
   const [recipientCount, setRecipientCount] = useState<number | null>(null);
   const [rsvpUrl, setRsvpUrl] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
@@ -17,13 +23,9 @@ export default function BroadcastPage() {
 
   useEffect(() => {
     if (!session) return;
-    fetch(`/api/broadcast/recipient-count`, {
+    apiClient(`/api/broadcast/recipient-count`, {
       headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
     })
-      .then(r => {
-        if (!r.ok) throw new Error('Failed to fetch count');
-        return r.json();
-      })
       .then(data => setRecipientCount(data.count ?? 0))
       .catch(() => setRecipientCount(0));
   }, [session]);
@@ -34,16 +36,13 @@ export default function BroadcastPage() {
     setShowConfirm(false);
     const toastId = toast.loading('Initiating broadcast...', { description: `Sending to ${recipientCount} recipients` });
     try {
-      const res = await fetch(`/api/broadcast/july-tour`, {
+      const data = await apiClient(`/api/broadcast/july-tour`, {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
         },
         body: JSON.stringify({ rsvpUrl: rsvpUrl || undefined }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || data.error || 'Broadcast failed.');
       
       setResult(data.results || { sent: 0, failed: 0 });
       toast.success('Broadcast initiated successfully', { 
@@ -114,14 +113,33 @@ export default function BroadcastPage() {
         </div>
       )}
 
+      {/* New Story Editor Section */}
+      {permissions.includes('broadcast:write') || permissions.includes('*') ? (
+        <div className="mb-10 bg-white border border-[#DADCE0] rounded-2xl p-6 shadow-sm flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-[#1A1A2E]">Content & Stories</h3>
+            <p className="text-sm text-gray-500">Draft and publish narrative updates for the tour.</p>
+          </div>
+          <button 
+            onClick={() => router.push('/dashboard/broadcast/story-editor/new')}
+            className="flex items-center gap-2 bg-[#F8F9FA] text-[#1A1A2E] px-5 py-2.5 rounded-full font-bold border border-[#DADCE0] hover:bg-white transition-all shadow-sm"
+          >
+            <PenTool size={18} />
+            Create Story
+          </button>
+        </div>
+      ) : null}
+
       {!showConfirm ? (
-        <button
-          onClick={() => setShowConfirm(true)}
-          disabled={loading || recipientCount === 0}
-          className="w-full bg-[#C0392B] hover:bg-[#a93226] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 active:scale-[0.98]"
-        >
-          Prepare Broadcast <Send size={18} />
-        </button>
+        (permissions.includes('broadcast:write') || permissions.includes('*')) && (
+          <button
+            onClick={() => setShowConfirm(true)}
+            disabled={loading || recipientCount === 0}
+            className="w-full bg-[#C0392B] hover:bg-[#a93226] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 active:scale-[0.98]"
+          >
+            Prepare Broadcast <Send size={18} />
+          </button>
+        )
       ) : (
         <div className="bg-amber-50 border border-amber-100 rounded-2xl p-6 animate-in zoom-in-95 duration-200">
           <div className="flex items-start gap-3 mb-4">

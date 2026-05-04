@@ -4,8 +4,11 @@ import { useSession } from 'next-auth/react'
 import Header from '@/components/dashboard/Header'
 import { PreRegistration } from '@/types'
 import { formatDateTime } from '@/lib/utils'
-import { Search, Download, MapPin, TrendingUp, Users } from 'lucide-react'
+import { Search, Download, MapPin, Users, CheckCircle2, XCircle } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { toast } from 'sonner'
+
+import { apiClient } from '@/lib/apiClient'
 
 const REGIONS = ['All Regions', 'Johannesburg / Gauteng', 'Cape Town / Western Cape', 'Durban / KZN', 'Pretoria / Gauteng', 'Port Elizabeth / Eastern Cape']
 const PIE_COLORS = ['#C0392B', '#1A1A2E', '#0B6E4F', '#D4A017', '#6B7280', '#9B59B6']
@@ -25,13 +28,12 @@ export default function PreRegistrationsPage() {
     try {
       const params = new URLSearchParams({ page: String(page) })
       if (region !== 'All Regions') params.set('region', region)
-      const r = await fetch(`/api/pre-registrations?${params}`, {
+      const res = await apiClient(`/api/pre-registrations?${params}`, {
         headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
       })
-      const res = await r.json()
-      if (res.success) {
+      if (res.success || res.data) {
         setRegistrations(res.data || [])
-        setTotal(res.total || 0)
+        setTotal(res.meta?.total || res.total || 0)
         // Note: backend doesn't seem to return byRegion yet, we'll keep it as [] or mock if needed
         setByRegion(res.byRegion || [])
       }
@@ -40,6 +42,19 @@ export default function PreRegistrationsPage() {
   }, [page, region, session])
 
   useEffect(() => { load() }, [load])
+
+  const handleStatusUpdate = async (id: string, status: string) => {
+    try {
+      await apiClient(`/api/pre-registrations/${id}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status })
+      })
+      toast.success(`Registration marked as ${status.toLowerCase()}`)
+      load() // Refresh data
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to update status')
+    }
+  }
 
   const filtered = registrations.filter(r =>
     search ? r.name.toLowerCase().includes(search.toLowerCase()) || r.email.toLowerCase().includes(search.toLowerCase()) : true
@@ -74,7 +89,9 @@ export default function PreRegistrationsPage() {
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-[#C0392B] rounded-full transition-all" 
-                  style={{ width: `${Math.min(100, (total / 5000) * 100)}%` } as any} 
+                  ref={(el) => {
+                    if (el) el.style.width = `${Math.min(100, (total / 5000) * 100)}%`
+                  }}
                 />
               </div>
               <div className="text-xs text-gray-400 mt-1">{((total / 5000) * 100).toFixed(1)}% of goal</div>
@@ -137,11 +154,11 @@ export default function PreRegistrationsPage() {
           </div>
           <table className="w-full text-sm">
             <thead><tr className="text-xs text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
-              {['Name', 'Email', 'Region', 'Source', 'Date'].map(h => <th key={h} className="text-left px-6 py-3 font-medium">{h}</th>)}
+              {['Name', 'Email', 'Region', 'Source', 'Date', ''].map((h, i) => <th key={i} className="text-left px-6 py-3 font-medium">{h}</th>)}
             </tr></thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-400">Loading...</td></tr>
+                <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-400">Loading...</td></tr>
               ) : filtered.map(reg => (
                 <tr key={reg.id} className="hover:bg-gray-50/50">
                   <td className="px-6 py-3 font-medium text-[#1A1A2E]">{reg.name}</td>
@@ -149,6 +166,37 @@ export default function PreRegistrationsPage() {
                   <td className="px-6 py-3"><div className="flex items-center gap-1.5 text-gray-500"><MapPin size={11} />{reg.region}</div></td>
                   <td className="px-6 py-3"><span className={`text-[10px] px-2 py-0.5 rounded border font-medium ${reg.source === 'tour' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>{reg.source}</span></td>
                   <td className="px-6 py-3 text-gray-400 text-xs">{formatDateTime(reg.createdAt)}</td>
+                  <td className="px-6 py-3 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      {reg.status === 'LEAD' && (
+                        <>
+                          <button 
+                            onClick={() => handleStatusUpdate(reg.id, 'APPROVED')}
+                            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                            title="Approve & Convert"
+                          >
+                            <CheckCircle2 size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleStatusUpdate(reg.id, 'REJECTED')}
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Reject"
+                          >
+                            <XCircle size={16} />
+                          </button>
+                        </>
+                      )}
+                      {reg.status === 'APPROVED' && (
+                        <span className="text-[10px] font-bold text-emerald-600 uppercase">Approved</span>
+                      )}
+                      {reg.status === 'REJECTED' && (
+                        <span className="text-[10px] font-bold text-red-600 uppercase">Rejected</span>
+                      )}
+                      {reg.status === 'CONVERTED' && (
+                        <span className="text-[10px] font-bold text-[#1A1A2E] uppercase">Converted</span>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

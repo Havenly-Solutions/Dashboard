@@ -3,13 +3,11 @@ import { useState } from 'react'
 import Header from '@/components/dashboard/Header'
 import { Save, Loader2, Lock, Eye, EyeOff } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/apiClient'
 
 export default function SecuritySettingsPage() {
-  const router = useRouter()
-  const { data: session, update } = useSession()
+  const { data: session } = useSession()
   const user = session?.user as any
 
   const [saving, setSaving] = useState(false)
@@ -37,21 +35,20 @@ export default function SecuritySettingsPage() {
     setSaving(true)
 
     try {
-      const res = await apiClient('/api/auth/change-password', {
+      const data = await apiClient('/api/auth/change-password', {
         method: 'POST',
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       })
 
-      const data = await res.json()
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Failed to update password')
-      }
-
-      toast.success('Password updated successfully. Please sign in again.')
-      setTimeout(() => {
-        signOut({ callbackUrl: '/' })
-      }, 1500)
+      toast.success('Password updated — signing you out in 3 seconds');
+      let count = 3;
+      const countdown = setInterval(() => {
+        count -= 1;
+        if (count <= 0) {
+          clearInterval(countdown);
+          signOut({ callbackUrl: '/' });
+        }
+      }, 1000);
       
     } catch (err: any) {
       toast.error(err.message || 'An unexpected error occurred')

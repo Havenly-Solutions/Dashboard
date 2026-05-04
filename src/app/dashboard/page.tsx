@@ -1,26 +1,17 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import Header from '@/components/dashboard/Header'
-import { AlertCircle, MapPin, Radio, Users, Activity, Shield, Zap, TrendingUp, Eye } from 'lucide-react'
+import { MapPin, Radio, Users, Activity, Shield, TrendingUp, Eye } from 'lucide-react'
 import { Incident, AuditLog, SEVERITY_COLORS } from '@/types'
-import { formatTimeAgo, formatDateTime } from '@/lib/utils'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { formatDateTime } from '@/lib/utils'
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
 import TimeAgo from '@/components/dashboard/TimeAgo'
-import Image from 'next/image'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSocket } from '@/hooks/useSocket'
 
-const BRAND_COLORS = {
-  blue: '#1a73e8',
-  green: '#34a853',
-  yellow: '#fbbc04',
-  red: '#ea4335',
-  text: '#202124',
-  secondary: '#5f6368',
-  border: '#dadce0',
-  grey: '#f1f3f4'
-}
+import { apiClient } from '@/lib/apiClient'
+
 
 export default function LiveFeedPage() {
   const queryClient = useQueryClient();
@@ -41,11 +32,7 @@ export default function LiveFeedPage() {
 
   const { data, isLoading: loading } = useQuery({
     queryKey: ['live-feed'],
-    queryFn: async () => {
-      const response = await fetch('/api/analytics')
-      if (!response.ok) throw new Error('Failed to fetch analytics')
-      return response.json()
-    }
+    queryFn: () => apiClient('/api/analytics')
   });
 
   const incidents: Incident[] = data?.recentIncidents || [];
@@ -67,10 +54,10 @@ export default function LiveFeedPage() {
         {/* Top Stats - GSC Style Property Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'GSM Network', value: 'OPERATIONAL', sub: 'Standard Frequency', icon: Radio, color: 'text-[#34a853]', dot: 'bg-[#34a853]' },
+            { label: 'GSM Network', value: 'INITIALIZING', sub: 'Standard Frequency', icon: Radio, color: 'text-[#fbbc04]', dot: 'bg-[#fbbc04]' },
             { label: 'Cloud Status', value: 'ACTIVE', sub: 'High Availability', icon: Activity, color: 'text-[#34a853]', dot: 'bg-[#34a853]' },
             { label: 'NGO Partners', value: stats.totalNGOs, isNum: true, sub: 'Verified Dispatch', icon: Users, color: 'text-[#1a73e8]', dot: 'bg-[#1a73e8]' },
-            { label: 'Evidence API', value: 'SYNCED', sub: 'Real-time Link', icon: Shield, color: 'text-[#1a73e8]', dot: 'bg-[#1a73e8]' },
+            { label: 'Evidence API', value: 'PENDING', sub: 'Real-time Link', icon: Shield, color: 'text-[#5f6368]', dot: 'bg-[#dadce0]' },
           ].map(({ label, value, isNum, sub, icon: Icon, color, dot }) => (
             <div key={label} className="card p-6 bg-white border border-[#dadce0] rounded-lg">
               <div className="flex items-start justify-between mb-2">
@@ -132,9 +119,9 @@ export default function LiveFeedPage() {
             <div className="card p-6 bg-white border border-[#dadce0] rounded-lg">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[14px] font-medium text-[#202124]">Engagement Performance</span>
-                <span className="text-[11px] text-[#34a853] font-medium flex items-center gap-1">
+                <span className="text-[11px] text-[#5f6368] font-medium flex items-center gap-1">
                   <TrendingUp size={12} />
-                  LIVE
+                  PRE-LAUNCH
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-4 mb-6">
@@ -172,7 +159,8 @@ export default function LiveFeedPage() {
               <div className="text-[14px] font-medium text-[#202124] mb-4">Quick Actions</div>
               <div className="space-y-2">
                 {[
-                  { label: 'Broadcast Perimeter Alert', icon: Zap, primary: true },
+                  /* Perimeter broadcast hidden pre-launch — no live users to alert */
+                  /* { label: 'Broadcast Perimeter Alert', icon: Zap, primary: true }, */
                   { label: 'Export Evidence Chain', icon: Shield, primary: false },
                   { label: 'Review NGO Credentials', icon: Eye, primary: false },
                 ].map(({ label, icon: Icon, primary }) => (

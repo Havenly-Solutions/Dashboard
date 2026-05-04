@@ -3,12 +3,11 @@
 import { useState } from 'react'
 import { Save, Loader2, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { apiClient } from '@/lib/apiClient'
 
 export default function ForcePasswordChangeModal() {
-  const { data: session, update } = useSession()
+  const { data: session } = useSession()
   const user = session?.user as any
-  const router = useRouter()
 
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -37,21 +36,11 @@ export default function ForcePasswordChangeModal() {
     }
 
     setSaving(true)
-
     try {
-      const res = await fetch('/api/auth/change-password', {
+      await apiClient('/api/auth/change-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
       })
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        // Backend returns { message } on most errors, { error } on auth failures
-        throw new Error(data.message || data.error || `Request failed (${res.status})`)
-      }
 
       // Sign out and redirect to login
       await signOut({ callbackUrl: '/', redirect: true })

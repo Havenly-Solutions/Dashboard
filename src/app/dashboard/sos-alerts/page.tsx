@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react'
 import Header from '@/components/dashboard/Header'
 import { Incident, SEVERITY_COLORS } from '@/types'
 import { useSession } from 'next-auth/react'
-import { formatDateTime, formatTimeAgo } from '@/lib/utils'
-import { MapPin, AlertCircle, CheckCircle, Clock } from 'lucide-react'
+import { apiClient } from '@/lib/apiClient'
+import { formatDateTime } from '@/lib/utils'
+import { AlertCircle, MapPin } from 'lucide-react'
 import { toast } from 'sonner'
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
 import TimeAgo from '@/components/dashboard/TimeAgo'
@@ -24,12 +25,11 @@ export default function SOSAlertsPage() {
         const params = new URLSearchParams({ page: String(page) })
         if (filter !== 'ALL') params.set('filter', filter)
         
-        const r = await fetch(`/api/incidents?${params}`, {
+        const res = await apiClient(`/api/incidents?${params}`, {
           headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
         })
-        const res = await r.json()
         setIncidents(res.data || [])
-        setTotal(res.total || (res.data?.length || 0))
+        setTotal(res.meta?.total || res.total || 0)
       } catch (e) { console.error(e) }
       setLoading(false)
     }
@@ -102,18 +102,15 @@ export default function SOSAlertsPage() {
                     <button 
                       onClick={async () => {
                         try {
-                          const res = await fetch(`/api/incidents/${incident.id}/status`, {
+                          await apiClient(`/api/incidents/${incident.id}/status`, {
                             method: 'PATCH',
                             headers: { 
-                              'Content-Type': 'application/json',
                               'Authorization': `Bearer ${(session?.user as any)?.accessToken}` 
                             },
                             body: JSON.stringify({ status: 'RESOLVED' })
                           });
-                          if (res.ok) {
-                            setIncidents(prev => prev.map(i => i.id === incident.id ? { ...i, status: 'RESOLVED' } : i));
-                            toast.success('Incident marked as RESOLVED');
-                          }
+                          setIncidents(prev => prev.map(i => i.id === incident.id ? { ...i, status: 'RESOLVED' } : i));
+                          toast.success('Incident marked as RESOLVED');
                         } catch (e) { toast.error('Failed to update status'); }
                       }}
                       className="px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-100 transition-colors"
@@ -123,18 +120,15 @@ export default function SOSAlertsPage() {
                     <button 
                       onClick={async () => {
                         try {
-                          const res = await fetch(`/api/incidents/${incident.id}/status`, {
+                          await apiClient(`/api/incidents/${incident.id}/status`, {
                             method: 'PATCH',
                             headers: { 
-                              'Content-Type': 'application/json',
                               'Authorization': `Bearer ${(session?.user as any)?.accessToken}` 
                             },
                             body: JSON.stringify({ status: 'DISMISSED' })
                           });
-                          if (res.ok) {
-                            setIncidents(prev => prev.map(i => i.id === incident.id ? { ...i, status: 'DISMISSED' } : i));
-                            toast.success('Incident DISMISSED');
-                          }
+                          setIncidents(prev => prev.map(i => i.id === incident.id ? { ...i, status: 'DISMISSED' } : i));
+                          toast.success('Incident DISMISSED');
                         } catch (e) { toast.error('Failed to update status'); }
                       }}
                       className="px-3 py-1.5 bg-gray-50 text-gray-600 border border-gray-100 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-gray-100 transition-colors"

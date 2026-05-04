@@ -4,6 +4,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { apiClient } from '@/lib/apiClient';
+import { useConfirmDelete } from '@/hooks/useConfirmDelete';
+import { toast } from 'sonner';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -67,9 +69,8 @@ export default function TeamPage() {
   const userRole = (session?.user as any)?.role;
 
   const queryClient = useQueryClient();
+  const { confirm, modal } = useConfirmDelete();
 
-  // React Query: fetch team. Automatically re-fetches when the socket
-  // emits invite_sent / data_updated(team) — no manual refresh needed.
   const { data: members, isLoading, error } = useQuery({
     queryKey: ['team'],
     queryFn: fetchTeam,
@@ -89,7 +90,6 @@ export default function TeamPage() {
     onSuccess: () => {
       setForm({ firstName: '', lastName: '', email: '', role: 'MANAGER' });
       setInviteError('');
-      // Optimistically refetch (socket event will also trigger this)
       queryClient.invalidateQueries({ queryKey: ['team'] });
     },
     onError: (err: Error) => setInviteError(err.message),
@@ -101,9 +101,13 @@ export default function TeamPage() {
     },
     onSuccess: () => {
       setActionError('');
+      toast.success('Member removed successfully');
       queryClient.invalidateQueries({ queryKey: ['team'] });
     },
-    onError: (err: Error) => setActionError(err.message),
+    onError: (err: Error) => {
+      setActionError(err.message);
+      toast.error(err.message || 'Failed to remove member');
+    },
   });
 
   const roleChange = useMutation({
@@ -115,9 +119,13 @@ export default function TeamPage() {
     },
     onSuccess: () => {
       setActionError('');
+      toast.success('Role updated successfully');
       queryClient.invalidateQueries({ queryKey: ['team'] });
     },
-    onError: (err: Error) => setActionError(err.message),
+    onError: (err: Error) => {
+      setActionError(err.message);
+      toast.error(err.message || 'Failed to update role');
+    },
   });
 
   if (userRole !== 'FOUNDER' && userRole !== 'CHIEF_OFFICER') {
@@ -137,7 +145,6 @@ export default function TeamPage() {
         </p>
       </div>
 
-      {/* ── Invite form ──────────────────────────────────────────────────── */}
       <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
         <h2 className="mb-4 text-base font-medium text-gray-900 dark:text-white">
           Invite a team member
@@ -163,6 +170,7 @@ export default function TeamPage() {
             onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
           />
           <select
+            title="Select Role"
             className="col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
             value={form.role}
             onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
@@ -190,7 +198,6 @@ export default function TeamPage() {
         </button>
       </div>
 
-      {/* ── Team list ─────────────────────────────────────────────────────── */}
       {isLoading && (
         <div className="text-center text-sm text-gray-400">Loading team...</div>
       )}
@@ -224,6 +231,7 @@ export default function TeamPage() {
                   <td className="px-4 py-3">
                     {userRole === 'FOUNDER' && m.role !== 'FOUNDER' ? (
                       <select
+                        title="Change Member Role"
                         className="rounded-lg border border-gray-300 px-2 py-1 text-xs dark:border-gray-700 dark:bg-gray-800 dark:text-white"
                         value={m.role}
                         onChange={(e) => roleChange.mutate({ id: m.id, role: e.target.value })}
@@ -262,11 +270,12 @@ export default function TeamPage() {
                     <td className="px-4 py-3">
                       {m.role !== 'FOUNDER' && (
                         <button
-                          onClick={() => {
-                            if (window.confirm('Are you sure you want to remove this member?')) {
-                              removeMember.mutate(m.id);
-                            }
-                          }}
+                          onClick={() => confirm(
+                            'Remove Team Member',
+                            `Are you sure you want to remove ${m.email} from the team? This action cannot be undone.`,
+                            () => removeMember.mutateAsync(m.id),
+                            'Remove Member'
+                          )}
                           className="text-xs font-medium text-red-600 hover:text-red-700 disabled:opacity-50"
                           disabled={removeMember.isPending}
                         >
@@ -281,6 +290,8 @@ export default function TeamPage() {
           </table>
         </div>
       )}
+
+      {modal}
     </div>
   );
 }

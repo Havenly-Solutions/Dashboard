@@ -5,7 +5,7 @@ import { getSocket } from '@/lib/socket'
 import { Bell, X, Check, Info, AlertTriangle, Clock } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/apiClient'
 import TimeAgo from './TimeAgo'
 
 interface Notification {
@@ -25,9 +25,7 @@ export default function NotificationFeed() {
 
   useEffect(() => {
     if (session?.accessToken) {
-      // Fetch initial notifications
       apiClient('/api/notifications')
-        .then(res => res.json())
         .then(data => {
           setNotifications(data.data || [])
           setUnreadCount(data.meta?.unreadCount || 0)
@@ -55,12 +53,20 @@ export default function NotificationFeed() {
           })
         })
 
+        socket.on('media_asset_ready', (asset: any) => {
+          toast.success('Media Uploaded', {
+            description: `${asset.title} is now available in the Media Vault.`,
+          })
+        })
+
         return () => {
           socket.off('NEW_NOTIFICATION')
           socket.off('SOS_ALERT')
+          socket.off('media_asset_ready')
         }
       }
     }
+    return () => {}
   }, [session])
 
   const markAsRead = async (id: string) => {
@@ -169,6 +175,7 @@ export default function NotificationFeed() {
                             {!n.isRead && <div className="w-2 h-2 bg-[#1a73e8] rounded-full" />}
                             <button 
                               onClick={(e) => { e.stopPropagation(); deleteNotification(n.id); }}
+                              title="Delete Notification"
                               className="opacity-0 group-hover:opacity-100 p-1 text-[#80868b] hover:bg-[#f1f3f4] rounded-full transition-all"
                             >
                               <X size={14} />
@@ -186,6 +193,7 @@ export default function NotificationFeed() {
                       {!n.isRead && (
                         <button 
                           onClick={() => markAsRead(n.id)}
+                          title="Mark as read"
                           className="absolute inset-0 z-10"
                         />
                       )}

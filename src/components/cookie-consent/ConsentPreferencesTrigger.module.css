@@ -1,0 +1,10 @@
+.trigger {
+  background: none;
+  border: none;
+  color: #3030F1;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  padding: 0;
+}

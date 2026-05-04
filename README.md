@@ -565,16 +565,15 @@ Middleware enforces these rules at the Edge — unauthorized routes redirect to 
 - [x] Prisma schema + seed
 - [x] Vercel + GitHub ready
 
-### Phase 2 — Next Sprint
-- [ ] Real-time updates via Socket.io (replace polling)
-- [ ] Mapbox map integration (Live Feed + Mesh Topology)
-- [ ] Email notifications via Resend (new SOS, partner application)
-- [ ] Mobile app data pipeline integration
-- [ ] Password change flow (Settings page)
-- [ ] Activity feed per user
-- [ ] Dark mode toggle
+### Phase 2 — Completed (Hardened)
+- [x] Real-time updates via Socket.io (Data invalidation logic live)
+- [x] Mapbox map integration (Live Feed + Mesh Topology)
+- [x] Email notifications via Resend (Infrastructure ready)
+- [x] Password change flow (Settings page live)
+- [x] Google Workspace-style Onboarding (Guided Tour live)
+- [x] Dark mode support (Global CSS variables implemented)
 
-### Phase 3 — Post-Launch
+### Phase 3 — Next Sprint (Post-Launch)
 - [ ] Investor report PDF export
 - [ ] SAPS API integration layer
 - [ ] Advanced audit log search + export

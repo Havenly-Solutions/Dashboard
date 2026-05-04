@@ -1,12 +1,13 @@
 'use client'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Settings, Search, LogOut, User, ShieldCheck, Loader2 } from 'lucide-react'
-import { ROLE_LABELS, ROLE_BADGE_COLORS, Role } from '@/types'
+import { Settings, Search, LogOut, User } from 'lucide-react'
+import { Role } from '@/types'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
 import { apiClient } from '@/lib/apiClient'
 import NotificationFeed from './NotificationFeed'
+import { toast } from 'sonner'
 
 interface HeaderProps { title: string; subtitle?: string }
 
@@ -27,13 +28,11 @@ export default function Header({ title, subtitle }: HeaderProps) {
   const user = session?.user as any
   const role = user?.role as Role
   const [showProfile, setShowProfile] = useState(false)
-  const [activeAlerts, setActiveAlerts] = useState(0)
 
   useEffect(() => {
     async function fetchAlerts() {
       try {
-        const data = await apiClient('/api/analytics')
-        setActiveAlerts(data.activeAlerts || 0)
+        await apiClient('/api/analytics')
       } catch (e) {
         // Silently fail for header polling
       }
@@ -113,7 +112,15 @@ export default function Header({ title, subtitle }: HeaderProps) {
               </div>
               <div className="border-t border-[#f1f3f4] pt-2">
                 <button 
-                  onClick={() => router.push('/api/auth/signout')}
+                  onClick={async () => {
+                    try {
+                      toast.loading('Signing out...');
+                      await signOut({ callbackUrl: '/' });
+                    } catch (e) {
+                      toast.error('Sign out failed');
+                      console.error(e);
+                    }
+                  }}
                   className="w-full flex items-center gap-3 px-6 py-2 text-[14px] text-[#ea4335] hover:bg-[#f8f9fa]"
                 >
                   <LogOut size={18} /> Sign out

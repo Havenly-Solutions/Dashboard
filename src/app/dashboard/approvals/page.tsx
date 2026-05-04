@@ -5,7 +5,6 @@ import { useSession } from 'next-auth/react'
 import Header from '@/components/dashboard/Header'
 import { 
   CheckCircle2, 
-  XCircle, 
   Clock, 
   User, 
   Mail, 
@@ -13,12 +12,12 @@ import {
   ArrowRight,
   ShieldAlert,
   Search,
-  Filter,
   Check,
   X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Role } from '@/types'
+import { apiClient } from '@/lib/apiClient'
+import { toast } from 'sonner'
 
 interface ProfileRequest {
   id: string
@@ -46,10 +45,9 @@ export default function ApprovalsHub() {
       const url = filter === 'ALL' 
         ? '/api/profile/admin/profile-requests' 
         : `/api/profile/admin/profile-requests?status=${filter}`
-      const res = await fetch(url, {
+      const data = await apiClient(url, {
         headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
       })
-      const data = await res.json()
       setRequests(data)
     } catch (e) {
       console.error('Failed to fetch requests')
@@ -63,27 +61,23 @@ export default function ApprovalsHub() {
   }, [fetchRequests])
 
   async function handleAction(id: string, status: 'APPROVED' | 'REJECTED', note?: string) {
-    setProcessing(id)
+    setProcessing(id);
     try {
-      const res = await fetch(`/api/profile/admin/profile-requests/${id}`, {
+      await apiClient(`/api/profile/admin/profile-requests/${id}`, {
         method: 'PATCH',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(session?.user as any)?.accessToken}`
-        },
         body: JSON.stringify({ status, reviewNote: note || `Actioned by ${session?.user?.name}` })
-      })
-      if (res.ok) {
-        setRequests(prev => prev.filter(r => r.id !== id))
-      }
-    } catch (e) {
-      console.error('Action failed')
+      });
+
+      setRequests(prev => prev.filter(r => r.id !== id));
+      toast.success(status === 'APPROVED' ? 'Request approved' : 'Request rejected');
+    } catch (e: any) {
+      toast.error('Action failed', { description: e?.message || 'Please try again' });
     } finally {
-      setProcessing(null)
+      setProcessing(null);
     }
   }
 
-  const getFieldIcon = (field: string) => {
+  const getFieldIcon = (field: 'name' | 'email' | 'phone') => {
     switch (field) {
       case 'email': return <Mail size={14} />
       case 'phone': return <Phone size={14} />

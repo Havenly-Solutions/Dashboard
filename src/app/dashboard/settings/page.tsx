@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { ROLE_LABELS, ROLE_BADGE_COLORS, Role } from '@/types'
 import { Save, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/apiClient'
 
 export default function SettingsPage() {
   const { data: session, update, status } = useSession()
@@ -25,21 +25,29 @@ export default function SettingsPage() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault(); 
+    
+    if (!name.trim()) {
+      toast.error('Display name cannot be empty');
+      return;
+    }
+
+    if (phone && !/^(\+27|0)[0-9]{9}$/.test(phone.replace(/\s+/g, ''))) {
+      toast.error('Please enter a valid South African phone number');
+      return;
+    }
+
     setSaving(true)
     try {
-      const res = await apiClient('/api/profile', {
+      const data = await apiClient('/api/profile', {
         method: 'PUT',
         body: JSON.stringify({ name, phone })
       })
-      
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || data.message || 'Failed to update profile')
       
       await update({ name, phone })
       
       toast.success(data.message || 'Profile updated successfully')
     } catch (err: any) {
-      toast.error(err.message)
+      toast.error(err.message || 'Failed to update profile')
     } finally {
       setSaving(false)
     }

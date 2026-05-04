@@ -13,6 +13,7 @@ export default function LoadingScreen() {
 
     if (document.readyState === 'complete') {
       handleLoad()
+      return () => {}
     } else {
       window.addEventListener('load', handleLoad)
       return () => window.removeEventListener('load', handleLoad)

@@ -12,7 +12,7 @@ import * as Sentry from '@sentry/nextjs'
 import { toast } from 'sonner'
 
 export default function RootLoginPage() {
-  const { data: session, status } = useSession()
+  const { status } = useSession()
   const router = useRouter()
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export default function RootLoginPage() {
               Sign in
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} method="POST" className="space-y-6">
               <div className="animate-in slide-in-from-right-4 duration-300">
                 <input
                   id="login-email"

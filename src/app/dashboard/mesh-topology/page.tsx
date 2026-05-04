@@ -4,6 +4,7 @@ import Header from '@/components/dashboard/Header'
 import { MeshNode } from '@/types'
 import { formatTimeAgo } from '@/lib/utils'
 import { Activity, Wifi, Battery, Cpu } from 'lucide-react'
+import { apiClient } from '@/lib/apiClient'
 
 const NODE_STATUS_COLORS: Record<string, string> = {
   STABLE: 'bg-emerald-50 text-emerald-700 border-emerald-200',
@@ -18,8 +19,8 @@ export default function MeshTopologyPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/mesh-nodes').then(r => r.json()).then(d => { setNodes(Array.isArray(d) ? d : []); setLoading(false) })
-    const id = setInterval(() => fetch('/api/mesh-nodes').then(r => r.json()).then(d => setNodes(Array.isArray(d) ? d : [])), 30000)
+    apiClient('/api/mesh-nodes').then(d => { setNodes(Array.isArray(d) ? d : []); setLoading(false) })
+    const id = setInterval(() => apiClient('/api/mesh-nodes').then(d => setNodes(Array.isArray(d) ? d : [])), 30000)
     return () => clearInterval(id)
   }, [])
 
@@ -32,11 +33,12 @@ export default function MeshTopologyPage() {
       <main className="flex-1 p-8 space-y-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'GSM Health', value: '94.2%', icon: Wifi, sub: 'Network stable', color: 'text-emerald-600' },
+            { label: 'GSM Health', value: '--', icon: Wifi, sub: 'Connecting...', color: 'text-gray-400' },
             { label: 'Active Nodes', value: String(nodes.length), icon: Activity, sub: `${stable} stable`, color: 'text-[#1A1A2E]' },
             { label: 'Avg Latency', value: `${avgLatency}ms`, icon: Cpu, sub: 'Local response', color: 'text-blue-600' },
-            { label: 'Uptime', value: '99.98%', icon: Battery, sub: '742 days uninterrupted', color: 'text-[#1A1A2E]' },
+            { label: 'Uptime', value: '0%', icon: Battery, sub: '0 days', color: 'text-[#1A1A2E]' },
           ].map(({ label, value, icon: Icon, sub, color }) => (
+
             <div key={label} className="stat-card">
               <div className="flex items-start justify-between mb-2">
                 <span className="text-xs text-gray-400 uppercase tracking-widest">{label}</span>
@@ -54,7 +56,7 @@ export default function MeshTopologyPage() {
               <h3 className="font-display font-bold text-[#1A1A2E]">Topological Logs</h3>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="text-xs text-gray-400">System Status: Active</span>
+                <span className="text-xs text-gray-400">System Status: Initializing</span>
               </div>
             </div>
             <table className="w-full text-sm">

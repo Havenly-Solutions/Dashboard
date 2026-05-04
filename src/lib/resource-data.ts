@@ -6,7 +6,7 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
     icon: Cpu,
     desc: 'Deep-dive schematics and maintenance actions for Guardian Node clusters.',
     fullContent: `
-      ### Guardian Node Infrastructure (V6.2)
+      ### Guardian Node Infrastructure
       Guardian Nodes are the backbone of the Havenly Solutions offline-first mesh network. 
       
       #### Current Priorities:
@@ -19,7 +19,7 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
       2. RF Antenna Array Calibration Guide
       3. Auxiliary Power Unit (APU) Troubleshooting
     `,
-    stats: { count: '19 Documents', type: 'Schematics' }
+    stats: { count: '0 Documents', type: 'Schematics' }
   },
   'chief-training': {
     title: 'Chief Training',
@@ -39,7 +39,7 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
       - **Phase 2**: NGO tier launch and municipal contract negotiation.
       - **Phase 3**: National safety infrastructure conversion.
     `,
-    stats: { count: '8 Modules', type: 'Training' }
+    stats: { count: '0 Modules', type: 'Training' }
   },
   'sop-frameworks': {
     title: 'SOP Frameworks',
@@ -58,7 +58,7 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
       - **Safety First**: The primary SOS panic button is never paywalled.
       - **Trust by Design**: User privacy (POPIA) is non-negotiable.
     `,
-    stats: { count: '35 Policies', type: 'Legal' }
+    stats: { count: '0 Policies', type: 'Legal' }
   },
   'comms-linkage': {
     title: 'Comms Linkage',
@@ -77,7 +77,7 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
       - **Offline-First Logic**: Local caching of SOS triggers with automatic sync upon reconnection.
       - **RF Management**: Dynamic frequency switching to avoid interference in high-density urban areas.
     `,
-    stats: { count: '12 Schematics', type: 'Comms' }
+    stats: { count: '0 Schematics', type: 'Comms' }
   },
   'cyber-defense': {
     title: 'Cyber Defense',
@@ -96,7 +96,7 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
       - **POPIA-First Architecture**: Built-in data residency and user consent management.
       - **SAPS API Readiness**: Structured data formats for direct government system integration.
     `,
-    stats: { count: '24 Guides', type: 'Security' }
+    stats: { count: '0 Guides', type: 'Security' }
   },
   'civic-liaison': {
     title: 'Civic Liaison',
@@ -114,6 +114,6 @@ export const RESOURCE_CATEGORIES: Record<string, any> = {
       #### Vision:
       Havenly becomes the default community safety infrastructure, ensuring every school, NGO, and municipality operates on a single, trusted platform.
     `,
-    stats: { count: '16 Templates', type: 'Civic' }
+    stats: { count: '0 Templates', type: 'Civic' }
   }
 }

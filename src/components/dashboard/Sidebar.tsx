@@ -4,28 +4,30 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import Image from 'next/image'
-import { Shield, Radio, FileText, Users, BarChart2, BookOpen, AlertCircle, Network, LogOut, Settings, HelpCircle, ChevronRight, Menu, X, Megaphone, LifeBuoy } from 'lucide-react'
+import { Radio, FileText, Users, BarChart2, BookOpen, AlertCircle, Network, LogOut, Settings, X, Megaphone, LifeBuoy, Clapperboard, Menu } from 'lucide-react'
 import { ROLE_PERMISSIONS, ROLE_LABELS, Role } from '@/types'
 import { cn } from '@/lib/utils'
 import PortalSwitcher, { usePortalView } from '../PortalSwitcher'
+import { toast } from 'sonner'
 
 const LogoIcon = ({ size = 16 }: { size?: number }) => (
   <Image src="/favicon.ico" alt="" width={size} height={size} className="rounded-sm shrink-0 object-contain" />
 )
 
 const ALL_NAV_ITEMS = [
-  { href: '/dashboard', label: 'Live Feed', icon: Radio, exact: true },
-  { href: '/dashboard/sos-alerts', label: 'SOS Alerts', icon: AlertCircle },
-  { href: '/dashboard/mesh-topology', label: 'Mesh Topology', icon: Network },
-  { href: '/dashboard/safety-logs', label: 'Safety Logs', icon: LogoIcon },
-  { href: '/dashboard/ngo-portal', label: 'NGO Portal', icon: Users },
-  { href: '/dashboard/pre-registrations', label: 'Pre-Registrations', icon: FileText },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart2 },
-  { href: '/dashboard/team', label: 'Team Management', icon: Users },
-  { href: '/dashboard/approvals', label: 'Approvals Hub', icon: LogoIcon },
-  { href: '/dashboard/broadcast', label: 'Tour Broadcast', icon: Megaphone },
-  { href: '/dashboard/resource-centre', label: 'Resource Centre', icon: BookOpen },
-  { href: '/dashboard/support-tickets', label: 'Support Tickets', icon: LifeBuoy },
+  { href: '/dashboard', label: 'Live Feed', icon: Radio, exact: true, scope: 'feed:read' },
+  { href: '/dashboard/sos-alerts', label: 'SOS Alerts', icon: AlertCircle, scope: 'sos:read' },
+  { href: '/dashboard/mesh-topology', label: 'Mesh Topology', icon: Network, scope: 'mesh:read' },
+  { href: '/dashboard/safety-logs', label: 'Safety Logs', icon: LogoIcon, scope: 'safety:read' },
+  { href: '/dashboard/ngo-portal', label: 'NGO Portal', icon: Users, scope: 'ngo:read' },
+  { href: '/dashboard/pre-registrations', label: 'Pre-Registrations', icon: FileText, scope: 'pre-registrations:read' },
+  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart2, scope: 'analytics:read' },
+  { href: '/dashboard/media', label: 'Media Vault', icon: Clapperboard, scope: 'media:read' },
+  { href: '/dashboard/broadcast', label: 'Tour Broadcast', icon: Megaphone, scope: 'broadcast:read' },
+  { href: '/dashboard/team', label: 'Team Management', icon: Users, scope: 'team:read' },
+  { href: '/dashboard/approvals', label: 'Approvals Hub', icon: LogoIcon, scope: 'approvals:read' },
+  { href: '/dashboard/resource-centre', label: 'Resource Centre', icon: BookOpen, scope: 'resource-centre:read' },
+  { href: '/dashboard/support-tickets', label: 'Support Tickets', icon: LifeBuoy, scope: 'support:read' },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ]
 
@@ -36,16 +38,38 @@ export default function Sidebar() {
   const portalView = usePortalView()
 
   // Use portal view if available (for Founder previewing other roles), otherwise use actual role
-  const actualRole = (session?.user as any)?.role as Role
-  const effectiveRole = actualRole === 'FOUNDER' ? portalView : actualRole
+  const actualRole = (session?.user as any)?.role as string
+  const effectiveRole = (actualRole === 'FOUNDER' ? portalView : actualRole) as string
+  
+  // Normalized role lookup to be case-insensitive just in case
+  const roleKey = Object.keys(ROLE_PERMISSIONS).find(
+    k => k.toUpperCase() === effectiveRole?.toUpperCase()
+  )
+  
+  const permissions = roleKey ? ROLE_PERMISSIONS[roleKey] : []
 
-  const permissions = effectiveRole ? ROLE_PERMISSIONS[effectiveRole] : []
-  const isAllowed = (href: string) => {
+  // DEBUG: Uncomment to trace permission issues in console
+  /*
+  console.log('[Sidebar Auth Debug]:', {
+    actualRole,
+    effectiveRole,
+    roleKey,
+    permissionsCount: permissions.length,
+    pathname
+  });
+  */
+
+  const isAllowed = (item: typeof ALL_NAV_ITEMS[0]) => {
     if (permissions.includes('*')) return true
-    return permissions.some(p => href === p)
+    if (!item.scope) return true 
+    
+    // Check if permissions include the specific scope (e.g. 'sos:read') 
+    // OR the direct path (e.g. '/dashboard/sos-alerts')
+    const allowed = permissions.includes(item.scope) || permissions.includes(item.href)
+    return allowed
   }
 
-  const visibleItems = ALL_NAV_ITEMS.filter(item => isAllowed(item.href))
+  const visibleItems = ALL_NAV_ITEMS.filter(isAllowed)
 
   return (
     <>
@@ -78,22 +102,32 @@ export default function Sidebar() {
           <div className="text-[18px] font-medium text-[#5f6368] tracking-tight">
             Havenly <span className="font-normal text-[#80868b]">Solutions</span>
           </div>
-          <button onClick={() => setIsOpen(false)} className="md:hidden ml-auto text-[#5f6368] p-1">
+          <button onClick={() => setIsOpen(false)} title="Close Menu" className="md:hidden ml-auto text-[#5f6368] p-1">
             <X size={20} />
           </button>
         </div>
 
         {/* PORTAL SWITCHER */}
-        <div className="px-4 py-3 bg-[#f8f9fa] border-b border-[#dadce0]">
+        <div id="portal-switcher" className="px-4 py-3 bg-[#f8f9fa] border-b border-[#dadce0]">
           <PortalSwitcher />
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 py-4 overflow-y-auto pr-2">
-          {visibleItems.map(({ href, label, icon: Icon, exact }) => {
+        <nav 
+          id="sidebar-nav" 
+          className="flex-1 py-4 overflow-y-auto pr-2 min-h-0 scrollbar-thin scrollbar-thumb-gray-200 hover:scrollbar-thumb-gray-300 scrollbar-track-transparent"
+        >
+          {visibleItems.map(({ href, label, icon: Icon, exact, scope }) => {
             const active = exact ? pathname === href : pathname.startsWith(href)
+            const id = scope ? `nav-${scope.split(':')[0]}` : `nav-${label.toLowerCase().replace(/\s+/g, '-')}`
             return (
-              <Link key={href} href={href} onClick={() => setIsOpen(false)} className={cn('sidebar-nav-item', active ? 'active' : 'inactive')}>
+              <Link 
+                key={href} 
+                href={href} 
+                id={id}
+                onClick={() => setIsOpen(false)} 
+                className={cn('sidebar-nav-item', active ? 'active' : 'inactive')}
+              >
                 <Icon size={20} />
                 <span className="truncate">{label}</span>
               </Link>
@@ -102,14 +136,33 @@ export default function Sidebar() {
         </nav>
 
         {/* Bottom */}
-        <div className="pb-4 border-t border-[#dadce0] pt-4">
+        <div className="pb-4 border-t border-[#dadce0] pt-4 mt-auto">
           <div className="px-6 py-2 mb-2">
-            <p className="text-[11px] text-[#5f6368] font-medium mb-1">Clearance Level</p>
-            <p className="text-[13px] text-[#202124] font-medium">{ROLE_LABELS[effectiveRole]}</p>
+            <p className="text-[11px] text-[#5f6368] font-medium mb-1 uppercase tracking-wider">Clearance Level</p>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <p className="text-[13px] text-[#202124] font-semibold">{ROLE_LABELS[effectiveRole]}</p>
+            </div>
           </div>
-          <button onClick={() => signOut({ callbackUrl: '/' })} className="sidebar-nav-item inactive w-[calc(100%-8px)]">
-            <LogOut size={20} />
-            <span>Log Out</span>
+          <button 
+            id="nav-logout"
+            onClick={async (e) => {
+              e.preventDefault();
+              try {
+                toast.loading('Initiating secure sign out...');
+                console.log('[Sidebar] Initiating secure sign out...');
+                // Clear session storage as well
+                sessionStorage.clear();
+                await signOut({ callbackUrl: '/' });
+              } catch (error) {
+                toast.error('Sign out failed');
+                console.error('[Sidebar] Sign out failed:', error);
+              }
+            }} 
+            className="sidebar-nav-item inactive w-[calc(100%-8px)] hover:bg-[#fce8e6] hover:text-[#ea4335] group"
+          >
+            <LogOut size={20} className="group-hover:translate-x-0.5 transition-transform" />
+            <span className="font-medium">Sign Out</span>
           </button>
         </div>
       </aside>

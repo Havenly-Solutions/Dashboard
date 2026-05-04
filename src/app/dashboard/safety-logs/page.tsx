@@ -4,7 +4,8 @@ import Header from '@/components/dashboard/Header'
 import { AuditLog } from '@/types'
 import { useSession } from 'next-auth/react'
 import { formatDateTime } from '@/lib/utils'
-import { Download, ShieldCheck, CheckCircle, Loader2 } from 'lucide-react'
+import { apiClient } from '@/lib/apiClient'
+import { Download, ShieldCheck, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
 const CATEGORIES = ['All Events', 'Critical', 'System']
@@ -34,10 +35,9 @@ export default function SafetyLogsPage() {
     async function load() {
       setLoading(true)
       try {
-        const r = await fetch(`/api/audit-logs?page=${page}&filter=${filter}`, {
+        const data = await apiClient(`/api/audit-logs?page=${page}&filter=${filter}`, {
           headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
         })
-        const data = await r.json()
         setLogs(Array.isArray(data) ? data : (data.logs || []))
         setTotal(Array.isArray(data) ? data.length : (data.total || 0))
       } catch (e) { console.error(e) }
@@ -89,20 +89,16 @@ export default function SafetyLogsPage() {
             <button 
               onClick={async () => {
                 try {
-                  const res = await fetch('/api/export/audit-logs?format=pdf', {
+                  const blob = await apiClient('/api/export/audit-logs?format=pdf', {
+                    responseType: 'blob',
                     headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
                   });
-                  if (res.ok) {
-                    const blob = await res.blob();
-                    const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `havenly-audit-${new Date().toISOString().split('T')[0]}.pdf`;
-                    a.click();
-                    toast.success('Audit report generated successfully');
-                  } else {
-                    toast.error('Failed to generate export');
-                  }
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `havenly-audit-${new Date().toISOString().split('T')[0]}.pdf`;
+                  a.click();
+                  toast.success('Audit report generated successfully');
                 } catch (e) { toast.error('Export service unavailable'); }
               }}
               className="flex items-center gap-2 px-4 py-2 glass-card border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"

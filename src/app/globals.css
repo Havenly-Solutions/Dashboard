@@ -118,3 +118,20 @@ input:not([type="checkbox"]):not([type="radio"]), select, textarea {
   100% { left: 100%; width: 100%; }
 }
 
+
+/* Custom Scrollbar Utilities */
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  .scrollbar-track-transparent::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thumb-gray-200::-webkit-scrollbar-thumb {
+    background: #e5e7eb;
+    border-radius: 10px;
+  }
+  .hover\:scrollbar-thumb-gray-300:hover::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+  }
+}

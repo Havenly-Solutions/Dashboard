@@ -1,4 +1,3 @@
-import { Role } from '../types';
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -8,7 +7,7 @@ import { useSession } from 'next-auth/react';
 // Allows the Founder to preview the dashboard as any role.
 // This ONLY changes what the UI renders — backend RBAC still enforces real permissions.
 
-type PortalView = 'FOUNDER' | 'PA' | 'MANAGER' | 'DEVELOPER' | 'INVESTOR' | 'NGO_PARTNER';
+type PortalView = 'FOUNDER' | 'PA' | 'MANAGER' | 'DEVELOPER' | 'INVESTOR' | 'NGO_PARTNER' | 'VIDEOGRAPHER' | 'CONTENT_CREATOR';
 
 const PORTAL_OPTIONS: { view: PortalView; label: string; icon: string; description: string }[] = [
   { view: 'FOUNDER',     label: 'Admin View',     icon: '', description: 'Full system access' },
@@ -17,6 +16,8 @@ const PORTAL_OPTIONS: { view: PortalView; label: string; icon: string; descripti
   { view: 'DEVELOPER',   label: 'Developer View',  icon: '', description: 'Technical integrations' },
   { view: 'INVESTOR',    label: 'Investor View',   icon: '', description: 'Read-only analytics' },
   { view: 'NGO_PARTNER', label: 'NGO View',        icon: '🤝', description: 'Partner portal' },
+  { view: 'VIDEOGRAPHER', label: 'Videographer View', icon: '📹', description: 'Media & footage management' },
+  { view: 'CONTENT_CREATOR', label: 'Creator View', icon: '🎨', description: 'Marketing & broadcast content' },
 ];
 
 // Export the active portal view so other components can consume it

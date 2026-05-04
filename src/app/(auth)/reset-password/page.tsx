@@ -1,7 +1,8 @@
 'use client'
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Loader2, ShieldCheck, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { apiClient } from '@/lib/apiClient'
+import { Loader2, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import NextLink from 'next/link'
 import Image from 'next/image'
 import * as Sentry from '@sentry/nextjs'
@@ -34,20 +35,12 @@ function ResetPasswordForm() {
 
     setLoading(true)
     try {
-      const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.havenly.solutions'
-      const res = await fetch(`${BACKEND_URL}/api/auth/reset-password`, {
+      await apiClient(`/api/auth/reset-password`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token, newPassword: password, confirmPassword }),
       })
-
-      if (res.ok) {
-        setSuccess(true)
-        toast.success('Password reset successful')
-      } else {
-        const data = await res.json().catch(() => ({}))
-        toast.error(data.message || 'Failed to reset password')
-      }
+      setSuccess(true)
+      toast.success('Password reset successful')
     } catch (err) {
       Sentry.captureException(err)
       toast.error('An unexpected error occurred')

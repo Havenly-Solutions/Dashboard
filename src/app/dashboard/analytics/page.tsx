@@ -1,18 +1,21 @@
 'use client'
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 import Header from '@/components/dashboard/Header'
 import { 
-  TrendingUp, Users, Shield, Building2, Target, Loader2, 
-  ArrowUpRight, ArrowDownRight, Minus, Ticket, CheckCircle2, 
+  TrendingUp, Users, Shield, Loader2, 
+  ArrowUpRight, ArrowDownRight, Minus, CheckCircle2, 
   Clock, XCircle, AlertTriangle 
 } from 'lucide-react'
 import { 
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, 
-  AreaChart, Area, PieChart, Pie, Cell, CartesianGrid, Legend 
+  AreaChart, Area, PieChart, Pie, Cell, CartesianGrid 
 } from 'recharts'
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
 import { useQuery } from '@tanstack/react-query'
 import { useSocket } from '@/hooks/useSocket'
+import { apiClient } from '@/lib/apiClient'
+import { cn } from '@/lib/utils'
 
 const BRAND_PALETTE = ['#C0392B', '#1A1A2E', '#0B6E4F', '#D4A017', '#6366f1', '#ec4899']
 const SEVERITY_COLORS: Record<string, string> = {
@@ -20,6 +23,13 @@ const SEVERITY_COLORS: Record<string, string> = {
   HIGH: '#E67E22',
   MEDIUM: '#F39C12',
   LOW: '#0B6E4F'
+}
+
+const SEVERITY_BG_MAP: Record<string, string> = {
+  CRITICAL: 'bg-[#C0392B]',
+  HIGH: 'bg-[#E67E22]',
+  MEDIUM: 'bg-[#F39C12]',
+  LOW: 'bg-[#0B6E4F]'
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -36,20 +46,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export default function AnalyticsPage() {
   const [isExporting, setIsExporting] = useState<string | null>(null)
+  const { data: session } = useSession()
   
   // Real-time invalidation via socket
   useSocket();
 
   const { data, isLoading: loading } = useQuery({
     queryKey: ['analytics'],
-    queryFn: async () => {
-      const r = await fetch(`/api/analytics`)
-      if (r.status === 401 || r.status === 403) {
-        throw new Error('Auth error')
-      }
-      if (!r.ok) throw new Error('Failed to fetch analytics')
-      return r.json()
-    },
+    queryFn: () => apiClient(`/api/analytics`),
     retry: false
   });
 
@@ -59,9 +63,10 @@ export default function AnalyticsPage() {
       const endpoint = type === 'audit' ? '/api/export/audit-logs' :
         type === 'alerts' ? '/api/export/alerts' : '/api/export/registrations'
 
-      const response = await fetch(`${endpoint}?format=${format}`)
-
-      if (!response.ok) throw new Error('Export failed')
+      const response = await apiClient(`${endpoint}?format=${format}`, {
+        responseType: 'blob',
+        headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
+      })
 
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
@@ -263,7 +268,7 @@ export default function AnalyticsPage() {
                     {data.incidentsBySeverity.map((entry: any) => (
                       <div key={entry.name} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: SEVERITY_COLORS[entry.name] }} />
+                          <div className={cn("w-2 h-2 rounded-full", SEVERITY_BG_MAP[entry.name] || 'bg-gray-400')} />
                           <span className="text-[10px] font-bold text-gray-500 uppercase">{entry.name}</span>
                         </div>
                         <span className="text-xs font-black text-[#1A1A2E]">{entry.value}</span>

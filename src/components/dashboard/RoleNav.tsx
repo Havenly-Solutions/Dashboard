@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   Settings,
   Users,
+  LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -23,7 +24,7 @@ import { cn } from '@/lib/utils';
 interface NavItem {
   label: string;
   href: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: LucideIcon;
 }
 
 // ─── Role → nav items map ─────────────────────────────────────────────────────
@@ -140,4 +141,3 @@ export function RoleNav() {
     </nav>
   );
 }
-

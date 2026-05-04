@@ -4,7 +4,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 import { io, Socket } from 'socket.io-client';
-import type { HavenlyEvents } from '@/types/socket';
+
 
 // ─── Config ───────────────────────────────────────────────────────────────────
 
@@ -47,6 +47,7 @@ export function useSocket() {
       auth: {
         userId: session.user.id,
         role: (session.user as any).role,
+        portalId: (session.user as any).portalId,
         // Pass the access token so the backend can optionally verify the socket
         token: (session as any).accessToken,
       },

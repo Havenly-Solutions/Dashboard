@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { CheckCircle, XCircle, Clock, Building2, Plus, X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/apiClient'
 
 const STATUS_STYLES: Record<NGOStatus, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -30,9 +30,12 @@ export default function NGOPortalPage() {
   useEffect(() => {
     if (!session) return
     apiClient('/api/ngo-partners')
-    .then(r => r.json())
-    .then(d => { setPartners(Array.isArray(d) ? d : []); setLoading(false) })
-    .catch(err => {
+    .then(d => { 
+      const list = d.data || (Array.isArray(d) ? d : []);
+      setPartners(list); 
+      setLoading(false);
+    })
+    .catch(() => {
       toast.error('Failed to load NGO partners')
       setLoading(false)
     })
@@ -40,17 +43,12 @@ export default function NGOPortalPage() {
 
   async function updateStatus(id: string, status: NGOStatus) {
     try {
-      const res = await apiClient(`/api/ngo-partners/${id}/status`, { 
+      await apiClient(`/api/ngo-partners/${id}`, { 
         method: 'PATCH', 
         body: JSON.stringify({ status }) 
       })
-      if (res.ok) {
-        setPartners(prev => prev.map(p => p.id === id ? { ...p, status } : p))
-        toast.success(`Partner status updated to ${status}`)
-      } else {
-        const data = await res.json()
-        throw new Error(data.message || 'Update failed')
-      }
+      setPartners(prev => prev.map(p => p.id === id ? { ...p, status } : p))
+      toast.success(`Partner status updated to ${status}`)
     } catch (err: any) {
       toast.error(err.message)
     }
@@ -60,18 +58,13 @@ export default function NGOPortalPage() {
     e.preventDefault(); 
     setSubmitting(true)
     try {
-      const res = await apiClient('/api/ngo-partners', { 
+      const data = await apiClient('/api/ngo-partners', { 
         method: 'POST', 
         body: JSON.stringify(form) 
       })
-      const data = await res.json()
-      if (res.ok) { 
-        setPartners(prev => [data, ...prev])
-        toast.success('Application submitted successfully')
-        setShowForm(false) 
-      } else {
-        throw new Error(data.message || 'Submission failed')
-      }
+      setPartners(prev => [data, ...prev])
+      toast.success('Application submitted successfully')
+      setShowForm(false) 
     } catch (err: any) {
       toast.error(err.message)
     } finally {

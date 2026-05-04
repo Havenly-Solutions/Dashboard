@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import Header from '@/components/dashboard/Header'
 import { SupportTicket } from '@/types'
@@ -9,15 +9,13 @@ import {
   LifeBuoy, 
   Clock, 
   CheckCircle, 
-  AlertCircle, 
-  MessageSquare, 
   User, 
   Tag,
   Loader2,
   X
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/api-client'
+import { apiClient } from '@/lib/apiClient'
 import { cn } from '@/lib/utils'
 
 export default function SupportTicketsPage() {
@@ -34,37 +32,31 @@ export default function SupportTicketsPage() {
     priority: 'MEDIUM'
   })
 
-  useEffect(() => {
-    if (!session) return
-    loadTickets()
-  }, [session, filter])
-
-  async function loadTickets() {
+  const loadTickets = useCallback(async () => {
     try {
       const url = filter === 'ALL' ? '/api/support-tickets' : `/api/support-tickets?status=${filter}`
-      const res = await apiClient(url)
-      const data = await res.json()
+      const data = await apiClient(url)
       setTickets(Array.isArray(data) ? data : (data.data || []))
-    } catch (err) {
-      toast.error('Failed to load tickets')
+    } catch (e) {
+      console.error(e)
     } finally {
       setLoading(false)
     }
-  }
+  }, [filter])
+
+  useEffect(() => {
+    if (!session) return
+    loadTickets()
+  }, [session, loadTickets])
 
   async function updateStatus(id: string, status: string) {
     try {
-      const res = await apiClient(`/api/support-tickets/${id}/status`, {
+      await apiClient(`/api/support-tickets/${id}/status`, {
         method: 'PATCH',
         body: JSON.stringify({ status })
       })
-      if (res.ok) {
-        setTickets(prev => prev.map(t => t.id === id ? { ...t, status: status as any } : t))
-        toast.success(`Ticket marked as ${status}`)
-      } else {
-        const error = await res.json()
-        throw new Error(error.message || 'Update failed')
-      }
+      setTickets(prev => prev.map(t => t.id === id ? { ...t, status: status as any } : t))
+      toast.success(`Ticket marked as ${status}`)
     } catch (err: any) {
       toast.error(err.message)
     }
@@ -74,20 +66,14 @@ export default function SupportTicketsPage() {
     e.preventDefault()
     setSubmitting(true)
     try {
-      const res = await apiClient('/api/support-tickets', {
+      const created = await apiClient('/api/support-tickets', {
         method: 'POST',
         body: JSON.stringify(newTicket)
       })
-      if (res.ok) {
-        const created = await res.json()
-        setTickets(prev => [created, ...prev])
-        toast.success('Support ticket opened successfully')
-        setShowNewModal(false)
-        setNewTicket({ subject: '', message: '', category: 'SOFTWARE', priority: 'MEDIUM' })
-      } else {
-        const error = await res.json()
-        throw new Error(error.message || 'Failed to open ticket')
-      }
+      setTickets(prev => [created, ...prev])
+      toast.success('Support ticket opened successfully')
+      setShowNewModal(false)
+      setNewTicket({ subject: '', message: '', category: 'SOFTWARE', priority: 'MEDIUM' })
     } catch (err: any) {
       toast.error(err.message)
     } finally {
@@ -216,7 +202,7 @@ export default function SupportTicketsPage() {
                 <h3 className="font-display font-bold text-[#1A1A2E] text-lg">Support Request</h3>
                 <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Priority Technical Assistance</p>
               </div>
-              <button onClick={() => setShowNewModal(false)} className="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-gray-100">
+              <button onClick={() => setShowNewModal(false)} title="Close Modal" className="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-gray-100">
                 <X size={18} />
               </button>
             </div>
