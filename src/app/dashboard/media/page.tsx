@@ -1,8 +1,9 @@
 'use client'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Clapperboard, Upload, Filter, Search, MoreVertical, Play, Download, Trash2, Tag, FileText, Image as ImageIcon, Video as VideoIcon, RefreshCw } from 'lucide-react'
 import Uppy from '@uppy/core'
 import dynamic from 'next/dynamic'
+import Image from 'next/image'
 const UppyDashboardModal = dynamic(() => import('@uppy/react/dashboard-modal'), { ssr: false }) as any
 import AwsS3 from '@uppy/aws-s3'
 import '@uppy/core/css/style.min.css'
@@ -104,13 +105,13 @@ export default function MediaVaultPage() {
         return { location: key };
       }
     })
-  }, [])
+  }, [fetchAssets])
 
   useEffect(() => {
     fetchAssets()
-  }, [filterType, searchQuery, viewMode])
+  }, [fetchAssets])
 
-  const fetchAssets = async () => {
+  const fetchAssets = useCallback(async () => {
     try {
       setIsLoading(true)
       const query = new URLSearchParams({
@@ -125,7 +126,7 @@ export default function MediaVaultPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [filterType, searchQuery, viewMode])
 
   const handleDelete = async (id: string) => {
     try {
@@ -228,7 +229,7 @@ export default function MediaVaultPage() {
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             Media Vault
           </h1>
-          <p className="text-slate-500">Secure repository for Havenly Solution's visual assets.</p>
+          <p className="text-slate-500">Secure repository for Havenly Solution&apos;s visual assets.</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -315,15 +316,20 @@ export default function MediaVaultPage() {
             >
               <div className="aspect-video bg-slate-900 flex items-center justify-center relative overflow-hidden">
                 {asset.assetType === 'IMAGE' && asset.viewUrl ? (
-                  <img 
-                    src={asset.viewUrl} 
-                    alt={asset.title} 
-                    loading="lazy"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://placehold.co/600x400/0f172a/64748b?text=Image+Unavailable';
-                    }}
-                  />
+                  <div className="relative w-full h-full">
+                    <Image 
+                      src={asset.viewUrl} 
+                      alt={asset.title} 
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500" 
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.srcset = '';
+                        target.src = 'https://placehold.co/600x400/0f172a/64748b?text=Image+Unavailable';
+                      }}
+                    />
+                  </div>
                 ) : asset.assetType === 'VIDEO' && asset.viewUrl ? (
                   <video 
                     src={`${asset.viewUrl}#t=0.1`} 
@@ -453,7 +459,14 @@ export default function MediaVaultPage() {
           <div className="max-w-5xl w-full max-h-[85vh] flex flex-col gap-4">
             <div className="relative aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl">
               {selectedAsset.assetType === 'IMAGE' ? (
-                <img src={selectedAsset.viewUrl} alt={selectedAsset.title} className="w-full h-full object-contain" />
+                <div className="relative w-full h-full">
+                  <Image 
+                    src={selectedAsset.viewUrl || ''} 
+                    alt={selectedAsset.title} 
+                    fill
+                    className="object-contain" 
+                  />
+                </div>
               ) : selectedAsset.assetType === 'VIDEO' ? (
                 <video src={selectedAsset.viewUrl} controls autoPlay className="w-full h-full" />
               ) : (

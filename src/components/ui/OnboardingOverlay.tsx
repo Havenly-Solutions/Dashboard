@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, X, CheckCircle2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
@@ -13,7 +13,7 @@ export default function OnboardingOverlay() {
   const [coords, setCoords] = useState({ top: 0, left: 0, width: 0, height: 0 });
 
   const role = session?.user?.role as string;
-  const steps = ONBOARDING_CONTENT[role] || [];
+  const steps = useMemo(() => ONBOARDING_CONTENT[role] || [], [role]);
   const hasCompleted = (session?.user as any)?.hasCompletedOnboarding;
 
   useEffect(() => {
