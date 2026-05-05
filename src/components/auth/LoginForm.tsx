@@ -21,7 +21,7 @@ export default function LoginForm() {
     setMounted(true)
   }, [])
 
-  const countdown = useCountdown(process.env.NEXT_PUBLIC_LAUNCH_DATE || '2026-11-01T00:00:00+02:00')
+  const countdown = useCountdown(process.env.NEXT_PUBLIC_LAUNCH_DATE || '2026-07-01T00:00:00+02:00')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
