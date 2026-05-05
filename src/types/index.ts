@@ -35,8 +35,8 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
   [Role.ADMIN]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/mesh-topology", "/dashboard/safety-logs", "/dashboard/ngo-portal", "/dashboard/pre-registrations", "/dashboard/analytics", "/dashboard/broadcast", "/dashboard/settings", "/dashboard/support-tickets"],
   [Role.FOUNDER]: ["*"],
   [Role.CHIEF_OFFICER]: ["*"],
-  [Role.PA]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/approvals", "/dashboard/settings", "/dashboard/support-tickets"],
-  [Role.MANAGER]: ["/dashboard", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/settings", "/dashboard/support-tickets"],
+  [Role.PA]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/media", "/dashboard/approvals", "/dashboard/settings", "/dashboard/support-tickets"],
+  [Role.MANAGER]: ["/dashboard", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/media", "/dashboard/settings", "/dashboard/support-tickets"],
   [Role.DEVELOPER]: ["/dashboard", "/dashboard/mesh-topology", "/dashboard/analytics", "/dashboard/settings", "/dashboard/support-tickets"],
   [Role.INVESTOR]: ["/dashboard", "/dashboard/analytics", "/dashboard/settings", "/dashboard/support-tickets"],
   [Role.NGO_PARTNER]: ["/dashboard/ngo-portal", "/dashboard/settings", "/dashboard/support-tickets"],
@@ -51,7 +51,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     "analytics:read", 
     "pre-registrations:read", 
     "resource-centre:read", "resource-centre:write",
-    "/dashboard/analytics", "/dashboard/pre-registrations", "/dashboard/resource-centre", "/dashboard/broadcast", "/dashboard/settings"
+    "/dashboard/analytics", "/dashboard/pre-registrations", "/dashboard/resource-centre", "/dashboard/broadcast", "/dashboard/media", "/dashboard/settings"
   ],
 }
 

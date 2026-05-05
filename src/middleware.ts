@@ -21,8 +21,9 @@ export async function middleware(req: NextRequest) {
     }
 
     // 2. If token exists but role is invalid or permissions missing
-    const role = token.role as keyof typeof ROLE_PERMISSIONS
-    const permissions = ROLE_PERMISSIONS[role]
+    const tokenRole = (token.role as string || '').toUpperCase()
+    const roleKey = Object.keys(ROLE_PERMISSIONS).find(k => k.toUpperCase() === tokenRole)
+    const permissions = roleKey ? ROLE_PERMISSIONS[roleKey] : null
 
     if (!permissions) {
       // Prevent loop: If already on home with an error, don't redirect again

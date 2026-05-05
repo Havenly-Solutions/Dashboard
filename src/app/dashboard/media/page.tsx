@@ -46,7 +46,7 @@ export default function MediaVaultPage() {
     try {
       const d = new Date(dateStr)
       if (isNaN(d.getTime())) return 'N/A'
-      return format(d, 'MMM d, yyyy')
+      return format(d, 'MMM d, yyyy • HH:mm')
     } catch (e) {
       return 'N/A'
     }
@@ -432,9 +432,15 @@ export default function MediaVaultPage() {
                     {asset.mediaCategory || 'GENERAL'}
                   </div>
                 </div>
-                <div className="flex items-center justify-between text-xs text-slate-400">
-                  <span>{safeFormatDate(asset.createdAt || '')}</span>
-                  <span>{asset.uploadedBy?.name || 'Unknown'}</span>
+                <div className="flex flex-col text-[11px] text-slate-500 space-y-1 mt-1">
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium text-slate-700">Uploaded by:</span>
+                    <span>{asset.uploadedBy?.name || 'Unknown'}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium text-slate-700">Timestamp:</span>
+                    <span>{safeFormatDate(asset.createdAt || '')}</span>
+                  </div>
                 </div>
               </div>
               {viewMode === 'all' && (
@@ -507,12 +513,17 @@ export default function MediaVaultPage() {
             <div className="flex items-center justify-between px-2">
               <div className="space-y-1">
                 <h2 className="text-2xl font-bold text-white">{selectedAsset.title}</h2>
-                <div className="flex items-center gap-3 text-slate-400 text-sm">
-                  <span>{selectedAsset.assetType}</span>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-400 text-sm">
+                  <span className="px-2 py-0.5 bg-white/10 rounded text-[10px] font-bold uppercase tracking-wider text-blue-400 border border-blue-500/20">{selectedAsset.assetType}</span>
                   <span>•</span>
                   <span>{selectedAsset.mediaCategory}</span>
                   <span>•</span>
-                  <span>Uploaded by {selectedAsset.uploadedBy?.name}</span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-slate-500">Uploaded by</span>
+                    <span className="text-white font-medium">{selectedAsset.uploadedBy?.name || 'Unknown'}</span>
+                  </span>
+                  <span>•</span>
+                  <span>{safeFormatDate(selectedAsset.createdAt || '')}</span>
                 </div>
               </div>
               <button 
