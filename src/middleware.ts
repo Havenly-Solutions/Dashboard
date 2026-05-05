@@ -7,7 +7,8 @@ export async function middleware(req: NextRequest) {
   try {
     const token = await getToken({ 
       req, 
-      secret: process.env.NEXTAUTH_SECRET as string 
+      secret: process.env.NEXTAUTH_SECRET as string,
+      cookieName: 'next-auth.session-token'
     })
     const { pathname, searchParams } = req.nextUrl
 
