@@ -11,12 +11,13 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_U
  */
 export async function serverFetch(path: string, options: RequestInit = {}) {
   const headersList = getHeaders()
-  
-  // OPTIMIZATION: Check for token injected by middleware first
   let accessToken = headersList.get('x-auth-token')
   let refreshToken = null
+  
+  const PUBLIC_API_PATHS = ['/api/pre-registrations/register', '/api/auth/signin', '/api/auth/signup'];
+  const isPublicPath = PUBLIC_API_PATHS.some(p => path.startsWith(p));
 
-  if (!accessToken) {
+  if (!accessToken && !isPublicPath) {
     const session = await getServerSession(authOptions)
     if (!session) return null
     accessToken = (session as any).accessToken
@@ -29,7 +30,7 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
   const url = `${BACKEND_URL}${path}`
   const headers: any = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${accessToken}`,
+    ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
     'x-forwarded-for': forwardedFor,
     'user-agent': userAgent,
     ...options.headers,

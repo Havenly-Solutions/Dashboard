@@ -345,7 +345,7 @@ export default function MediaVaultPage() {
                   </div>
                 ) : asset.assetType === 'VIDEO' && asset.viewUrl ? (
                   <video 
-                    src={`${asset.viewUrl}#t=0.1`} 
+                    src={asset.viewUrl.startsWith('http') ? `${asset.viewUrl}#t=0.1` : asset.viewUrl} 
                     preload="metadata"
                     muted
                     className="w-full h-full object-cover" 

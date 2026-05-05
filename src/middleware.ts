@@ -36,11 +36,21 @@ export async function middleware(req: NextRequest) {
     }
 
     // 4. Check specific path permissions
+    // Map /api/resource to /dashboard/resource for permission matching
+    const normalizedPath = pathname.startsWith('/api/') 
+      ? pathname.replace('/api/', '/dashboard/') 
+      : pathname
+
     const isAllowed = permissions.some(
-      (p) => pathname === p || pathname.startsWith(p + '/')
+      (p) => normalizedPath === p || normalizedPath.startsWith(p + '/')
     )
 
     if (!isAllowed) {
+      // Don't redirect API calls, just return unauthorized
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+      }
+
       const defaultRoute = permissions.find(p => p.startsWith('/dashboard')) || '/dashboard'
       
       // If we are already on the default route or a base path, don't loop

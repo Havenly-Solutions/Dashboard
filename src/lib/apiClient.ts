@@ -70,7 +70,15 @@ export async function baseApiClient(endpoint: string, options: any = {}) {
       return response.blob();
     }
 
-    return response.json();
+    const text = await response.text();
+    if (!text) return {}; // Handle empty responses (204 No Content, etc)
+    
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      // If it's not JSON, return as is or in a message object
+      return { message: text };
+    }
   } catch (err: any) {
     clearTimeout(timeoutId);
     const duration = Date.now() - startTime;
