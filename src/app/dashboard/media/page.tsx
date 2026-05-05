@@ -5,9 +5,9 @@ import Uppy from '@uppy/core'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 const UppyDashboardModal = dynamic(
-  () => import('@uppy/react').then((mod) => mod.DashboardModal),
+  () => import('@uppy/react').then((mod: any) => mod.DashboardModal),
   { ssr: false }
-);
+) as any;
 import AwsS3 from '@uppy/aws-s3'
 import '@uppy/core/css/style.min.css'
 import '@uppy/dashboard/css/style.min.css'

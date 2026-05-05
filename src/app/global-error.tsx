@@ -1,6 +1,5 @@
 "use client";
 
-import { AlertTriangle, RefreshCcw, Home } from "lucide-react";
 import Error from "next/error";
 import React from "react";
 
