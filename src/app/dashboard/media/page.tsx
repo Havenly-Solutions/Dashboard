@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect, useMemo, useCallback } from 'react'
-import { Upload, Search, Play, Download, Trash2, FileText, Image as ImageIcon, Video as VideoIcon, RefreshCw } from 'lucide-react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { Upload, Search, Play, Download, Trash2, FileText, Image as ImageIcon, Video as VideoIcon, RefreshCw, X } from 'lucide-react'
 import Uppy from '@uppy/core'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -41,6 +41,12 @@ export default function MediaVaultPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   
   const { confirm, modal } = useConfirmDelete()
+  
+  // Use a ref for fetchAssets to avoid Uppy re-initialization
+  const fetchAssetsRef = useRef(fetchAssets)
+  useEffect(() => {
+    fetchAssetsRef.current = fetchAssets
+  }, [fetchAssets])
 
   const fetchAssets = useCallback(async () => {
     try {
@@ -60,14 +66,16 @@ export default function MediaVaultPage() {
   }, [filterType, searchQuery, viewMode])
 
   const uppy = useMemo(() => {
-    return new Uppy({
+    const u = new Uppy({
       id: 'media-vault',
       autoProceed: false,
       restrictions: {
         maxFileSize: 5 * 1024 * 1024 * 1024, // 5GB
         allowedFileTypes: ['video/*', 'image/*', 'application/pdf', '.doc', '.docx'],
       },
-    }).use(AwsS3, {
+    })
+    
+    u.use(AwsS3, {
       limit: 4,
       shouldUseMultipart: true,
       createMultipartUpload: async (file: any) => {
@@ -89,7 +97,7 @@ export default function MediaVaultPage() {
           })
         });
         
-        uppy.setFileMeta(file.id, { assetId: response.assetId });
+        u.setFileMeta(file.id, { assetId: response.assetId });
 
         return { 
           uploadId: response.uploadId, 
@@ -121,11 +129,13 @@ export default function MediaVaultPage() {
             parts
           })
         });
-        fetchAssets();
+        fetchAssetsRef.current();
         return { location: key };
       }
     })
-  }, [fetchAssets])
+
+    return u
+  }, []) // Initialize ONLY once
 
   useEffect(() => {
     fetchAssets()
@@ -457,7 +467,7 @@ export default function MediaVaultPage() {
             title="Close Preview"
             className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all active:scale-90"
           >
-            <Trash2 className="w-6 h-6 rotate-45" />
+            <X className="w-6 h-6" />
           </button>
           
           <div className="max-w-5xl w-full max-h-[85vh] flex flex-col gap-4">
