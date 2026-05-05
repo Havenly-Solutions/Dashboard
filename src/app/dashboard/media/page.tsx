@@ -42,12 +42,6 @@ export default function MediaVaultPage() {
   
   const { confirm, modal } = useConfirmDelete()
   
-  // Use a ref for fetchAssets to avoid Uppy re-initialization
-  const fetchAssetsRef = useRef(fetchAssets)
-  useEffect(() => {
-    fetchAssetsRef.current = fetchAssets
-  }, [fetchAssets])
-
   const fetchAssets = useCallback(async () => {
     try {
       setIsLoading(true)
@@ -64,6 +58,12 @@ export default function MediaVaultPage() {
       setIsLoading(false)
     }
   }, [filterType, searchQuery, viewMode])
+
+  // Use a ref for fetchAssets to avoid Uppy re-initialization
+  const fetchAssetsRef = useRef(fetchAssets)
+  useEffect(() => {
+    fetchAssetsRef.current = fetchAssets
+  }, [fetchAssets])
 
   const uppy = useMemo(() => {
     const u = new Uppy({
