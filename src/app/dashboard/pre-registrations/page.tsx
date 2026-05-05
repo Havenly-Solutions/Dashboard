@@ -12,6 +12,7 @@ import { apiClient } from '@/lib/apiClientClient'
 
 const REGIONS = ['All Regions', 'Johannesburg / Gauteng', 'Cape Town / Western Cape', 'Durban / KZN', 'Pretoria / Gauteng', 'Port Elizabeth / Eastern Cape']
 const PIE_COLORS = ['#C0392B', '#1A1A2E', '#0B6E4F', '#D4A017', '#6B7280', '#9B59B6']
+const TARGET_REGISTRATIONS = 5000;
 
 export default function PreRegistrationsPage() {
   const { data: session } = useSession()
@@ -84,17 +85,15 @@ export default function PreRegistrationsPage() {
           </div>
           <div className="stat-card">
             <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">Tour Target</div>
-            <div className="font-display font-bold text-3xl text-[#1A1A2E]">5,000</div>
+            <div className="font-display font-bold text-3xl text-[#1A1A2E]">{TARGET_REGISTRATIONS.toLocaleString()}</div>
             <div className="mt-2">
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-[#C0392B] rounded-full transition-all" 
-                  ref={(el) => {
-                    if (el) el.style.width = `${Math.min(100, (total / 5000) * 100)}%`
-                  }}
+                  style={{ width: `${Math.min(100, (total / TARGET_REGISTRATIONS) * 100)}%` }}
                 />
               </div>
-              <div className="text-xs text-gray-400 mt-1">{((total / 5000) * 100).toFixed(1)}% of goal</div>
+              <div className="text-xs text-gray-400 mt-1">{((total / TARGET_REGISTRATIONS) * 100).toFixed(1)}% of goal</div>
             </div>
           </div>
           <div className="stat-card">

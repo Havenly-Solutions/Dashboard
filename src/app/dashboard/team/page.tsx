@@ -51,6 +51,8 @@ const ROLE_COLOURS: Record<string, string> = {
   NGO_PARTNER:    'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
   DEVELOPER:      'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
   INVESTOR:       'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200',
+  VIDEOGRAPHER:   'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
+  CONTENT_CREATOR:'bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-200',
 };
 
 const ALLOWED_ROLES = [
@@ -60,6 +62,8 @@ const ALLOWED_ROLES = [
   'PA',
   'NGO_PARTNER',
   'INVESTOR',
+  'VIDEOGRAPHER',
+  'CONTENT_CREATOR',
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────

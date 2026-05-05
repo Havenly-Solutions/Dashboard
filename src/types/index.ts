@@ -51,7 +51,7 @@ export const ROLE_PERMISSIONS: Record<string, string[]> = {
     "analytics:read", 
     "pre-registrations:read", 
     "resource-centre:read", "resource-centre:write",
-    "/dashboard/editor", "/dashboard/analytics", "/dashboard/pre-registrations", "/dashboard/resource-centre", "/dashboard/broadcast", "/dashboard/settings"
+    "/dashboard/analytics", "/dashboard/pre-registrations", "/dashboard/resource-centre", "/dashboard/broadcast", "/dashboard/settings"
   ],
 }
 

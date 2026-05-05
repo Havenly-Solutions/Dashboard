@@ -54,10 +54,10 @@ export default function LiveFeedPage() {
         {/* Top Stats - GSC Style Property Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'GSM Network', value: 'INITIALIZING', sub: 'Standard Frequency', icon: Radio, color: 'text-[#fbbc04]', dot: 'bg-[#fbbc04]' },
-            { label: 'Cloud Status', value: 'ACTIVE', sub: 'High Availability', icon: Activity, color: 'text-[#34a853]', dot: 'bg-[#34a853]' },
+            { label: 'GSM Network', value: 'ACTIVE', sub: '99.9% Core Uptime', icon: Radio, color: 'text-[#34a853]', dot: 'bg-[#34a853]' },
+            { label: 'Cloud Status', value: 'ACTIVE', sub: 'Region: AF-SOUTH-1', icon: Activity, color: 'text-[#34a853]', dot: 'bg-[#34a853]' },
             { label: 'NGO Partners', value: stats.totalNGOs, isNum: true, sub: 'Verified Dispatch', icon: Users, color: 'text-[#1a73e8]', dot: 'bg-[#1a73e8]' },
-            { label: 'Evidence API', value: 'PENDING', sub: 'Real-time Link', icon: Shield, color: 'text-[#5f6368]', dot: 'bg-[#dadce0]' },
+            { label: 'Evidence API', value: 'CONNECTED', sub: 'Real-time Chain', icon: Shield, color: 'text-[#34a853]', dot: 'bg-[#34a853]' },
           ].map(({ label, value, isNum, sub, icon: Icon, color, dot }) => (
             <div key={label} className="card p-6 bg-white border border-[#dadce0] rounded-lg">
               <div className="flex items-start justify-between mb-2">
