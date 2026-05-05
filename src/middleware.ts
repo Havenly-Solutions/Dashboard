@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
       req, 
       secret: process.env.NEXTAUTH_SECRET as string 
     })
-    const pathname = req.nextUrl.pathname
+    const { pathname, searchParams } = req.nextUrl
 
     // 1. If no token and trying to access dashboard, redirect to login
     if (!token) {
@@ -19,12 +19,14 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next()
     }
 
-    // 2. If token exists but role is invalid
+    // 2. If token exists but role is invalid or permissions missing
     const role = token.role as keyof typeof ROLE_PERMISSIONS
     const permissions = ROLE_PERMISSIONS[role]
 
     if (!permissions) {
-      return NextResponse.redirect(new URL('/', req.url))
+      // Prevent loop: If already on home with an error, don't redirect again
+      if (pathname === '/' && searchParams.has('error')) return NextResponse.next()
+      return NextResponse.redirect(new URL('/?error=unauthorized', req.url))
     }
 
     // 3. Founder and Chief Officer bypass
@@ -38,8 +40,11 @@ export async function middleware(req: NextRequest) {
     )
 
     if (!isAllowed) {
-      const defaultRoute = permissions[0] || '/dashboard'
+      const defaultRoute = permissions.find(p => p.startsWith('/dashboard')) || '/dashboard'
+      
+      // If we are already on the default route or a base path, don't loop
       if (pathname === defaultRoute) return passWithToken(req, token.accessToken as string)
+      
       return NextResponse.redirect(new URL(defaultRoute, req.url))
     }
 
@@ -52,7 +57,6 @@ export async function middleware(req: NextRequest) {
 
 /**
  * Helper to pass the request forward while injecting the access token into headers.
- * This allows downstream Server Components and Route Handlers to bypass redundant session lookups.
  */
 function passWithToken(req: NextRequest, token: string) {
   const requestHeaders = new Headers(req.headers)
@@ -68,5 +72,9 @@ function passWithToken(req: NextRequest, token: string) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/api/:path*'], // Added /api to matcher for token passthrough
+  // Exclude auth routes and static assets
+  matcher: [
+    '/dashboard/:path*',
+    '/api/((?!auth).*)', // Matches /api/ but not /api/auth/
+  ],
 }

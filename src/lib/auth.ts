@@ -45,6 +45,11 @@ export const authOptions: NextAuthOptions = {
             }),
           })
           
+          if (!result || !result.user) {
+            console.error('Authorize Error: Backend returned success but no user data', result)
+            throw new Error('Authentication failed: Invalid response from security server')
+          }
+
           const { user, accessToken, refreshToken } = result
           
           return { 
@@ -61,8 +66,12 @@ export const authOptions: NextAuthOptions = {
             hasCompletedOnboarding: user.hasCompletedOnboarding
           }
         } catch (error: any) {
-          console.error('Authorize Exception:', error.message)
-          throw new Error(error.message)
+          // If it's already a clean Error we threw, just pass it up
+          if (error instanceof Error && !error.message.includes('API error')) {
+             throw error
+          }
+          console.error('Authorize Exception:', error.message || error)
+          throw new Error(error.message || 'The security server is currently unreachable')
         }
       },
     }),

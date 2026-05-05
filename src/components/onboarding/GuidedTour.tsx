@@ -206,10 +206,13 @@ export function TourProvider({ children }: { children: ReactNode }) {
   const steps = TOUR_STEPS[role] || (portalId ? TOUR_STEPS[portalId] : TOUR_STEPS['DASHBOARD']);
 
   useEffect(() => {
-    if (session?.user && hasCompletedOnboarding !== true) {
+    // Only activate tour on dashboard routes. Never on the login page.
+    const isDashboard = pathname.startsWith('/dashboard');
+    
+    if (isDashboard && session?.user && hasCompletedOnboarding !== true) {
       setIsActive(true);
     }
-  }, [session, hasCompletedOnboarding]);
+  }, [session, hasCompletedOnboarding, pathname]);
 
   const startTour = () => {
     setCurrentStepIndex(0);
