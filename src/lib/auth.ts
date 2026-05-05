@@ -103,6 +103,16 @@ export const authOptions: NextAuthOptions = {
         if (session.mustChangePassword === false) token.mustChangePassword = false
         if (session.user?.hasCompletedOnboarding === true) token.hasCompletedOnboarding = true
       }
+
+      // Automatically reset onboarding tour when the dev server is restarted
+      if (process.env.NODE_ENV === 'development') {
+        const globalStore = global as any;
+        const bootTime = globalStore.__SERVER_BOOT_TIME || (globalStore.__SERVER_BOOT_TIME = Date.now());
+        if ((token as any).lastBoot !== bootTime) {
+          token.hasCompletedOnboarding = false;
+          (token as any).lastBoot = bootTime;
+        }
+      }
       
       return token
     },

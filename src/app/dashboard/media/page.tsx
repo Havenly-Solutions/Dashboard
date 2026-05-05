@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Upload, Search, Play, Download, Trash2, FileText, Image as ImageIcon, Video as VideoIcon, RefreshCw, X } from 'lucide-react'
 import Uppy from '@uppy/core'
 import dynamic from 'next/dynamic'
@@ -37,6 +37,8 @@ export default function MediaVaultPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState<string>('all')
+  const [mounted, setMounted] = useState(false)
+  
   const [viewMode, setViewMode] = useState<'all' | 'bin'>('all')
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   
@@ -78,23 +80,23 @@ export default function MediaVaultPage() {
   useEffect(() => {
     fetchAssetsRef.current = fetchAssets
   }, [fetchAssets])
-  const [uppy, setUppy] = useState<Uppy | null>(null)
+  const [uppy, setUppy] = useState<any>(null)
 
   useEffect(() => {
+    setMounted(true)
     const u = new Uppy({
       id: 'media-vault',
       autoProceed: false,
       restrictions: {
-        maxFileSize: 1024 * 1024 * 500, // 500MB
+        maxFileSize: 1024 * 1024 * 500,
         allowedFileTypes: ['image/*', 'video/*']
       },
       meta: { mediaCategory: 'GENERAL' }
     })
-
     u.use(AwsS3, {
       shouldUseMultipart: true,
-      getUploadParameters: async (file: any) => {
-        const assetType = file.type?.startsWith('image/') ? 'IMAGE' : 'VIDEO';
+      createMultipartUpload: async (file: any) => {
+        const assetType = file.type?.startsWith('image/') ? 'IMAGE' : 'VIDEO'
         const response = await apiClient('/api/media/initiate-upload', {
           method: 'POST',
           body: JSON.stringify({
@@ -106,56 +108,37 @@ export default function MediaVaultPage() {
             mediaCategory: file.meta.mediaCategory || 'GENERAL',
             description: file.meta.description || ''
           })
-        });
-        
-        if (!response?.assetId) {
-          throw new Error('Failed to initiate upload: No asset ID returned');
-        }
-        
-        u.setFileMeta(file.id, { assetId: response.assetId });
-
-        return { 
-          uploadId: response.uploadId, 
-          key: response.key, 
-          assetId: response.assetId 
-        };
+        })
+        if (!response?.assetId) throw new Error('Failed to initiate upload')
+        ;(u as any).setFileMeta(file.id, { assetId: response.assetId })
+        return { uploadId: response.uploadId, key: response.key }
       },
       signPart: async (_file: any, { uploadId, key, partNumber }: any) => {
-        const response = await apiClient(`/api/media/upload-url?key=${encodeURIComponent(key)}&uploadId=${uploadId}&partNumber=${partNumber}`);
-        return { url: response.url };
+        const r = await apiClient(`/api/media/upload-url?key=${encodeURIComponent(key)}&uploadId=${uploadId}&partNumber=${partNumber}`)
+        return { url: r.url }
       },
       listParts: async (_file: any, { uploadId, key }: any) => {
-        const response = await apiClient(`/api/media/list-parts?key=${encodeURIComponent(key)}&uploadId=${uploadId}`);
-        return response;
+        return apiClient(`/api/media/list-parts?key=${encodeURIComponent(key)}&uploadId=${uploadId}`)
       },
       abortMultipartUpload: async (_file: any, { uploadId, key }: any) => {
-        await apiClient(`/api/media/abort-upload`, {
-          method: 'POST',
-          body: JSON.stringify({ uploadId, key })
-        });
+        await apiClient('/api/media/abort-upload', { method: 'POST', body: JSON.stringify({ uploadId, key }) })
       },
       completeMultipartUpload: async (file: any, { uploadId, key, parts }: any) => {
-        const assetId = file.meta.assetId;
-        const response = await apiClient(`/api/media/complete-upload`, {
+        const assetId = file.meta.assetId
+        const response = await apiClient('/api/media/complete-upload', {
           method: 'POST',
           body: JSON.stringify({ uploadId, key, parts, assetId })
-        });
-        
+        })
         await apiClient(`/api/media/${assetId}/confirm`, {
           method: 'POST',
           body: JSON.stringify({ key, fileSizeBytes: file.size })
-        });
-
-        fetchAssetsRef.current();
-        return response;
+        })
+        fetchAssetsRef.current()
+        return response
       }
     })
-
     setUppy(u)
-
-    return () => {
-      u.close()
-    }
+    return () => { u.destroy() }
   }, [])
 
   useEffect(() => {
@@ -169,7 +152,6 @@ export default function MediaVaultPage() {
       fetchAssets()
     } catch (error) {
       toast.error('Failed to move asset to bin')
-      throw error // Re-throw for hook to handle
     }
   }
 
@@ -232,7 +214,6 @@ export default function MediaVaultPage() {
       fetchAssets()
     } catch (error) {
       toast.error('Permanent delete failed')
-      throw error // Re-throw for hook to handle
     }
   }
 
@@ -453,7 +434,7 @@ export default function MediaVaultPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="font-medium text-slate-700">Timestamp:</span>
-                    <span>{safeFormatDate(asset.createdAt || '')}</span>
+                    <span>{mounted ? safeFormatDate(asset.createdAt || '') : '...'}</span>
                   </div>
                 </div>
               </div>
@@ -537,7 +518,7 @@ export default function MediaVaultPage() {
                     <span className="text-white font-medium">{selectedAsset.uploadedBy?.name || 'Unknown'}</span>
                   </span>
                   <span>•</span>
-                  <span>{safeFormatDate(selectedAsset.createdAt || '')}</span>
+                  <span>{mounted ? safeFormatDate(selectedAsset.createdAt || '') : '...'}</span>
                 </div>
               </div>
               <button 
@@ -552,7 +533,7 @@ export default function MediaVaultPage() {
         </div>
       )}
 
-      {uppy && (
+      {mounted && uppy && (
         <UppyDashboardModal
           uppy={uppy}
           open={isUploadModalOpen}
@@ -561,33 +542,12 @@ export default function MediaVaultPage() {
           metaFields={[
             { id: 'title', name: 'Asset Title', placeholder: 'Give your asset a clear name' },
             { id: 'description', name: 'Description', placeholder: 'What is this media for?' },
-            { 
-              id: 'mediaCategory', 
-              name: 'Category', 
-              render: ({ value, onChange, fieldID }: any) => {
-                return (
-                  <select 
-                    id={fieldID}
-                    title="Select Media Category"
-                    value={value} 
-                    onChange={(e) => onChange(e.target.value)}
-                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm"
-                  >
-                    <option value="GENERAL">General</option>
-                    <option value="RAW">Raw Footage</option>
-                    <option value="BROLL">B-Roll</option>
-                    <option value="FINAL_EDIT">Final Edit</option>
-                    <option value="TRAINING">Training Material</option>
-                    <option value="SOP">SOP Visual</option>
-                  </select>
-                )
-              }
-            }
+            { id: 'mediaCategory', name: 'Category', placeholder: 'GENERAL, RAW, BROLL, FINAL_EDIT, etc' }
           ]}
         />
       )}
 
-      {modal}
+      {mounted && modal}
 
       {/* Bulk Action Bar */}
       {selectedIds.length > 0 && (

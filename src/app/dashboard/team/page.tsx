@@ -56,15 +56,19 @@ const ROLE_COLOURS: Record<string, string> = {
 };
 
 const ALLOWED_ROLES = [
+  'ADMIN',
   'CHIEF_OFFICER',
   'MANAGER',
-  'DEVELOPER',
   'PA',
+  'DEVELOPER',
   'NGO_PARTNER',
   'INVESTOR',
   'VIDEOGRAPHER',
   'CONTENT_CREATOR',
 ];
+
+const roleLabel = (r: string) =>
+  r.split('_').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -180,7 +184,7 @@ export default function TeamPage() {
             onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
           >
             {ALLOWED_ROLES.map(r => (
-              <option key={r} value={r}>{r.replace('_', ' ').toLowerCase()}</option>
+              <option key={r} value={r}>{roleLabel(r)}</option>
             ))}
           </select>
         </div>
@@ -242,7 +246,7 @@ export default function TeamPage() {
                         disabled={roleChange.isPending}
                       >
                         {ALLOWED_ROLES.map(r => (
-                          <option key={r} value={r}>{r.replace('_', ' ')}</option>
+                          <option key={r} value={r}>{roleLabel(r)}</option>
                         ))}
                       </select>
                     ) : (
