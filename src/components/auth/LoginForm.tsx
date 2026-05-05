@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import React from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Eye, EyeOff, Loader2 } from 'lucide-react'
@@ -7,15 +7,19 @@ import { useCountdown } from '@/hooks/useCountdown'
 import NextLink from 'next/link'
 import Image from 'next/image'
 
-import * as Sentry from '@sentry/nextjs'
 import { toast } from 'sonner'
 
 export default function LoginForm() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPw, setShowPw] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+  const [showPw, setShowPw] = React.useState(false)
+  const [loading, setLoading] = React.useState(false)
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const countdown = useCountdown(process.env.NEXT_PUBLIC_LAUNCH_DATE || '2026-11-24T00:00:00+02:00')
 
@@ -27,11 +31,7 @@ export default function LoginForm() {
       const res = await signIn('credentials', { email, password, redirect: false })
       if (res?.error) {
         if (res.error !== 'CredentialsSignin') {
-          Sentry.withScope((scope) => {
-            scope.setExtra("email", email);
-            scope.setLevel("warning");
-            Sentry.captureMessage(`Sign in failed: ${res.error}`);
-          });
+          console.warn(`Sign in failed: ${res.error}`)
         }
         toast.error(res.error === 'CredentialsSignin' ? 'Invalid email or password' : res.error)
         setLoading(false)
@@ -41,11 +41,7 @@ export default function LoginForm() {
         router.push('/dashboard')
       }
     } catch (err) {
-      Sentry.withScope((scope) => {
-        scope.setExtra("email", email);
-        scope.setLevel("error");
-        Sentry.captureException(err);
-      });
+      console.error('Login Error:', err)
       toast.error('An unexpected authentication error occurred')
       setLoading(false)
     }
@@ -168,12 +164,18 @@ export default function LoginForm() {
             {/* Launch Countdown in Side Panel */}
             <div className="bg-white p-4 rounded border border-gray-200 shadow-sm">
               <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Launch Countdown</p>
-              <div className="grid grid-cols-4 gap-1 text-center">
-                <div className="flex flex-col"><span className="text-lg font-black text-[#C0392B]">{countdown.days}</span><span className="text-[8px] uppercase text-gray-400">D</span></div>
-                <div className="flex flex-col"><span className="text-lg font-black text-[#1A1A2E]">{countdown.hours}</span><span className="text-[8px] uppercase text-gray-400">H</span></div>
-                <div className="flex flex-col"><span className="text-lg font-black text-[#1A1A2E]">{countdown.mins}</span><span className="text-[8px] uppercase text-gray-400">M</span></div>
-                <div className="flex flex-col"><span className="text-lg font-black text-[#1A1A2E]">{countdown.secs}</span><span className="text-[8px] uppercase text-gray-400">S</span></div>
-              </div>
+              {mounted ? (
+                <div className="grid grid-cols-4 gap-1 text-center">
+                  <div className="flex flex-col"><span className="text-lg font-black text-[#C0392B]">{countdown.days}</span><span className="text-[8px] uppercase text-gray-400">D</span></div>
+                  <div className="flex flex-col"><span className="text-lg font-black text-[#1A1A2E]">{countdown.hours}</span><span className="text-[8px] uppercase text-gray-400">H</span></div>
+                  <div className="flex flex-col"><span className="text-lg font-black text-[#1A1A2E]">{countdown.mins}</span><span className="text-[8px] uppercase text-gray-400">M</span></div>
+                  <div className="flex flex-col"><span className="text-lg font-black text-[#1A1A2E]">{countdown.secs}</span><span className="text-[8px] uppercase text-gray-400">S</span></div>
+                </div>
+              ) : (
+                <div className="h-10 flex items-center justify-center">
+                  <div className="w-full h-2 bg-gray-100 animate-pulse rounded" />
+                </div>
+              )}
             </div>
           </div>
 

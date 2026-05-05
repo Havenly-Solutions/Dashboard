@@ -1,11 +1,10 @@
 'use client'
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import { Loader2, Eye, EyeOff, CheckCircle } from 'lucide-react'
 import NextLink from 'next/link'
 import Image from 'next/image'
-import * as Sentry from '@sentry/nextjs'
 import { toast } from 'sonner'
 
 function ResetPasswordForm() {
@@ -42,7 +41,7 @@ function ResetPasswordForm() {
       setSuccess(true)
       toast.success('Password reset successful')
     } catch (err) {
-      Sentry.captureException(err)
+      console.error("Auth error:", err)
       toast.error('An unexpected error occurred')
     } finally {
       setLoading(false)

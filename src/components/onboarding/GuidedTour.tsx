@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ChevronRight } from 'lucide-react';
 import { useSession } from 'next-auth/react';
-import { apiClient } from '@/lib/apiClient';
+import { apiClient } from '@/lib/apiClientClient';
 
 interface TourStep {
   id: string;

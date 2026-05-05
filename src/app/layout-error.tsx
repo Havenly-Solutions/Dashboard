@@ -1,7 +1,6 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
-import { useEffect } from "react";
+import React from "react";
 
 export default function RootLayoutError({
   error,
@@ -10,12 +9,20 @@ export default function RootLayoutError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    Sentry.withScope((scope) => {
-      scope.setExtra("digest", error.digest);
-      scope.setTag("error_boundary", "root_layout");
-      Sentry.captureException(error);
-    });
+  React.useEffect(() => {
+    // Log the error
+    console.error('ROOT_LAYOUT_ERROR:', error.digest, error);
+    
+    // Conditionally import and use Sentry only in production
+    if (process.env.NODE_ENV === 'production') {
+      import('@sentry/nextjs').then((Sentry) => {
+        Sentry.withScope((scope) => {
+          scope.setExtra("digest", error.digest);
+          scope.setTag("error_boundary", "root_layout");
+          Sentry.captureException(error);
+        });
+      }).catch(() => {});
+    }
   }, [error]);
 
   return (

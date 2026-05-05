@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { LoadingButton } from '@/components/ui/LoadingButton';
-import { apiClient } from '@/lib/apiClient';
+import { apiClient } from '@/lib/apiClientClient';
 import { ROLE_PERMISSIONS, Role } from '@/types';
 
 export default function BroadcastPage() {

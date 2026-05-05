@@ -15,7 +15,7 @@ import {
   X
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import { cn } from '@/lib/utils'
 
 export default function SupportTicketsPage() {

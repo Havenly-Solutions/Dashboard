@@ -10,7 +10,7 @@ import TimeAgo from '@/components/dashboard/TimeAgo'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSocket } from '@/hooks/useSocket'
 
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 
 
 export default function LiveFeedPage() {

@@ -1,20 +1,16 @@
 import { getServerSession } from 'next-auth/next'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
-import LoginForm from '@/components/auth/LoginForm'
+import dynamic from 'next/dynamic'
+
+const LoginForm = dynamic(() => import('@/components/auth/LoginForm'), { ssr: false })
 
 export default async function RootLoginPage() {
-  try {
-    const session = await getServerSession(authOptions)
+  const session = await getServerSession(authOptions)
 
-    if (session) {
-      redirect('/dashboard')
-    }
-
-    return <LoginForm />
-  } catch (error) {
-    console.error('RootLoginPage Error:', error)
-    // If auth fails or session check crashes, just show the login form
-    return <LoginForm />
+  if (session) {
+    redirect('/dashboard')
   }
+
+  return <LoginForm />
 }

@@ -4,7 +4,7 @@ import Header from '@/components/dashboard/Header'
 import { AuditLog } from '@/types'
 import { useSession } from 'next-auth/react'
 import { formatDateTime } from '@/lib/utils'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import { Download, ShieldCheck, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 

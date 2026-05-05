@@ -8,7 +8,7 @@ import { Search, Download, MapPin, Users, CheckCircle2, XCircle } from 'lucide-r
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { toast } from 'sonner'
 
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 
 const REGIONS = ['All Regions', 'Johannesburg / Gauteng', 'Cape Town / Western Cape', 'Durban / KZN', 'Pretoria / Gauteng', 'Port Elizabeth / Eastern Cape']
 const PIE_COLORS = ['#C0392B', '#1A1A2E', '#0B6E4F', '#D4A017', '#6B7280', '#9B59B6']

@@ -1,7 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { NextResponse } from 'next/server'
-
 import { headers as getHeaders } from 'next/headers'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || 'https://api.havenly.solutions'
@@ -11,71 +10,85 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_U
  * Securely proxies server-side requests from Dashboard to Backend
  */
 export async function serverFetch(path: string, options: RequestInit = {}) {
-  const session = await getServerSession(authOptions)
+  const headersList = getHeaders()
   
-  if (!session) {
-    return null
+  // OPTIMIZATION: Check for token injected by middleware first
+  let accessToken = headersList.get('x-auth-token')
+  let refreshToken = null
+
+  if (!accessToken) {
+    const session = await getServerSession(authOptions)
+    if (!session) return null
+    accessToken = (session as any).accessToken
+    refreshToken = (session as any).refreshToken
   }
 
-  const headersList = getHeaders()
   const forwardedFor = headersList.get('x-forwarded-for') || ''
   const userAgent = headersList.get('user-agent') || ''
 
   const url = `${BACKEND_URL}${path}`
   const headers: any = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${(session as any).accessToken}`,
+    'Authorization': `Bearer ${accessToken}`,
     'x-forwarded-for': forwardedFor,
     'user-agent': userAgent,
     ...options.headers,
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+  const startTime = Date.now();
   try {
-    console.log(`[serverFetch] Calling backend: ${url} with method: ${options.method || 'GET'}`);
-    let response = await fetch(url, {
+    const response = await fetch(url, {
       cache: 'no-store',
       ...options,
       headers,
+      signal: controller.signal,
     })
+    clearTimeout(timeoutId);
+    
+    const duration = Date.now() - startTime;
+    if (duration > 2000) {
+      console.warn(`[serverFetch] Slow backend response from ${path}: ${duration}ms`);
+    }
 
     // If unauthorized, attempt token refresh
     if (response.status === 401 && path !== '/api/auth/refresh') {
-      console.log(`[serverFetch] 401 detected on ${path}, attempting refresh...`)
-      
-      const refreshToken = (session as any).refreshToken
-
       if (!refreshToken) {
-        console.warn(`[serverFetch] No refresh token available in session for ${path}`)
-        return response
+        const session = await getServerSession(authOptions)
+        refreshToken = (session as any)?.refreshToken
       }
 
-      const refreshRes = await fetch(`${BACKEND_URL}/api/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ refreshToken })
-      })
-
-      if (refreshRes.ok) {
-        const { accessToken } = await refreshRes.json()
-        console.log(`[serverFetch] Refresh successful for ${path}`)
-        
-        // Retry original request with new token
-        headers['Authorization'] = `Bearer ${accessToken}`
-        response = await fetch(url, {
-          cache: 'no-store',
-          ...options,
-          headers,
+      if (refreshToken) {
+        const refreshRes = await fetch(`${BACKEND_URL}/api/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refreshToken }),
+          signal: controller.signal,
         })
-      } else {
-        console.warn(`[serverFetch] Refresh failed for ${path}: ${refreshRes.status}`)
+
+        if (refreshRes.ok) {
+          const { accessToken: newAccessToken } = await refreshRes.json()
+          headers['Authorization'] = `Bearer ${newAccessToken}`
+          return fetch(url, {
+            cache: 'no-store',
+            ...options,
+            headers,
+          })
+        }
       }
     }
 
     return response
-  } catch (error) {
-    console.error(`serverFetch error [${path}]:`, error)
+  } catch (error: any) {
+    clearTimeout(timeoutId);
+    const duration = Date.now() - startTime;
+    if (error.name === 'AbortError') {
+       console.error(`[serverFetch] Timeout after ${duration}ms on ${path}`);
+    } else {
+       console.error(`[serverFetch] error after ${duration}ms [${path}]:`, error);
+    }
     return null
   }
 }
@@ -85,7 +98,6 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
  * Helper to handle standard proxy responses
  */
 export async function apiProxy(req: Request, path: string) {
-  console.log(`[apiProxy] Incoming ${req.method} request to ${path}`);
   const method = req.method
   const urlObj = new URL(req.url)
   const proxyPath = `${path}${urlObj.search}`
@@ -105,15 +117,14 @@ export async function apiProxy(req: Request, path: string) {
   } as RequestInit)
 
   if (!res) {
-    console.error(`[apiProxy] Backend unreachable or Session missing for path: ${proxyPath}`)
     return NextResponse.json({ error: 'Gateway Timeout: Backend Unreachable' }, { status: 504 })
   }
 
-  const text = await res.text()
-  try {
-    const data = JSON.parse(text)
-    return NextResponse.json(data, { status: res.status })
-  } catch (e) {
-    return NextResponse.json({ error: text || 'Unknown backend error' }, { status: res.status })
-  }
+  // Stream the response back to the client
+  return new NextResponse(res.body, {
+    status: res.status,
+    headers: {
+      'Content-Type': res.headers.get('Content-Type') || 'application/json',
+    }
+  })
 }

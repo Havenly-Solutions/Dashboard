@@ -5,7 +5,7 @@ import { Settings, Search, LogOut, User } from 'lucide-react'
 import { Role } from '@/types'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import NotificationFeed from './NotificationFeed'
 import { toast } from 'sonner'
 

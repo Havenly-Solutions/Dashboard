@@ -1,6 +1,5 @@
 'use client';
-import { useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
+import React from 'react';
 import { AlertTriangle, RefreshCcw, Home } from 'lucide-react';
 import Link from 'next/link';
 
@@ -11,10 +10,16 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    // Log the error to Sentry
-    Sentry.captureException(error);
-    console.error('CRITICAL_DASHBOARD_ERROR:', error);
+  React.useEffect(() => {
+    // Log the error
+    console.error('CRITICAL_DASHBOARD_ERROR:', error.digest, error);
+    
+    // Conditionally import and use Sentry only in production
+    if (process.env.NODE_ENV === 'production') {
+      import('@sentry/nextjs').then((Sentry) => {
+        Sentry.captureException(error);
+      }).catch(() => {});
+    }
   }, [error]);
 
   return (

@@ -1,3 +1,6 @@
+/**
+ * ApiError class for structured error handling
+ */
 export class ApiError extends Error {
   status: number;
   data: any;
@@ -11,10 +14,12 @@ export class ApiError extends Error {
 }
 
 /**
- * Base API client that doesn't automatically fetch session to avoid circular dependencies and server-side issues.
+ * baseApiClient
+ * Core fetch wrapper. Safe for both Client and Server components.
+ * Does NOT automatically fetch session to avoid circular dependencies.
  */
 export async function baseApiClient(endpoint: string, options: any = {}) {
-  const { responseType = 'json', token, ...fetchOptions } = options;
+  const { responseType = 'json', token, timeout = 60000, ...fetchOptions } = options;
   
   const isBrowser = typeof window !== 'undefined';
   const baseUrl = isBrowser ? window.location.origin : (process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || '');
@@ -30,15 +35,24 @@ export async function baseApiClient(endpoint: string, options: any = {}) {
     headers.set('Authorization', `Bearer ${token}`);
   }
   
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+
   const config = {
     ...fetchOptions,
     headers,
+    signal: controller.signal,
   };
 
+  const startTime = Date.now();
   try {
-    if (isBrowser) console.log(`[apiClient] Requesting ${url}`, fetchOptions);
     const response = await fetch(url, config);
-    if (isBrowser) console.log(`[apiClient] Response from ${url}:`, response.status, response.ok);
+    clearTimeout(timeoutId);
+    
+    const duration = Date.now() - startTime;
+    if (duration > 2000) {
+      console.warn(`[baseApiClient] Slow response from ${url}: ${duration}ms`);
+    }
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'No response body');
@@ -48,7 +62,7 @@ export async function baseApiClient(endpoint: string, options: any = {}) {
       } catch (e) {
         errorData = { message: errorText };
       }
-      console.error(`[apiClient] Error ${response.status} on ${url}:`, errorData);
+      console.error(`[baseApiClient] Error ${response.status} on ${url}:`, errorData);
       throw new ApiError(response.status, errorData);
     }
 
@@ -58,26 +72,11 @@ export async function baseApiClient(endpoint: string, options: any = {}) {
 
     return response.json();
   } catch (err: any) {
-    console.error(`[apiClient] Fetch failed on ${url}:`, err.message);
+    clearTimeout(timeoutId);
+    const duration = Date.now() - startTime;
+    if (err.name === 'AbortError') {
+      console.error(`[baseApiClient] Timeout after ${duration}ms on ${url}`);
+    }
     throw err;
   }
-}
-
-/**
- * Convenience wrapper that attempts to inject the session token.
- * Use this in Client Components. In Server Components/Middleware, 
- * prefer passing the token explicitly to baseApiClient.
- */
-export async function apiClient(endpoint: string, options: any = {}) {
-  const isBrowser = typeof window !== 'undefined';
-  let token = options.token;
-
-  if (!token && isBrowser) {
-    // Dynamic import to avoid server-side issues with next-auth/react
-    const { getSession } = await import('next-auth/react');
-    const session = await getSession() as any;
-    token = session?.accessToken;
-  }
-
-  return baseApiClient(endpoint, { ...options, token });
 }

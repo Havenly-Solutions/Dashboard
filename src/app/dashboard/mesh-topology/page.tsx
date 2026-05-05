@@ -4,7 +4,7 @@ import Header from '@/components/dashboard/Header'
 import { MeshNode } from '@/types'
 import { formatTimeAgo } from '@/lib/utils'
 import { Activity, Wifi, Battery, Cpu } from 'lucide-react'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 
 const NODE_STATUS_COLORS: Record<string, string> = {
   STABLE: 'bg-emerald-50 text-emerald-700 border-emerald-200',

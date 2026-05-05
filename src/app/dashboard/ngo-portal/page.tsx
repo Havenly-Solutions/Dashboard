@@ -6,7 +6,7 @@ import { formatDate } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { CheckCircle, XCircle, Clock, Building2, Plus, X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 
 const STATUS_STYLES: Record<NGOStatus, string> = {
   PENDING: 'bg-amber-50 text-amber-700 border-amber-200',

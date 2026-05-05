@@ -29,7 +29,7 @@ export async function middleware(req: NextRequest) {
 
     // 3. Founder and Chief Officer bypass
     if (permissions.includes('*')) {
-      return NextResponse.next()
+      return passWithToken(req, token.accessToken as string)
     }
 
     // 4. Check specific path permissions
@@ -39,20 +39,34 @@ export async function middleware(req: NextRequest) {
 
     if (!isAllowed) {
       const defaultRoute = permissions[0] || '/dashboard'
-      // Avoid redirect loops
-      if (pathname === defaultRoute) return NextResponse.next()
+      if (pathname === defaultRoute) return passWithToken(req, token.accessToken as string)
       return NextResponse.redirect(new URL(defaultRoute, req.url))
     }
 
-    return NextResponse.next()
+    return passWithToken(req, token.accessToken as string)
   } catch (error) {
     console.error('Middleware Error:', error)
-    // Fallback to allowing the request to proceed to the app where it can be handled by layout checks
-    // This avoids a 500 error at the edge
     return NextResponse.next()
   }
 }
 
+/**
+ * Helper to pass the request forward while injecting the access token into headers.
+ * This allows downstream Server Components and Route Handlers to bypass redundant session lookups.
+ */
+function passWithToken(req: NextRequest, token: string) {
+  const requestHeaders = new Headers(req.headers)
+  if (token) {
+    requestHeaders.set('x-auth-token', token)
+  }
+  
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
+}
+
 export const config = {
-  matcher: ['/dashboard/:path*'],
+  matcher: ['/dashboard/:path*', '/api/:path*'], // Added /api to matcher for token passthrough
 }

@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react'
 import { ROLE_LABELS, ROLE_BADGE_COLORS, Role } from '@/types'
 import { Save, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 
 export default function SettingsPage() {
   const { data: session, update, status } = useSession()

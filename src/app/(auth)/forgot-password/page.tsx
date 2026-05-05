@@ -1,11 +1,10 @@
 'use client'
 import { useState } from 'react'
 
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import { Loader2, ArrowLeft, Send } from 'lucide-react'
 import NextLink from 'next/link'
 import Image from 'next/image'
-import * as Sentry from '@sentry/nextjs'
 import { toast } from 'sonner'
 
 export default function ForgotPasswordPage() {
@@ -25,7 +24,7 @@ export default function ForgotPasswordPage() {
       setSubmitted(true)
       toast.success('Reset link sent if account exists')
     } catch (err) {
-      Sentry.captureException(err)
+      console.error("Auth error:", err)
       toast.error('An unexpected error occurred')
     } finally {
       setLoading(false)

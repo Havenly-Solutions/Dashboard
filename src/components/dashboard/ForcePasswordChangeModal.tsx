@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Save, Loader2, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 
 export default function ForcePasswordChangeModal() {
   const { data: session } = useSession()

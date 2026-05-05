@@ -1,10 +1,9 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, X, CheckCircle2 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { ONBOARDING_CONTENT } from '@/lib/onboarding-steps';
-import { apiClient } from '@/lib/apiClient';
+import { apiClient } from '@/lib/apiClientClient';
 
 export default function OnboardingOverlay() {
   const { data: session, update } = useSession();
@@ -18,7 +17,6 @@ export default function OnboardingOverlay() {
 
   useEffect(() => {
     if (!session?.user || hasCompleted || steps.length === 0) return;
-
     const timer = setTimeout(() => setIsVisible(true), 1500);
     return () => clearTimeout(timer);
   }, [session, hasCompleted, steps.length]);
@@ -61,7 +59,6 @@ export default function OnboardingOverlay() {
     try {
       await apiClient('/api/profile/complete-onboarding', { method: 'POST' });
       setIsVisible(false);
-      // Update session to reflect completion
       await update({ hasCompletedOnboarding: true });
     } catch (err) {
       console.error('Failed to save onboarding status', err);
@@ -74,9 +71,15 @@ export default function OnboardingOverlay() {
   const step = steps[currentStep];
 
   return (
-    <div className="fixed inset-0 z-[200] pointer-events-none">
+    <div className="fixed inset-0 z-[200] pointer-events-none" style={{ animation: 'fadeIn 0.3s ease' }}>
+      <style>{`
+        @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
+        @keyframes pulse-ring { 0%, 100% { opacity: 0.5; transform: scale(1) } 50% { opacity: 0; transform: scale(1.2) } }
+      `}</style>
+
       {/* Background Overlay with hole */}
-      <div 
+      <div
         className="absolute inset-0 bg-black/70 transition-opacity duration-500"
         style={{
           clipPath: `polygon(
@@ -91,7 +94,7 @@ export default function OnboardingOverlay() {
       />
 
       {/* Pulse effect around target */}
-      <div 
+      <div
         className="absolute border-2 border-red-500 rounded-lg pointer-events-none"
         style={{
           top: coords.top - 4,
@@ -100,69 +103,64 @@ export default function OnboardingOverlay() {
           height: coords.height + 8,
         }}
       >
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
-          transition={{ duration: 2, repeat: Infinity }}
+        <div
           className="absolute inset-0 bg-red-500/20 rounded-lg"
+          style={{ animation: 'pulse-ring 2s ease-in-out infinite' }}
         />
       </div>
 
       {/* Tooltip */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentStep}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="absolute pointer-events-auto bg-white rounded-2xl shadow-2xl p-6 w-[320px] border border-gray-100"
-          style={{
-            top: step.position === 'bottom' ? coords.top + coords.height + 20 : coords.top,
-            left: step.position === 'right' ? coords.left + coords.width + 20 : coords.left,
-            transform: step.position === 'top' ? 'translateY(-120%)' : step.position === 'left' ? 'translateX(-120%)' : 'none'
-          }}
-        >
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-              Step {currentStep + 1} of {steps.length}
-            </span>
-            <button 
-              onClick={() => setIsVisible(false)} 
-              title="Close Onboarding"
-              className="text-gray-400 hover:text-black"
-            >
-              <X size={16} />
-            </button>
-          </div>
+      <div
+        key={currentStep}
+        className="absolute pointer-events-auto bg-white rounded-2xl shadow-2xl p-6 w-[320px] border border-gray-100"
+        style={{
+          top: step.position === 'bottom' ? coords.top + coords.height + 20 : coords.top,
+          left: step.position === 'right' ? coords.left + coords.width + 20 : coords.left,
+          transform: step.position === 'top' ? 'translateY(-120%)' : step.position === 'left' ? 'translateX(-120%)' : 'none',
+          animation: 'slideUp 0.25s ease',
+        }}
+      >
+        <div className="flex justify-between items-start mb-4">
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            Step {currentStep + 1} of {steps.length}
+          </span>
+          <button
+            onClick={() => setIsVisible(false)}
+            title="Close Onboarding"
+            className="text-gray-400 hover:text-black"
+          >
+            <X size={16} />
+          </button>
+        </div>
 
-          <h3 className="text-lg font-black text-gray-900 mb-2 leading-tight">
-            {step.title}
-          </h3>
-          <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-            {step.content}
-          </p>
+        <h3 className="text-lg font-black text-gray-900 mb-2 leading-tight">
+          {step.title}
+        </h3>
+        <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+          {step.content}
+        </p>
 
-          <div className="flex justify-between items-center pt-4 border-t border-gray-50">
-            <button 
-              onClick={handlePrev}
-              disabled={currentStep === 0}
-              className={`flex items-center gap-1 text-xs font-bold ${currentStep === 0 ? 'text-gray-300' : 'text-gray-600 hover:text-black'}`}
-            >
-              <ChevronLeft size={14} /> Back
-            </button>
+        <div className="flex justify-between items-center pt-4 border-t border-gray-50">
+          <button
+            onClick={handlePrev}
+            disabled={currentStep === 0}
+            className={`flex items-center gap-1 text-xs font-bold ${currentStep === 0 ? 'text-gray-300' : 'text-gray-600 hover:text-black'}`}
+          >
+            <ChevronLeft size={14} /> Back
+          </button>
 
-            <button 
-              onClick={handleNext}
-              className="flex items-center gap-2 bg-[#C0392B] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition-all shadow-lg shadow-red-500/20"
-            >
-              {currentStep === steps.length - 1 ? (
-                <>Finish <CheckCircle2 size={14} /></>
-              ) : (
-                <>Next <ChevronRight size={14} /></>
-              )}
-            </button>
-          </div>
-        </motion.div>
-      </AnimatePresence>
+          <button
+            onClick={handleNext}
+            className="flex items-center gap-2 bg-[#C0392B] text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-black transition-all shadow-lg shadow-red-500/20"
+          >
+            {currentStep === steps.length - 1 ? (
+              <>Finish <CheckCircle2 size={14} /></>
+            ) : (
+              <>Next <ChevronRight size={14} /></>
+            )}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

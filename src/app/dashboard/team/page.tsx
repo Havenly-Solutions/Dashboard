@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { apiClient } from '@/lib/apiClient';
+import { apiClient } from '@/lib/apiClientClient';
 import { useConfirmDelete } from '@/hooks/useConfirmDelete';
 import { toast } from 'sonner';
 

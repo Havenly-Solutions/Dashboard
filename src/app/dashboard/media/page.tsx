@@ -4,14 +4,17 @@ import { Upload, Search, Play, Download, Trash2, FileText, Image as ImageIcon, V
 import Uppy from '@uppy/core'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-const UppyDashboardModal = dynamic((() => import('@uppy/react/dashboard-modal')) as any, { ssr: false }) as any;
+const UppyDashboardModal = dynamic(
+  () => import('@uppy/react').then((mod) => mod.DashboardModal),
+  { ssr: false }
+);
 import AwsS3 from '@uppy/aws-s3'
 import '@uppy/core/css/style.min.css'
 import '@uppy/dashboard/css/style.min.css'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import { useConfirmDelete } from '@/hooks/useConfirmDelete'
 
 interface MediaAsset {

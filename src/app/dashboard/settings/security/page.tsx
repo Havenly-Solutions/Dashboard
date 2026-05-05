@@ -4,7 +4,7 @@ import Header from '@/components/dashboard/Header'
 import { Save, Loader2, Lock, Eye, EyeOff } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 
 export default function SecuritySettingsPage() {
   const { data: session } = useSession()

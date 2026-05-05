@@ -13,7 +13,7 @@ import {
   X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import { toast } from 'sonner'
 
 interface ProfileRequest {

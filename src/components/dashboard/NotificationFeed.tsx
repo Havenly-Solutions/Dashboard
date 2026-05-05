@@ -5,7 +5,7 @@ import { getSocket } from '@/lib/socket'
 import { Bell, X, Check, Info, AlertTriangle, Clock } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import TimeAgo from './TimeAgo'
 
 interface Notification {

@@ -14,7 +14,7 @@ import {
 import AnimatedCounter from '@/components/dashboard/AnimatedCounter'
 import { useQuery } from '@tanstack/react-query'
 import { useSocket } from '@/hooks/useSocket'
-import { apiClient } from '@/lib/apiClient'
+import { apiClient } from '@/lib/apiClientClient'
 import { cn } from '@/lib/utils'
 
 const BRAND_PALETTE = ['#C0392B', '#1A1A2E', '#0B6E4F', '#D4A017', '#6366f1', '#ec4899']
