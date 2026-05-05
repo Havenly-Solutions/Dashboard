@@ -163,7 +163,7 @@ export default function LoginForm() {
 
             {/* Launch Countdown in Side Panel */}
             <div className="bg-white p-4 rounded border border-gray-200 shadow-sm">
-              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">Launch Countdown</p>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2">July National Tour Countdown</p>
               {mounted ? (
                 <div className="grid grid-cols-4 gap-1 text-center">
                   <div className="flex flex-col"><span className="text-lg font-black text-[#C0392B]">{countdown.days}</span><span className="text-[8px] uppercase text-gray-400">D</span></div>
