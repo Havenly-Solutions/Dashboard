@@ -5,7 +5,7 @@ import Uppy from '@uppy/core'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 const UppyDashboardModal = dynamic(
-  () => import('@uppy/react').then((mod: any) => mod.DashboardModal),
+  () => import('@uppy/react/dashboard-modal').then((mod) => mod.default),
   { ssr: false }
 ) as any;
 import AwsS3 from '@uppy/aws-s3'
