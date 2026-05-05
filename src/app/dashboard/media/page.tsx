@@ -61,7 +61,11 @@ export default function MediaVaultPage() {
         ...(viewMode === 'bin' ? { showDeleted: 'true' } : {})
       })
       const result = await apiClient(`/api/media?${query.toString()}`);
-      setAssets(result.data || [])
+      if (result && (result.data || Array.isArray(result))) {
+        setAssets(Array.isArray(result) ? result : (result.data || []))
+      } else {
+        setAssets([])
+      }
     } catch (error) {
       toast.error('Failed to load media vault')
     } finally {
@@ -74,26 +78,23 @@ export default function MediaVaultPage() {
   useEffect(() => {
     fetchAssetsRef.current = fetchAssets
   }, [fetchAssets])
+  const [uppy, setUppy] = useState<Uppy | null>(null)
 
-  const uppy = useMemo(() => {
+  useEffect(() => {
     const u = new Uppy({
       id: 'media-vault',
       autoProceed: false,
       restrictions: {
-        maxFileSize: 5 * 1024 * 1024 * 1024, // 5GB
-        allowedFileTypes: ['video/*', 'image/*', 'application/pdf', '.doc', '.docx'],
+        maxFileSize: 1024 * 1024 * 500, // 500MB
+        allowedFileTypes: ['image/*', 'video/*']
       },
+      meta: { mediaCategory: 'GENERAL' }
     })
-    
-    u.use(AwsS3, {
-      limit: 4,
-      shouldUseMultipart: true,
-      createMultipartUpload: async (file: any) => {
-        let assetType: MediaAsset['assetType'] = 'DOCUMENT'
-        if (file.type.startsWith('video/')) assetType = 'VIDEO'
-        else if (file.type.startsWith('image/')) assetType = 'IMAGE'
-        else if (file.type === 'application/pdf') assetType = 'PDF'
 
+    u.use(AwsS3, {
+      shouldUseMultipart: true,
+      getUploadParameters: async (file: any) => {
+        const assetType = file.type?.startsWith('image/') ? 'IMAGE' : 'VIDEO';
         const response = await apiClient('/api/media/initiate-upload', {
           method: 'POST',
           body: JSON.stringify({
@@ -106,6 +107,10 @@ export default function MediaVaultPage() {
             description: file.meta.description || ''
           })
         });
+        
+        if (!response?.assetId) {
+          throw new Error('Failed to initiate upload: No asset ID returned');
+        }
         
         u.setFileMeta(file.id, { assetId: response.assetId });
 
@@ -123,29 +128,35 @@ export default function MediaVaultPage() {
         const response = await apiClient(`/api/media/list-parts?key=${encodeURIComponent(key)}&uploadId=${uploadId}`);
         return response;
       },
-      abortMultipartUpload: async (file: any, { uploadId, key }: any) => {
-        const assetId = file.meta.assetId;
+      abortMultipartUpload: async (_file: any, { uploadId, key }: any) => {
         await apiClient(`/api/media/abort-upload`, {
           method: 'POST',
-          body: JSON.stringify({ uploadId, key, assetId })
+          body: JSON.stringify({ uploadId, key })
         });
       },
       completeMultipartUpload: async (file: any, { uploadId, key, parts }: any) => {
         const assetId = file.meta.assetId;
+        const response = await apiClient(`/api/media/complete-upload`, {
+          method: 'POST',
+          body: JSON.stringify({ uploadId, key, parts, assetId })
+        });
+        
         await apiClient(`/api/media/${assetId}/confirm`, {
           method: 'POST',
-          body: JSON.stringify({
-            uploadId,
-            parts
-          })
+          body: JSON.stringify({ key, fileSizeBytes: file.size })
         });
+
         fetchAssetsRef.current();
-        return { location: key };
+        return response;
       }
     })
 
-    return u
-  }, []) // Initialize ONLY once
+    setUppy(u)
+
+    return () => {
+      u.close()
+    }
+  }, [])
 
   useEffect(() => {
     fetchAssets()
@@ -227,7 +238,10 @@ export default function MediaVaultPage() {
 
   const handleDownload = async (id: string) => {
     try {
-      const { downloadUrl, filename } = await apiClient(`/api/media/${id}/download-url`)
+      const response = await apiClient(`/api/media/${id}/download-url`)
+      if (!response?.downloadUrl) throw new Error('No download URL returned')
+      
+      const { downloadUrl, filename } = response
       const a = document.createElement('a')
       a.href = downloadUrl
       a.download = filename
@@ -538,38 +552,40 @@ export default function MediaVaultPage() {
         </div>
       )}
 
-      <UppyDashboardModal
-        uppy={uppy}
-        open={isUploadModalOpen}
-        onRequestClose={() => setIsUploadModalOpen(false)}
-        plugins={['Dashboard']}
-        metaFields={[
-          { id: 'title', name: 'Asset Title', placeholder: 'Give your asset a clear name' },
-          { id: 'description', name: 'Description', placeholder: 'What is this media for?' },
-          { 
-            id: 'mediaCategory', 
-            name: 'Category', 
-            render: ({ value, onChange, fieldID }: any) => {
-              return (
-                <select 
-                  id={fieldID}
-                  title="Select Media Category"
-                  value={value} 
-                  onChange={(e) => onChange(e.target.value)}
-                  className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm"
-                >
-                  <option value="GENERAL">General</option>
-                  <option value="RAW">Raw Footage</option>
-                  <option value="BROLL">B-Roll</option>
-                  <option value="FINAL_EDIT">Final Edit</option>
-                  <option value="TRAINING">Training Material</option>
-                  <option value="SOP">SOP Visual</option>
-                </select>
-              )
+      {uppy && (
+        <UppyDashboardModal
+          uppy={uppy}
+          open={isUploadModalOpen}
+          onRequestClose={() => setIsUploadModalOpen(false)}
+          proudlyDisplayPoweredByUppy={false}
+          metaFields={[
+            { id: 'title', name: 'Asset Title', placeholder: 'Give your asset a clear name' },
+            { id: 'description', name: 'Description', placeholder: 'What is this media for?' },
+            { 
+              id: 'mediaCategory', 
+              name: 'Category', 
+              render: ({ value, onChange, fieldID }: any) => {
+                return (
+                  <select 
+                    id={fieldID}
+                    title="Select Media Category"
+                    value={value} 
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-sm"
+                  >
+                    <option value="GENERAL">General</option>
+                    <option value="RAW">Raw Footage</option>
+                    <option value="BROLL">B-Roll</option>
+                    <option value="FINAL_EDIT">Final Edit</option>
+                    <option value="TRAINING">Training Material</option>
+                    <option value="SOP">SOP Visual</option>
+                  </select>
+                )
+              }
             }
-          }
-        ]}
-      />
+          ]}
+        />
+      )}
 
       {modal}
 
