@@ -41,6 +41,12 @@ export default function Sidebar() {
   const actualRole = (session?.user as any)?.role as string
   const effectiveRole = (actualRole === 'FOUNDER' ? portalView : actualRole) as string
   
+  useEffect(() => {
+    const handler = () => setIsOpen(prev => !prev);
+    window.addEventListener('toggle-sidebar', handler);
+    return () => window.removeEventListener('toggle-sidebar', handler);
+  }, [])
+
   // Normalized role lookup to be case-insensitive just in case
   const roleKey = Object.keys(ROLE_PERMISSIONS).find(
     k => k.toUpperCase() === effectiveRole?.toUpperCase()
@@ -73,18 +79,7 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white z-30 flex items-center justify-between px-4 border-b border-gray-100 shadow-sm">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 bg-[#1A1A2E] p-1">
-            <Image src="/favicon.ico" alt="Havenly Solutions Logo" width={32} height={32} className="w-full h-full object-contain" />
-          </div>
-          <div className="font-display font-bold text-[#1A1A2E] text-base leading-none">Havenly Solutions</div>
-        </div>
-        <button onClick={() => setIsOpen(true)} className="text-[#1A1A2E]/80 hover:text-[#1A1A2E] p-2" aria-label="Open menu">
-          <Menu size={24} />
-        </button>
-      </div>
+      {/* Mobile Header Removed - Integrated into main Header */}
 
       {/* Overlay Background for Mobile */}
       {isOpen && (

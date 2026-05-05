@@ -1,7 +1,7 @@
 'use client'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Settings, Search, LogOut, User } from 'lucide-react'
+import { Settings, Search, LogOut, User, Menu } from 'lucide-react'
 import { Role } from '@/types'
 import { cn } from '@/lib/utils'
 import { useState, useEffect } from 'react'
@@ -45,11 +45,17 @@ export default function Header({ title, subtitle }: HeaderProps) {
   const clearance = role ? CLEARANCE_LEVELS[role] || CLEARANCE_LEVELS[Role.GUEST] : CLEARANCE_LEVELS[Role.GUEST]
 
   return (
-    <header className="bg-white border-b border-[#dadce0] px-6 h-[64px] flex items-center justify-between sticky top-0 z-30">
-      <div className="flex items-center gap-6">
+    <header className="bg-white border-b border-[#dadce0] px-4 md:px-6 h-[64px] flex items-center justify-between sticky top-0 z-30">
+      <div className="flex items-center gap-3 md:gap-6">
+        <button 
+          onClick={() => window.dispatchEvent(new CustomEvent('toggle-sidebar'))}
+          className="md:hidden p-2 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full transition-colors"
+        >
+          <Menu size={20} />
+        </button>
         <div>
-          <h1 className="text-[22px] font-normal text-[#202124] leading-tight">{title}</h1>
-          {subtitle && <p className="text-[12px] text-[#5f6368] mt-0.5">{subtitle}</p>}
+          <h1 className="text-[18px] md:text-[22px] font-normal text-[#202124] leading-tight truncate max-w-[150px] md:max-w-none">{title}</h1>
+          {subtitle && <p className="text-[10px] md:text-[12px] text-[#5f6368] mt-0.5 truncate">{subtitle}</p>}
         </div>
         
         {/* Status indicator - Google Style */}

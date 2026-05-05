@@ -148,63 +148,67 @@ export default function TeamPage() {
     <div className="mx-auto max-w-4xl p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Team</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Invite members and manage roles. New members appear instantly — no refresh needed.
-        </p>
-      </div>
-
-      <div className="mb-8 rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-800 dark:bg-gray-900">
-        <h2 className="mb-4 text-base font-medium text-gray-900 dark:text-white">
-          Invite a team member
-        </h2>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-8 animate-in slide-in-from-top-4 duration-500">
+        <div className="space-y-1">
+          <label className="text-[12px] font-medium text-gray-500 ml-1">First name</label>
           <input
-            className="col-span-1 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            placeholder="First name"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            placeholder="John"
             value={form.firstName}
-            onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
+            onChange={(e) => setForm({ ...form, firstName: e.target.value })}
           />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[12px] font-medium text-gray-500 ml-1">Last name</label>
           <input
-            className="col-span-1 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            placeholder="Last name"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            placeholder="Doe"
             value={form.lastName}
-            onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
+            onChange={(e) => setForm({ ...form, lastName: e.target.value })}
           />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[12px] font-medium text-gray-500 ml-1">Work email</label>
           <input
-            className="col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-            type="email"
-            placeholder="Email address"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+            placeholder="john@havenly.solutions"
             value={form.email}
-            onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[12px] font-medium text-gray-500 ml-1">Assigned Role</label>
           <select
-            title="Select Role"
-            className="col-span-2 rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+            title="Assign Member Role"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
             value={form.role}
-            onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
+            onChange={(e) => setForm({ ...form, role: e.target.value })}
           >
             {ALLOWED_ROLES.map(r => (
               <option key={r} value={r}>{roleLabel(r)}</option>
             ))}
           </select>
         </div>
-
-        {inviteError && (
-          <p className="mt-3 text-sm text-red-500">{inviteError}</p>
-        )}
-
-        {actionError && (
-          <p className="mt-3 text-sm text-red-500">{actionError}</p>
-        )}
-
-        <button
-          className="mt-4 rounded-lg bg-teal-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-teal-700 disabled:opacity-50"
-          disabled={invite.isPending || !form.email || !form.firstName || !form.lastName}
-          onClick={() => invite.mutate(form)}
-        >
-          {invite.isPending ? 'Sending...' : 'Send invite'}
-        </button>
+        <div className="lg:col-span-4 flex justify-end">
+          <button
+            className="w-full md:w-auto rounded-lg bg-[#1a73e8] px-8 py-2 text-sm font-medium text-white hover:bg-[#1557b0] transition-colors disabled:opacity-50 shadow-sm"
+            disabled={invite.isPending || !form.email || !form.firstName || !form.lastName}
+            onClick={() => invite.mutate(form)}
+          >
+            {invite.isPending ? 'Processing...' : 'Send secure invitation'}
+          </button>
+        </div>
       </div>
+
+      </div>
+
+      {inviteError && (
+        <p className="mt-3 text-sm text-red-500">{inviteError}</p>
+      )}
+
+      {actionError && (
+        <p className="mt-3 text-sm text-red-500">{actionError}</p>
+      )}
 
       {isLoading && (
         <div className="text-center text-sm text-gray-400">Loading team...</div>
@@ -215,7 +219,7 @@ export default function TeamPage() {
       )}
 
       {members && (
-        <div className="overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800">
+        <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white shadow-sm">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-gray-200 bg-gray-50 text-xs text-gray-500 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400">
               <tr>

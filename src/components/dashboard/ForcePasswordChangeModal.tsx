@@ -52,9 +52,9 @@ export default function ForcePasswordChangeModal() {
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#202124]/30 p-4">
-      <div className="bg-white w-full max-w-md rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.2)] overflow-hidden animate-in zoom-in duration-200">
-        <div className="p-8 pb-4 text-center">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#202124]/60 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-md rounded-xl shadow-2xl overflow-hidden animate-in zoom-in duration-300">
+        <div className="p-6 md:p-8 pb-2 text-center">
           <div className="w-12 h-12 bg-[#e8f0fe] rounded-full flex items-center justify-center mx-auto mb-4">
             <Lock className="w-6 h-6 text-[#1a73e8]" />
           </div>
@@ -62,7 +62,7 @@ export default function ForcePasswordChangeModal() {
           <p className="text-[#5f6368] text-[14px] mt-1">Please set your permanent password</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-8 pt-4 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 md:p-8 pt-2 space-y-5">
           <div className="p-4 bg-[#fef7e0] border border-[#feefc3] rounded-[4px] text-[#202124] text-[13px] leading-relaxed flex gap-3">
             <AlertCircle className="w-5 h-5 text-[#fbbc04] shrink-0" />
             <p>To secure your account, you must update your temporary password to a unique 12+ character phrase.</p>
