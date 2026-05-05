@@ -42,6 +42,16 @@ export default function MediaVaultPage() {
   
   const { confirm, modal } = useConfirmDelete()
   
+  const safeFormatDate = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr)
+      if (isNaN(d.getTime())) return 'N/A'
+      return format(d, 'MMM d, yyyy')
+    } catch (e) {
+      return 'N/A'
+    }
+  }
+  
   const fetchAssets = useCallback(async () => {
     try {
       setIsLoading(true)
@@ -229,8 +239,9 @@ export default function MediaVaultPage() {
     }
   }
 
-  const filteredAssets = assets.filter(asset => {
-    const matchesSearch = asset.title.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredAssets = (assets || []).filter(asset => {
+    const title = asset?.title || 'Untitled'
+    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesFilter = filterType === 'all' || asset.assetType === filterType
     return matchesSearch && matchesFilter
   })
@@ -318,7 +329,9 @@ export default function MediaVaultPage() {
         </div>
       ) : filteredAssets.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredAssets.map((asset) => (
+          {filteredAssets.map((asset) => {
+            if (!asset?.id) return null
+            return (
             <div 
               key={asset.id} 
               onClick={() => toggleSelect(asset.id)}
@@ -414,13 +427,13 @@ export default function MediaVaultPage() {
               </div>
               <div className="p-4 space-y-2">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-semibold text-slate-900 truncate flex-1">{asset.title}</h3>
+                  <h3 className="font-semibold text-slate-900 truncate flex-1">{asset.title || 'Untitled'}</h3>
                   <div className="flex items-center gap-1 px-2 py-0.5 bg-slate-100 rounded-md text-[10px] font-bold text-slate-500 tracking-wider uppercase">
-                    {asset.mediaCategory}
+                    {asset.mediaCategory || 'GENERAL'}
                   </div>
                 </div>
                 <div className="flex items-center justify-between text-xs text-slate-400">
-                  <span>{format(new Date(asset.createdAt), 'MMM d, yyyy')}</span>
+                  <span>{safeFormatDate(asset.createdAt || '')}</span>
                   <span>{asset.uploadedBy?.name || 'Unknown'}</span>
                 </div>
               </div>
@@ -430,7 +443,7 @@ export default function MediaVaultPage() {
                     e.stopPropagation();
                     confirm(
                       `Move to Bin?`,
-                      `Are you sure you want to move "${asset.title}" to the bin? You can recover it later from the Bin view.`,
+                      `Are you sure you want to move "${asset.title || 'this asset'}" to the bin? You can recover it later from the Bin view.`,
                       () => handleDelete(asset.id),
                       "Move to Bin"
                     )
@@ -442,7 +455,8 @@ export default function MediaVaultPage() {
                 </button>
               )}
             </div>
-          ))}
+            )
+          })}
         </div>
       ) : (
         <div className="flex flex-col items-center justify-center py-24 bg-white border-2 border-dashed border-slate-200 rounded-3xl space-y-4">
