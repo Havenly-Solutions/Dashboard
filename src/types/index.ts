@@ -17,7 +17,8 @@ export enum Role {
 
 export interface DashboardUser {
   id: string;
-  name: string;
+  firstName: string;
+  surname: string;
   email: string;
   role: Role;
   department?: string;
@@ -120,7 +121,8 @@ export interface AuditLog {
   ipAddress?: string | null;
   createdAt: string;
   user?: {
-    name: string;
+    firstName: string;
+    surname: string;
     email: string;
   } | null;
 }
@@ -161,12 +163,13 @@ export type NGOStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
 export interface NGOPartner {
   id: string;
   orgName: string;
-  liaisonName: string;
+  liaisonFirstName: string;
+  liaisonSurname: string;
   liaisonPhone?: string | null;
   orgType: string;
   email: string;
   regNumber?: string | null;
-  operatingRegion: string;
+  province: string;
   missionStatement?: string | null;
   status: NGOStatus;
   createdAt: string;
@@ -175,19 +178,14 @@ export interface NGOPartner {
 
 export interface PreRegistration {
   id: string;
-  name: string;
+  firstName: string;
+  surname: string;
   email: string;
   phone?: string | null;
-  region: string;
+  province: string;
   source?: string | null;
-  userType?: string | null;
-  roleTitle?: string | null;
-  status: string;
-  reviewedBy?: string | null;
-  reviewedAt?: string | null;
-  reviewNote?: string | null;
+  tierInterest?: string | null;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface ProfileRequest {

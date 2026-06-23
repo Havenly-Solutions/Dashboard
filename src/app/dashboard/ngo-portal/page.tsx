@@ -25,7 +25,16 @@ export default function NGOPortalPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-  const [form, setForm] = useState({ orgName: '', liaisonName: '', orgType: 'Registered NGO', email: '', regNumber: '', operatingRegion: '', missionStatement: '' })
+  const [form, setForm] = useState({
+    orgName: '',
+    liaisonFirstName: '',
+    liaisonSurname: '',
+    orgType: 'Registered NGO',
+    email: '',
+    regNumber: '',
+    province: '',
+    missionStatement: ''
+  })
 
   useEffect(() => {
     if (!session) return
@@ -85,7 +94,7 @@ export default function NGOPortalPage() {
             { label: 'Total Partners', value: partners.length, color: 'text-[#1A1A2E]' },
             { label: 'Approved', value: approved, color: 'text-emerald-600' },
             { label: 'Pending Review', value: pending, color: 'text-amber-600' },
-            { label: 'Active Regions', value: new Set(partners.map(p => p.operatingRegion)).size, color: 'text-blue-600' },
+            { label: 'Active Provinces', value: new Set(partners.map(p => p.province)).size, color: 'text-blue-600' },
           ].map(({ label, value, color }) => (
             <div key={label} className="stat-card">
               <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">{label}</div>
@@ -104,7 +113,7 @@ export default function NGOPortalPage() {
         <div className="glass-card !p-0 overflow-hidden">
           <table className="w-full text-sm">
             <thead><tr className="text-xs text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
-              {['Organisation', 'Type', 'Liaison', 'Region', 'Applied', 'Status', 'Actions'].map(h =>
+              {['Organisation', 'Type', 'Liaison', 'Province', 'Applied', 'Status', 'Actions'].map(h =>
                 <th key={h} className="text-left px-6 py-3 font-medium">{h}</th>
               )}
             </tr></thead>
@@ -123,8 +132,8 @@ export default function NGOPortalPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-gray-500 text-xs">{p.orgType}</td>
-                    <td className="px-6 py-4 text-gray-600">{p.liaisonName}</td>
-                    <td className="px-6 py-4 text-gray-500 text-xs">{p.operatingRegion}</td>
+                    <td className="px-6 py-4 text-gray-600">{p.liaisonFirstName} {p.liaisonSurname}</td>
+                    <td className="px-6 py-4 text-gray-500 text-xs">{p.province}</td>
                     <td className="px-6 py-4 text-gray-400 text-xs">{formatDate(p.createdAt)}</td>
                     <td className="px-6 py-4">
                       <div className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase px-2 py-1 rounded border ${STATUS_STYLES[p.status]}`}>
@@ -161,10 +170,11 @@ export default function NGOPortalPage() {
                 <div className="grid grid-cols-2 gap-4">
                   {[
                     { label: 'Organisation Name', key: 'orgName', placeholder: 'Legal entity name' },
-                    { label: 'Liaison Name', key: 'liaisonName', placeholder: 'Full name' },
+                    { label: 'Liaison First Name', key: 'liaisonFirstName', placeholder: 'First name' },
+                    { label: 'Liaison Surname', key: 'liaisonSurname', placeholder: 'Surname' },
                     { label: 'Official Email', key: 'email', placeholder: 'liaison@org.co.za' },
                     { label: 'Reg Number', key: 'regNumber', placeholder: 'e.g. 2023/123456/08' },
-                    { label: 'Operating Region', key: 'operatingRegion', placeholder: 'e.g. Gauteng, Cape Metro' },
+                    { label: 'Province', key: 'province', placeholder: 'e.g. Gauteng' },
                   ].map(({ label, key, placeholder }) => (
                     <div key={key} className="col-span-2 sm:col-span-1">
                       <label className="block text-xs text-gray-500 uppercase tracking-widest mb-1.5">{label}</label>

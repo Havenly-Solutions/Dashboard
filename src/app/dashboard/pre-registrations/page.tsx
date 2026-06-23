@@ -10,37 +10,43 @@ import { toast } from 'sonner'
 
 import { apiClient } from '@/lib/apiClientClient'
 
-const REGIONS = ['All Regions', 'Johannesburg / Gauteng', 'Cape Town / Western Cape', 'Durban / KZN', 'Pretoria / Gauteng', 'Port Elizabeth / Eastern Cape']
-const PIE_COLORS = ['#C0392B', '#1A1A2E', '#0B6E4F', '#D4A017', '#6B7280', '#9B59B6']
+const PROVINCES = ['All Provinces', 'Gauteng', 'Western Cape', 'KwaZulu-Natal', 'Eastern Cape', 'Free State', 'Limpopo', 'Mpumalanga', 'Northern Cape', 'North West']
+const PIE_COLORS = ['#C0392B', '#1A1A2E', '#0B6E4F', '#D4A017', '#6B7280', '#9B59B6', '#E67E22', '#1ABC9C', '#2980B9']
 const TARGET_REGISTRATIONS = 5000;
 
 export default function PreRegistrationsPage() {
   const { data: session } = useSession()
   const [registrations, setRegistrations] = useState<PreRegistration[]>([])
   const [total, setTotal] = useState(0)
-  const [byRegion, setByRegion] = useState<{ region: string; _count: number }[]>([])
+  const [byProvince, setByProvince] = useState<{ province: string; _count: number }[]>([])
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
-  const [region, setRegion] = useState('All Regions')
+  const [province, setProvince] = useState('All Provinces')
   const [loading, setLoading] = useState(true)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams({ page: String(page) })
-      if (region !== 'All Regions') params.set('region', region)
+      if (province !== 'All Provinces') params.set('province', province)
       const res = await apiClient(`/api/pre-registrations?${params}`, {
         headers: { 'Authorization': `Bearer ${(session?.user as any)?.accessToken}` }
       })
-      if (res.success || res.data) {
-        setRegistrations(res.data || [])
-        setTotal(res.meta?.total || res.total || 0)
-        // Note: backend doesn't seem to return byRegion yet, we'll keep it as [] or mock if needed
-        setByRegion(res.byRegion || [])
-      }
+
+      const data = res.data || []
+      setRegistrations(data)
+      setTotal(res.meta?.total || data.length || 0)
+
+      // Compute client-side aggregation safely as per requirements
+      const agg = data.reduce((acc: any, curr: PreRegistration) => {
+        acc[curr.province] = (acc[curr.province] || 0) + 1
+        return acc
+      }, {})
+      setByProvince(Object.entries(agg).map(([k, v]) => ({ province: k, _count: v as number })).sort((a, b) => b._count - a._count))
+
     } catch (e) { console.error(e) }
     setLoading(false)
-  }, [page, region, session])
+  }, [page, province, session])
 
   useEffect(() => { load() }, [load])
 
@@ -58,11 +64,14 @@ export default function PreRegistrationsPage() {
   }
 
   const filtered = registrations.filter(r =>
-    search ? r.name.toLowerCase().includes(search.toLowerCase()) || r.email.toLowerCase().includes(search.toLowerCase()) : true
+    search ?
+      r.firstName.toLowerCase().includes(search.toLowerCase()) ||
+      r.surname.toLowerCase().includes(search.toLowerCase()) ||
+      r.email.toLowerCase().includes(search.toLowerCase()) : true
   )
 
   const exportCSV = () => {
-    const csv = ['Name,Email,Region,Source,Date', ...registrations.map(r => `${r.name},${r.email},${r.region},${r.source},${r.createdAt}`)].join('\n')
+    const csv = ['First Name,Surname,Email,Province,Source,Date', ...registrations.map(r => `${r.firstName},${r.surname},${r.email},${r.province},${r.source},${r.createdAt}`)].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -71,7 +80,7 @@ export default function PreRegistrationsPage() {
 
   return (
     <div className="flex flex-col flex-1">
-      <Header title="Pre-Registrations" subtitle="July Tour & Website Signups" />
+      <Header title="Pre-Registrations" subtitle="Lead Pipeline & Launch Readiness" />
       <main className="flex-1 p-8 space-y-6">
         {/* Top stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -84,7 +93,7 @@ export default function PreRegistrationsPage() {
             <div className="flex items-center gap-1 text-emerald-600 text-xs mt-1"></div>
           </div>
           <div className="stat-card">
-            <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">Tour Target</div>
+            <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">Target Goal</div>
             <div className="font-display font-bold text-3xl text-[#1A1A2E]">{TARGET_REGISTRATIONS.toLocaleString()}</div>
             <div className="mt-2">
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
@@ -97,18 +106,18 @@ export default function PreRegistrationsPage() {
             </div>
           </div>
           <div className="stat-card">
-            <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">Top Region</div>
-            <div className="font-display font-bold text-xl text-[#1A1A2E]">{byRegion[0]?.region?.split('/')[0]?.trim() || '—'}</div>
-            <div className="text-xs text-gray-400 mt-1">{byRegion[0]?._count || 0} registrations</div>
+            <div className="text-xs text-gray-400 uppercase tracking-widest mb-2">Top Province</div>
+            <div className="font-display font-bold text-xl text-[#1A1A2E]">{byProvince[0]?.province || '—'}</div>
+            <div className="text-xs text-gray-400 mt-1">{byProvince[0]?._count || 0} registrations</div>
           </div>
         </div>
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="glass-card  p-5">
-            <h3 className="font-display font-semibold text-[#1A1A2E] text-sm mb-4">Registrations by Region</h3>
+            <h3 className="font-display font-semibold text-[#1A1A2E] text-sm mb-4">By Province</h3>
             <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={byRegion.slice(0, 6).map(r => ({ name: r.region.split('/')[0].trim(), count: r._count }))} barSize={20}>
+              <BarChart data={byProvince.slice(0, 6).map(r => ({ name: r.province, count: r._count }))} barSize={20}>
                 <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#9B9B9B' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 10, fill: '#9B9B9B' }} axisLine={false} tickLine={false} />
                 <Tooltip contentStyle={{ fontSize: 11, border: 'none', borderRadius: 8 }} />
@@ -117,11 +126,11 @@ export default function PreRegistrationsPage() {
             </ResponsiveContainer>
           </div>
           <div className="glass-card  p-5">
-            <h3 className="font-display font-semibold text-[#1A1A2E] text-sm mb-4">Distribution</h3>
+            <h3 className="font-display font-semibold text-[#1A1A2E] text-sm mb-4">Regional Distribution</h3>
             <ResponsiveContainer width="100%" height={180}>
               <PieChart>
-                <Pie data={byRegion.slice(0, 6).map(r => ({ name: r.region.split('/')[0].trim(), value: r._count }))} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value">
-                  {byRegion.slice(0, 6).map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                <Pie data={byProvince.slice(0, 9).map(r => ({ name: r.province, value: r._count }))} cx="50%" cy="50%" innerRadius={45} outerRadius={75} dataKey="value">
+                  {byProvince.slice(0, 9).map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ fontSize: 11, border: 'none', borderRadius: 8 }} />
               </PieChart>
@@ -139,12 +148,12 @@ export default function PreRegistrationsPage() {
                 <input value={search} onChange={e => setSearch(e.target.value)} className="bg-gray-50 border border-gray-200 rounded-lg pl-9 pr-3 py-2 text-sm w-48 focus:outline-none focus:border-[#C0392B]" placeholder="Search..." />
               </div>
               <select 
-                title="Filter by region"
-                value={region} 
-                onChange={e => { setRegion(e.target.value); setPage(1) }} 
+                title="Filter by province"
+                value={province}
+                onChange={e => { setProvince(e.target.value); setPage(1) }}
                 className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none"
               >
-                {REGIONS.map(r => <option key={r}>{r}</option>)}
+                {PROVINCES.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
               <button onClick={exportCSV} className="flex items-center gap-2 px-3 py-2 bg-[#1A1A2E] text-white rounded-lg text-sm hover:bg-[#0f0f1f] transition-colors">
                 <Download size={14} />Export CSV
@@ -153,16 +162,16 @@ export default function PreRegistrationsPage() {
           </div>
           <table className="w-full text-sm">
             <thead><tr className="text-xs text-gray-400 uppercase tracking-widest bg-gray-50 border-b border-gray-100">
-              {['Name', 'Email', 'Region', 'Source', 'Date', ''].map((h, i) => <th key={i} className="text-left px-6 py-3 font-medium">{h}</th>)}
+              {['Name', 'Email', 'Province', 'Source', 'Date', ''].map((h, i) => <th key={i} className="text-left px-6 py-3 font-medium">{h}</th>)}
             </tr></thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
                 <tr><td colSpan={6} className="px-6 py-8 text-center text-gray-400">Loading...</td></tr>
               ) : filtered.map(reg => (
                 <tr key={reg.id} className="hover:bg-gray-50/50">
-                  <td className="px-6 py-3 font-medium text-[#1A1A2E]">{reg.name}</td>
+                  <td className="px-6 py-3 font-medium text-[#1A1A2E]">{reg.firstName} {reg.surname}</td>
                   <td className="px-6 py-3 text-gray-500">{reg.email}</td>
-                  <td className="px-6 py-3"><div className="flex items-center gap-1.5 text-gray-500"><MapPin size={11} />{reg.region}</div></td>
+                  <td className="px-6 py-3"><div className="flex items-center gap-1.5 text-gray-500"><MapPin size={11} />{reg.province}</div></td>
                   <td className="px-6 py-3"><span className={`text-[10px] px-2 py-0.5 rounded border font-medium ${reg.source === 'tour' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>{reg.source}</span></td>
                   <td className="px-6 py-3 text-gray-400 text-xs">{formatDateTime(reg.createdAt)}</td>
                   <td className="px-6 py-3 text-right">

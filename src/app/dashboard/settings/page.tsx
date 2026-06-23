@@ -125,13 +125,13 @@ export default function SettingsPage() {
 
         <div className="glass-card">
           <h3 className="font-display font-bold text-[#1A1A2E] mb-1">System</h3>
-          <p className="text-xs text-gray-400 mb-4">Command Centre build info</p>
+          <p className="text-xs text-gray-400 mb-4">Dashboard build info</p>
           <div className="space-y-2 text-sm">
             {[
               { label: 'Version', value: 'v1.0.0' },
-              { label: 'Company', value: 'The Black Sheep Tech Corp LTD (PTY)' },
-              { label: 'Product', value: 'Havenly Solutions Command Centre' },
-              { label: 'Launch Date', value: '24 November 2026' },
+              { label: 'Company', value: 'Havenly Solutions (Pty) LTD' },
+              { label: 'Product Of The', value: 'The Black Sheep Tech Corp (Pty) LTD' },
+              { label: 'Launch Date', value: '13 October 2026' },
             ].map(({ label, value }) => (
               <div key={label} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
                 <span className="text-gray-400 text-xs uppercase tracking-widest">{label}</span>

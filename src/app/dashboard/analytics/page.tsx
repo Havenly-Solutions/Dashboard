@@ -216,14 +216,14 @@ export default function AnalyticsPage() {
 
           {/* Regional Distribution */}
           <div className="glass-card p-6 border border-gray-100">
-            <h3 className="font-display font-bold text-[#1A1A2E] text-sm mb-6 uppercase tracking-widest">Regional Distribution</h3>
+            <h3 className="font-display font-bold text-[#1A1A2E] text-sm mb-6 uppercase tracking-widest">Provincial Distribution</h3>
             <div className="h-[280px]">
-              {data?.regionData?.length > 0 ? (
+              {data?.provinceData?.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={data.regionData}>
+                  <BarChart data={data.provinceData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                     <XAxis 
-                      dataKey="region" 
+                      dataKey="province"
                       axisLine={false} 
                       tickLine={false} 
                       tick={{ fontSize: 9, fill: '#1A1A2E', fontWeight: 600 }} 
@@ -237,7 +237,7 @@ export default function AnalyticsPage() {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex items-center justify-center h-full text-gray-400 text-sm">No regional data available</div>
+                <div className="flex items-center justify-center h-full text-gray-400 text-sm">No provincial data available</div>
               )}
             </div>
           </div>

@@ -33,7 +33,7 @@ export default function LoginForm() {
         if (res.error !== 'CredentialsSignin') {
           console.warn(`Sign in failed: ${res.error}`)
         }
-        toast.error(res.error === 'CredentialsSignin' ? 'Invalid email or password' : res.error)
+        toast.error(res.error === 'CredentialsSignin' ? 'Invalid email or password' : 'Authentication failed. Please try again.')
         setLoading(false)
       } else {
         toast.success('Login successful. Redirecting...')

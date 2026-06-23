@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { serverFetch } from '@/lib/serverFetch';
 import * as Sentry from '@sentry/nextjs';
 
 export async function POST() {
@@ -10,9 +11,16 @@ export async function POST() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Note: Direct database access (Prisma) is disabled in the dashboard.
-    // Onboarding status is managed via the session update in the frontend
-    // and synchronized with the backend API.
+    // Call the backend to update the database
+    const response = await serverFetch('/api/v1/profile/complete-onboarding', {
+      method: 'POST',
+    });
+
+    if (!response || !response.ok) {
+      console.error('[Onboarding] Failed to update backend onboarding status');
+      // We still return success to the UI to avoid blocking the user experience,
+      // but log the error for investigation.
+    }
     
     console.log(`[Onboarding] User ${session.user.email} marked onboarding as complete.`);
 
