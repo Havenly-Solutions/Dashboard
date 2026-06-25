@@ -19,6 +19,7 @@ const ENTITY_QUERY_KEYS: Record<string, string[][]> = {
   intake: [['intakes'], ['analytics', 'summary']],
   alert: [['alerts'], ['analytics', 'summary']],
   dispatch: [['dispatches']],
+  sos: [['live-feed'], ['alerts'], ['analytics', 'summary']],
 };
 
 // ─── Hook ─────────────────────────────────────────────────────────────────────
@@ -90,6 +91,20 @@ export function useSocket() {
       queryClient.invalidateQueries({ queryKey: ['alerts'] });
       queryClient.invalidateQueries({ queryKey: ['analytics', 'summary'] });
     });
+
+    socket.on('sos:alert', () => {
+      queryClient.invalidateQueries({ queryKey: ['live-feed'] });
+      queryClient.invalidateQueries({ queryKey: ['alerts'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics', 'summary'] });
+    });
+
+    socket.on('sos:status_changed', () => {
+      queryClient.invalidateQueries({ queryKey: ['live-feed'] });
+    })
+    
+    socket.on('sos:battery_critical', () => {
+      queryClient.invalidateQueries({ queryKey: ['live-feed'] });
+    })
 
     socket.on('intake_created', () => {
       queryClient.invalidateQueries({ queryKey: ['intakes'] });
