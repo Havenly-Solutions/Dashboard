@@ -52,8 +52,8 @@ export default function AnalyticsPage() {
   useSocket();
 
   const { data, isLoading: loading } = useQuery({
-    queryKey: ['analytics'],
-    queryFn: () => apiClient(`/api/analytics`),
+    queryKey: ['analytics', 'summary'],
+    queryFn: () => apiClient(`/api/dashboard/analytics`),
     retry: false
   });
 
