@@ -39,14 +39,14 @@ export default function ForcePasswordChangeModal() {
     try {
       await apiClient('/api/auth/change-password', {
         method: 'POST',
-        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+        body: JSON.stringify({ oldPassword: currentPassword, newPassword }),
       })
 
       // Sign out and redirect to login
       await signOut({ callbackUrl: '/', redirect: true })
       
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred')
+      setError(err?.error?.message || err?.message || 'An unexpected error occurred')
       setSaving(false)
     }
   }

@@ -37,7 +37,7 @@ export default function SecuritySettingsPage() {
     try {
       await apiClient('/api/auth/change-password', {
         method: 'POST',
-        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+        body: JSON.stringify({ oldPassword: currentPassword, newPassword }),
       })
 
       toast.success('Password updated — signing you out in 3 seconds');
@@ -51,7 +51,7 @@ export default function SecuritySettingsPage() {
       }, 1000);
       
     } catch (err: any) {
-      toast.error(err.message || 'An unexpected error occurred')
+      toast.error(err?.error?.message || err?.message || 'An unexpected error occurred')
     } finally {
       setSaving(false)
     }
