@@ -225,7 +225,3 @@ export function Topbar() {
     </header>
   );
 }
-      </div>
-    </header>
-  );
-}

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { api } from "@/lib/api-client";
 
-export default function UnsubscribePage() {
+function UnsubscribeContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -118,5 +118,13 @@ export default function UnsubscribePage() {
         &copy; 2026 Havenly Solutions. All rights reserved.
       </p>
     </div>
+  );
+}
+
+export default function UnsubscribePage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-surface-container-lowest"><Loader2 className="h-10 w-10 animate-spin text-secondary" /></div>}>
+      <UnsubscribeContent />
+    </Suspense>
   );
 }
