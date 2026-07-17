@@ -1,4 +1,3 @@
-import { NextResponse } from 'next/server';
 import { apiProxy } from '@/lib/serverFetch';
 
 export async function PUT(req: Request) {

@@ -185,6 +185,7 @@ export interface PreRegistration {
   province: string;
   source?: string | null;
   tierInterest?: string | null;
+  status?: string;
   createdAt: string;
 }
 
