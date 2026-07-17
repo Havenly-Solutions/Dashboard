@@ -61,7 +61,7 @@ function LoginForm() {
     <div>
       <h1 className="text-display-lg text-on-surface">Sign in</h1>
       <p className="mt-1.5 text-body-base text-on-surface-variant">
-        Welcome back to the Havenly command center.
+        Welcome back to the Havenly Solutions Dashboard.
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" noValidate>
@@ -110,7 +110,7 @@ function LoginForm() {
       </form>
 
       <p className="mt-8 text-center text-body-sm text-on-surface-variant">
-        Your Haven. Yo
+        Your Haven. Your Community. <span className="flicker text-[#D00000] hover:text-[#0B6E4F] transition-colors duration-300 cursor-default font-semibold"> Always On.</span>
       </p>
     </div>
   );
