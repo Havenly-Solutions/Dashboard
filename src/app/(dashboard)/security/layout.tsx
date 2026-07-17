@@ -10,7 +10,6 @@ const TABS = [
   { href: "/security/training", label: "Training Library" },
   { href: "/security/leaderboard", label: "Leaderboard" },
   { href: "/security/breach-logs", label: "Breach Logs" },
-  { href: "/security/audit-logs", label: "System Audit Log" },
 ];
 
 export default function SecurityLayout({ children }: { children: React.ReactNode }) {

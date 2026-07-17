@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { api } from "@/lib/api-client";
 import {
   TOUR_STEPS,
   markTourCompleted,
@@ -31,7 +30,7 @@ export function OnboardingTour() {
   // allow manual restart from Settings via a plain DOM event so this
   // component doesn't need a dedicated global context.
   useEffect(() => {
-    if (user && shouldAutoStartTour(user)) {
+    if (user && shouldAutoStartTour(user.id)) {
       setStepIndex(0);
       setActive(true);
     }
@@ -70,23 +69,13 @@ export function OnboardingTour() {
 
   if (!active || !user || !step || typeof document === "undefined") return null;
 
-  const finish = async () => {
+  const finish = () => {
     markTourCompleted(user.id);
     setActive(false);
-    try {
-      await api.post("/auth/complete-onboarding");
-    } catch {
-      // best-effort
-    }
   };
-  const skip = async () => {
+  const skip = () => {
     markTourDismissed(user.id);
     setActive(false);
-    try {
-      await api.post("/auth/complete-onboarding");
-    } catch {
-      // best-effort
-    }
   };
   const next = () => {
     if (stepIndex === TOUR_STEPS.length - 1) finish();

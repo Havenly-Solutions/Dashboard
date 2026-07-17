@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, Moon, Sun, Search, LogOut, ChevronDown, UserCog, Menu, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
@@ -8,38 +8,18 @@ import { useTheme } from "@/lib/theme-provider";
 import { ROLES, ROLE_LABELS, landingPathForRole } from "@/lib/rbac";
 import { useSosActiveCount } from "@/hooks/use-sos";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { MobileNav } from "@/components/layout/mobile-nav";
-import { GlobalSearch } from "@/components/layout/global-search";
-import { useClickOutside } from "@/hooks/use-click-outside";
 import type { Role } from "@/types";
-
-import { useNotifications, useMarkNotificationRead } from "@/hooks/use-notifications";
 
 export function Topbar() {
   const { user, logout, isSimulating, realUser, switchRole, exitSimulation } = useAuth();
   const { theme, toggle } = useTheme();
   const router = useRouter();
-
   const [profileOpen, setProfileOpen] = useState(false);
   const [roleSwitchOpen, setRoleSwitchOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
-
-  const profileRef = useRef<HTMLDivElement>(null);
-  const roleSwitchRef = useRef<HTMLDivElement>(null);
-  const notificationsRef = useRef<HTMLDivElement>(null);
-
-  useClickOutside(profileRef, () => setProfileOpen(false));
-  useClickOutside(roleSwitchRef, () => setRoleSwitchOpen(false));
-  useClickOutside(notificationsRef, () => setNotificationsOpen(false));
-
   const [switching, setSwitching] = useState<Role | null>(null);
   const activeSos = useSosActiveCount();
-  const { data: notifications } = useNotifications();
-  const markRead = useMarkNotificationRead();
-
-  const unreadCount = (notifications ?? []).filter((n: any) => !n.isRead).length;
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-outline-variant bg-surface-container-lowest px-4 sm:px-6">
@@ -52,7 +32,14 @@ export function Topbar() {
       </button>
       <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 
-      <GlobalSearch placeholder={user?.role === "FOUNDER" ? "Search everything..." : "Search tickets, SOS refs..."} />
+      <div className="relative hidden max-w-sm flex-1 sm:block">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant" />
+        <input
+          type="search"
+          placeholder="Search tickets, SOS refs, members\u2026"
+          className="h-10 w-full rounded-full border border-outline-variant bg-surface-container-low pl-9 pr-4 text-body-sm text-on-surface placeholder:text-on-surface-variant focus:border-secondary focus:outline-none"
+        />
+      </div>
 
       <div data-tour="topbar-utility" className="ml-auto flex items-center gap-1.5">
         {isSimulating && realUser && (
@@ -68,9 +55,9 @@ export function Topbar() {
           </button>
         )}
 
-        {/* Founder test-mode role switcher — mirrors POST /admin/test-mode/switch-role */}
+        {/* Founder test-mode role switcher \u2014 mirrors POST /admin/test-mode/switch-role */}
         {(user?.role === "FOUNDER" || (isSimulating && realUser?.role === "FOUNDER")) && (
-          <div className="relative" ref={roleSwitchRef}>
+          <div className="relative">
             <button
               onClick={() => setRoleSwitchOpen((v) => !v)}
               className="flex items-center gap-1.5 rounded-full border border-outline-variant px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-container-low"
@@ -118,74 +105,20 @@ export function Topbar() {
           {theme === "light" ? <Moon className="h-[18px] w-[18px]" /> : <Sun className="h-[18px] w-[18px]" />}
         </button>
 
-        <div className="relative" ref={notificationsRef}>
-          <button
-            onClick={() => setNotificationsOpen((v) => !v)}
-            aria-label="Notifications"
-            className="relative rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low"
-          >
-            <Bell className="h-[18px] w-[18px]" />
-            {(activeSos > 0 || unreadCount > 0) && (
-              <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-critical text-[10px] font-semibold text-white">
-                {activeSos + unreadCount}
-              </span>
-            )}
-          </button>
-          {notificationsOpen && (
-            <div className="absolute right-0 z-20 mt-2 w-80 rounded-lg border border-outline-variant bg-surface-container-lowest p-1.5 shadow-tile-hover">
-              <div className="border-b border-outline-variant px-3 py-2 flex justify-between items-center">
-                <p className="text-body-sm font-medium text-on-surface">Notifications</p>
-                {activeSos > 0 && <Badge tone="critical">{activeSos} SOS Active</Badge>}
-              </div>
-              <div className="max-h-96 overflow-y-auto">
-                {activeSos > 0 && (
-                  <button
-                    onClick={() => {
-                      setNotificationsOpen(false);
-                      router.push("/sos");
-                    }}
-                    className="flex w-full items-start gap-3 border-b border-outline-variant/60 bg-critical/5 p-3 text-left hover:bg-critical/10"
-                  >
-                    <div className="mt-1 rounded-full bg-critical p-1 text-white">
-                      <Bell className="h-3.5 w-3.5" />
-                    </div>
-                    <div>
-                      <p className="text-body-sm font-semibold text-critical">Active SOS Incidents</p>
-                      <p className="text-label-md text-on-surface-variant">{activeSos} incidents requiring attention</p>
-                    </div>
-                  </button>
-                )}
-                {notifications?.length === 0 && !activeSos ? (
-                  <p className="p-6 text-center text-body-sm text-on-surface-variant">No notifications</p>
-                ) : (
-                  notifications?.map((n: any) => (
-                    <button
-                      key={n.id}
-                      onClick={() => {
-                        if (!n.isRead) markRead.mutate(n.id);
-                        setNotificationsOpen(false);
-                      }}
-                      className={cn(
-                        "flex w-full items-start gap-3 border-b border-outline-variant/60 p-3 text-left hover:bg-surface-container-low",
-                        !n.isRead && "bg-secondary/5"
-                      )}
-                    >
-                      <div className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", n.isRead ? "bg-outline" : "bg-secondary")} />
-                      <div className="min-w-0 flex-1">
-                        <p className={cn("truncate text-body-sm", !n.isRead ? "font-semibold text-on-surface" : "text-on-surface-variant")}>
-                          {n.title}
-                        </p>
-                        <p className="line-clamp-2 text-label-md text-on-surface-variant">{n.message}</p>
-                      </div>
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
+        <button
+          onClick={() => router.push("/sos")}
+          aria-label="Notifications"
+          className="relative rounded-full p-2 text-on-surface-variant hover:bg-surface-container-low"
+        >
+          <Bell className="h-[18px] w-[18px]" />
+          {activeSos > 0 && (
+            <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-critical text-[10px] font-semibold text-white">
+              {activeSos}
+            </span>
           )}
-        </div>
+        </button>
 
-        <div className="relative" ref={profileRef}>
+        <div className="relative">
           <button
             onClick={() => setProfileOpen((v) => !v)}
             className="flex items-center gap-2 rounded-full py-1 pl-1 pr-2 hover:bg-surface-container-low"

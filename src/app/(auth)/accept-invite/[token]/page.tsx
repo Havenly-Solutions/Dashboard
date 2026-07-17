@@ -39,7 +39,7 @@ export default function AcceptInvitePage() {
 
   const { data: invite, isLoading, isError } = useQuery({
     queryKey: ["invite", params.token],
-    queryFn: () => api.get<InviteDetails>(`/auth/invite/${params.token}`, { skipAuth: true }),
+    queryFn: () => api.get<InviteDetails>(`/api/dashboard/auth/invite/${params.token}`, { skipAuth: true }),
     retry: false,
   });
 
@@ -54,7 +54,7 @@ export default function AcceptInvitePage() {
     setFormError(null);
     try {
       await api.post(
-        "/auth/accept-invite",
+        "/api/dashboard/auth/accept-invite",
         { token: params.token, password: values.password },
         { skipAuth: true }
       );
@@ -123,7 +123,7 @@ export default function AcceptInvitePage() {
           </p>
         )}
 
-        <Button type="submit" size="lg" className="w-full text-black" loading={isSubmitting}>
+        <Button type="submit" size="lg" className="w-full" loading={isSubmitting}>
           Activate account
         </Button>
       </form>

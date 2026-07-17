@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, apiRequestWithFallback } from "@/lib/api-client";
+import { mockApprovalRequests, mockTeamMembers } from "@/lib/mock-data";
 import type { ApprovalRequest, Role, TeamMember } from "@/types";
 
 export const teamKeys = {
@@ -12,14 +13,14 @@ export const teamKeys = {
 export function useTeamMembers() {
   return useQuery({
     queryKey: teamKeys.members,
-    queryFn: () => api.get("/admin/team"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/admin/team", mockTeamMembers),
   });
 }
 
 export function useApprovalRequests() {
   return useQuery({
     queryKey: teamKeys.approvals,
-    queryFn: () => api.get("/admin/approvals"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/admin/approvals", mockApprovalRequests),
     refetchInterval: 60_000,
   });
 }
@@ -29,7 +30,7 @@ export function useApproveRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, role }: { id: string; role: Role }) =>
-      api.post(`/admin/approvals/${id}/approve`, { role }),
+      api.post(`/api/dashboard/admin/approvals/${id}/approve`, { role }),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: teamKeys.approvals });
       qc.invalidateQueries({ queryKey: teamKeys.members });
@@ -40,7 +41,7 @@ export function useApproveRequest() {
 export function useDenyRequest() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => api.post(`/admin/approvals/${id}/deny`),
+    mutationFn: (id: string) => api.post(`/api/dashboard/admin/approvals/${id}/deny`),
     onSettled: () => qc.invalidateQueries({ queryKey: teamKeys.approvals }),
   });
 }
@@ -49,7 +50,7 @@ export function useInviteMember() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: { name: string; email: string; role: Role }) =>
-      api.post<TeamMember>("/admin/team/invite", payload),
+      api.post<TeamMember>("/api/dashboard/admin/team/invite", payload),
     onSettled: () => qc.invalidateQueries({ queryKey: teamKeys.members }),
   });
 }
@@ -57,13 +58,13 @@ export function useInviteMember() {
 export function useSuspendMember() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => api.post(`/admin/team/${id}/suspend`),
+    mutationFn: (id: string) => api.post(`/api/dashboard/admin/team/${id}/suspend`),
     onSettled: () => qc.invalidateQueries({ queryKey: teamKeys.members }),
   });
 }
 
 export function useResendInvite() {
   return useMutation({
-    mutationFn: (id: string) => api.post(`/admin/team/${id}/resend-invite`),
+    mutationFn: (id: string) => api.post(`/api/dashboard/admin/team/${id}/resend-invite`),
   });
 }

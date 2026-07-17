@@ -40,7 +40,7 @@ const MEMBER_STATUS_TONE: Record<TeamMember["status"], "success" | "info" | "war
 const inviteSchema = z.object({
   name: z.string().min(2, "Enter a full name"),
   email: z.string().email("Enter a valid email"),
-  role: z.string(), // We'll cast to Role
+  role: z.enum(["FOUNDER", "CO_FOUNDER", "MANAGER", "PA", "DEVELOPER", "NGO_PARTNER", "INVESTOR"]),
 });
 type InviteValues = z.infer<typeof inviteSchema>;
 
@@ -86,11 +86,8 @@ export default function TeamPage() {
               <li key={req.id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
                 <div>
                   <p className="text-body-base font-medium text-on-surface">{req.applicantName}</p>
-                  <p className="text-body-base text-on-surface">
-                    {req.applicantEmail}
-                  </p>
                   <p className="text-body-sm text-on-surface-variant">
-                    requesting {ROLE_LABELS[req.requestedRole]} &middot;{" "}
+                    {req.applicantEmail} &middot; requesting {ROLE_LABELS[req.requestedRole]} &middot;{" "}
                     {formatRelativeTime(req.requestedAt)}
                   </p>
                   {req.note && <p className="mt-0.5 text-body-sm text-on-surface-variant">&ldquo;{req.note}&rdquo;</p>}
@@ -141,9 +138,8 @@ export default function TeamPage() {
                   <Avatar name={m.name} />
                   <div>
                     <p className="text-body-base font-medium text-on-surface">{m.name}</p>
-                    <p className="text-body-base text-on-surface">{m.email}</p>
                     <p className="text-body-sm text-on-surface-variant">
-                      {ROLE_LABELS[m.role]}
+                      {m.email} &middot; {ROLE_LABELS[m.role]}
                       {m.organizationName ? ` \u2014 ${m.organizationName}` : ""}
                     </p>
                   </div>
@@ -197,11 +193,11 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<InviteValues>({ resolver: zodResolver(inviteSchema), defaultValues: { role: "MANAGER" } });
+  } = useForm<InviteValues>({ resolver: zodResolver(inviteSchema), defaultValues: { role: "PA" } });
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: InviteValues) => {
     try {
-      await invite.mutateAsync(values as any);
+      await invite.mutateAsync(values);
       push(`Invite email sent to ${values.email}.`);
       reset();
       onClose();
@@ -237,10 +233,10 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
           They&apos;ll receive an email with a secure link to set their own password. No PIN or SMS involved.
         </p>
         <div className="flex justify-end gap-2 pt-2">
-          <Button type="button" variant="outline" size="lg" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" size="lg" className="text-black" loading={isSubmitting}>
+          <Button type="submit" loading={isSubmitting}>
             Send invite
           </Button>
         </div>

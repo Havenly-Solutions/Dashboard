@@ -49,11 +49,11 @@ export default function MarketingAnalyticsPage() {
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
         <Tile className="xl:col-span-2">
           <TileHeader title="Visitors & signups" subtitle="Weekly trend" />
-          {isLoading || !data?.trend ? (
+          {isLoading ? (
             <TileSkeleton rows={5} />
           ) : (
             <TrendAreaChart
-              data={data.trend}
+              data={data!.trend}
               xKey="label"
               series={[
                 { key: "visitors", color: "rgb(70 72 212)", label: "Visitors" },
@@ -65,11 +65,11 @@ export default function MarketingAnalyticsPage() {
 
         <Tile>
           <TileHeader title="Traffic sources" />
-          {isLoading || !data?.topSources ? (
+          {isLoading ? (
             <TileSkeleton rows={5} />
           ) : (
             <ul className="space-y-3">
-              {data.topSources.map((s) => (
+              {data!.topSources.map((s) => (
                 <li key={s.source}>
                   <div className="mb-1 flex items-center justify-between text-body-sm">
                     <span className="text-on-surface">{s.source}</span>
@@ -88,11 +88,11 @@ export default function MarketingAnalyticsPage() {
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
         <Tile>
           <TileHeader title="Conversion funnel" />
-          {isLoading || !data?.funnel ? (
+          {isLoading ? (
             <TileSkeleton rows={5} />
           ) : (
             <ul className="space-y-2.5">
-              {data.funnel.map((f) => (
+              {data!.funnel.map((f) => (
                 <li key={f.stage}>
                   <div className="mb-1 flex items-center justify-between text-body-sm">
                     <span className="text-on-surface">{f.stage}</span>
@@ -112,7 +112,7 @@ export default function MarketingAnalyticsPage() {
 
         <Tile className="xl:col-span-2">
           <TileHeader title="Top pages" />
-          {isLoading || !data?.topPages ? (
+          {isLoading ? (
             <TileSkeleton rows={5} />
           ) : (
             <Table>
@@ -122,7 +122,7 @@ export default function MarketingAnalyticsPage() {
                 <TH>Avg. time</TH>
               </THead>
               <TBody>
-                {data.topPages.map((p) => (
+                {data!.topPages.map((p) => (
                   <TR key={p.path}>
                     <TD className="font-mono text-body-sm">{p.path}</TD>
                     <TD>{formatNumber(p.views)}</TD>

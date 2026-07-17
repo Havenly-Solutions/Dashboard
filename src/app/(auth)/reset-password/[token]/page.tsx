@@ -36,7 +36,7 @@ export default function ResetPasswordPage() {
   const onSubmit = async (values: FormValues) => {
     setFormError(null);
     try {
-      await api.post("/auth/reset-password", { token: params.token, password: values.password }, { skipAuth: true });
+      await api.post("/api/dashboard/auth/reset-password", { token: params.token, password: values.password }, { skipAuth: true });
       router.push("/password-changed");
     } catch (err) {
       if (err instanceof ApiError && err.status === 400) {
@@ -71,7 +71,7 @@ export default function ResetPasswordPage() {
           </p>
         )}
 
-        <Button type="submit" size="lg" className="w-full text-black" loading={isSubmitting}>
+        <Button type="submit" size="lg" className="w-full" loading={isSubmitting}>
           Reset password
         </Button>
       </form>

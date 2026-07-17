@@ -1,5 +1,3 @@
-import type { AuthUser } from "@/types";
-
 export interface TourStep {
   id: string;
   step: number;
@@ -90,16 +88,14 @@ export function isTourPending(userId: string): boolean {
   return safeGet(pendingKey(userId)) === "1";
 }
 
-export function isTourCompleted(userId: string, remoteCompletedAt?: string | null): boolean {
-  if (remoteCompletedAt) return true;
+export function isTourCompleted(userId: string): boolean {
   return safeGet(completedKey(userId)) === "1";
 }
 export function markTourCompleted(userId: string) {
   safeSet(completedKey(userId), "1");
 }
 
-export function isTourDismissed(userId: string, remoteCompletedAt?: string | null): boolean {
-  if (remoteCompletedAt) return true;
+export function isTourDismissed(userId: string): boolean {
   return safeGet(dismissedKey(userId)) === "1";
 }
 export function markTourDismissed(userId: string) {
@@ -107,7 +103,7 @@ export function markTourDismissed(userId: string) {
 }
 
 /** Should the tour auto-start for this user right now? True once, right after first login, until completed or dismissed. */
-export function shouldAutoStartTour(user: AuthUser): boolean {
-  if (isTourCompleted(user.id, user.onboardingCompletedAt) || isTourDismissed(user.id, user.onboardingCompletedAt)) return false;
-  return isTourPending(user.id);
+export function shouldAutoStartTour(userId: string): boolean {
+  if (isTourCompleted(userId) || isTourDismissed(userId)) return false;
+  return isTourPending(userId);
 }

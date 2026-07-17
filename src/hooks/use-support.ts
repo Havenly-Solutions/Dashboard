@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, apiRequestWithFallback } from "@/lib/api-client";
+import { mockEnquiries, mockEnquiryReplies } from "@/lib/mock-data";
 import type { EnquiryReply, EnquiryStatus, SupportEnquiry } from "@/types";
 
 export const supportKeys = {
@@ -12,7 +13,7 @@ export const supportKeys = {
 export function useEnquiries() {
   return useQuery({
     queryKey: supportKeys.enquiries,
-    queryFn: () => api.get("/support/enquiries"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/support/enquiries", mockEnquiries),
     refetchInterval: 45_000,
   });
 }
@@ -20,7 +21,10 @@ export function useEnquiries() {
 export function useEnquiryReplies(enquiryId: string | null) {
   return useQuery({
     queryKey: supportKeys.replies(enquiryId ?? ""),
-    queryFn: () => api.get(`/support/enquiries/${enquiryId}/replies`),
+    queryFn: () =>
+      apiRequestWithFallback(`/api/dashboard/support/enquiries/${enquiryId}/replies`, () =>
+        mockEnquiryReplies(enquiryId ?? "")
+      ),
     enabled: !!enquiryId,
   });
 }
@@ -29,7 +33,7 @@ export function useReplyToEnquiry() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, body }: { id: string; body: string }) =>
-      api.post<EnquiryReply>(`/support/enquiries/${id}/replies`, { body }),
+      api.post<EnquiryReply>(`/api/dashboard/support/enquiries/${id}/replies`, { body }),
     onSuccess: (_data, vars) => {
       qc.invalidateQueries({ queryKey: supportKeys.replies(vars.id) });
       qc.invalidateQueries({ queryKey: supportKeys.enquiries });
@@ -41,7 +45,7 @@ export function useUpdateEnquiryStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: EnquiryStatus }) =>
-      api.patch<SupportEnquiry>(`/support/enquiries/${id}/status`, { status }),
+      api.patch<SupportEnquiry>(`/api/dashboard/support/enquiries/${id}/status`, { status }),
     onSettled: () => qc.invalidateQueries({ queryKey: supportKeys.enquiries }),
   });
 }

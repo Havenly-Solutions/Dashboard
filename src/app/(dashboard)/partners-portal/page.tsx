@@ -8,15 +8,17 @@ import { StatCard } from "@/components/ui/stat-card";
 import { Badge } from "@/components/ui/badge";
 import { TileSkeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/auth-context";
-import { usePartnerMe, usePartners } from "@/hooks/use-partners";
+import { usePartners } from "@/hooks/use-partners";
 import { GettingStartedChecklist } from "@/components/onboarding/getting-started-checklist";
 
 export default function PartnersPortalPage() {
   const { user } = useAuth();
-  const { data: partners, isLoading: isLoadingAll } = usePartners();
-  const { data: myOrg, isLoading: isLoadingMe } = usePartnerMe();
+  const { data: partners, isLoading } = usePartners();
 
-  const isLoading = isLoadingAll || isLoadingMe;
+  // Until havenly-backend scopes /api/dashboard/partners by the caller's
+  // organizationId, this previews the first partner record as "your org."
+  // Swap for GET /api/dashboard/partners/me once that route exists.
+  const myOrg = partners?.[0];
   const otherPartners = (partners ?? []).filter((p) => p.id !== myOrg?.id);
 
   return (

@@ -10,11 +10,8 @@ export type Role =
   | "FOUNDER"
   | "CO_FOUNDER"
   | "MANAGER"
-  | "MANAGER_VIDEOGRAPHER"
-  | "MANAGER_CONTENT_CREATOR"
+  | "PA"
   | "DEVELOPER"
-  | "CYBERSECURITY"
-  | "MEDIA"
   | "NGO_PARTNER"
   | "INVESTOR";
 
@@ -27,7 +24,6 @@ export interface AuthUser {
   organizationId?: string | null;
   organizationName?: string | null;
   mustChangePassword?: boolean;
-  onboardingCompletedAt?: string | null;
 }
 
 export interface LoginResponse {
@@ -181,13 +177,6 @@ export interface SecurityCampaign {
   reportedSuspicious: number;
   startedAt?: string | null;
   endsAt?: string | null;
-}
-
-export interface SecurityTrainingModule {
-  id: string;
-  title: string;
-  provider: string;
-  challenges: number;
 }
 
 export interface LeaderboardEntry {

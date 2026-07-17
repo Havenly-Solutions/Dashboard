@@ -49,7 +49,7 @@ export default function SettingsPage() {
   const onSubmit = async (values: FormValues) => {
     setFormError(null);
     try {
-      await api.post("/auth/change-password", {
+      await api.post("/api/dashboard/auth/change-password", {
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       });
@@ -78,8 +78,8 @@ export default function SettingsPage() {
               <dd className="text-on-surface">{user?.name}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-on-surface">Email</dt>
-              <dd className="text-body-base font-medium text-on-surface">{user?.email}</dd>
+              <dt className="text-on-surface-variant">Email</dt>
+              <dd className="text-on-surface">{user?.email}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-on-surface-variant">Role</dt>
@@ -167,7 +167,7 @@ export default function SettingsPage() {
                 {formError}
               </p>
             )}
-            <Button type="submit" size="lg" className="text-black" loading={isSubmitting}>
+            <Button type="submit" loading={isSubmitting}>
               Update password
             </Button>
           </form>

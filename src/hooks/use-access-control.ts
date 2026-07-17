@@ -2,7 +2,8 @@
 
 import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, apiRequestWithFallback } from "@/lib/api-client";
+import { mockAccessChangeLog, mockRoleGrants, mockUserOverrides } from "@/lib/mock-data";
 import { effectiveModulesFor, resolveAccessibleModuleKeys } from "@/lib/permissions";
 import { useAuth } from "@/lib/auth-context";
 import type { AccessChangeLogEntry, Role, RoleGrant, UserOverride } from "@/types";
@@ -16,21 +17,21 @@ const keys = {
 export function useRoleGrants() {
   return useQuery({
     queryKey: keys.roleGrants,
-    queryFn: () => api.get("/admin/access-control/role-grants"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/admin/access-control/role-grants", mockRoleGrants),
   });
 }
 
 export function useUserOverrides() {
   return useQuery({
     queryKey: keys.userOverrides,
-    queryFn: () => api.get("/admin/access-control/user-overrides"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/admin/access-control/user-overrides", mockUserOverrides),
   });
 }
 
 export function useAccessChangeLog() {
   return useQuery({
     queryKey: keys.changeLog,
-    queryFn: () => api.get("/admin/access-control/change-log"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/admin/access-control/change-log", mockAccessChangeLog),
   });
 }
 
@@ -38,7 +39,7 @@ export function useSetRoleGrant() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: { role: Role; moduleKey: string; enabled: boolean }) =>
-      api.post<RoleGrant>("/admin/access-control/role-grants", payload),
+      api.post<RoleGrant>("/api/dashboard/admin/access-control/role-grants", payload),
     onMutate: async (payload) => {
       await qc.cancelQueries({ queryKey: keys.roleGrants });
       const previous = qc.getQueryData<RoleGrant[]>(keys.roleGrants) ?? [];
@@ -60,7 +61,7 @@ export function useSetUserOverride() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: { userId: string; userName: string; userRole: Role; moduleKey: string; enabled: boolean; reason?: string }) =>
-      api.post<UserOverride>("/admin/access-control/user-overrides", payload),
+      api.post<UserOverride>("/api/dashboard/admin/access-control/user-overrides", payload),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: keys.userOverrides });
       qc.invalidateQueries({ queryKey: keys.changeLog });
@@ -71,7 +72,7 @@ export function useSetUserOverride() {
 export function useRemoveUserOverride() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => api.delete(`/admin/access-control/user-overrides/${id}`),
+    mutationFn: (id: string) => api.delete(`/api/dashboard/admin/access-control/user-overrides/${id}`),
     onSettled: () => {
       qc.invalidateQueries({ queryKey: keys.userOverrides });
       qc.invalidateQueries({ queryKey: keys.changeLog });

@@ -61,20 +61,20 @@ function LoginForm() {
     <div>
       <h1 className="text-display-lg text-on-surface">Sign in</h1>
       <p className="mt-1.5 text-body-base text-on-surface-variant">
-        Welcome back to the Havenly Solutions Dashboard.
+        Welcome back to the Havenly command center.
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" noValidate autoComplete="off">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5" noValidate>
         <div>
           <Label htmlFor="email">Work email</Label>
-          <Input id="email" type="email" autoComplete="off" placeholder="you@havenly.io" {...register("email")} />
+          <Input id="email" type="email" autoComplete="email" placeholder="you@havenly.io" {...register("email")} />
           <FieldError>{errors.email?.message}</FieldError>
         </div>
 
         <div>
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <Link href="/forgot-password" hidden className="mb-1.5 text-label-md font-medium text-secondary hover:underline">
+            <Link href="/forgot-password" className="mb-1.5 text-label-md font-medium text-secondary hover:underline">
               Forgot password?
             </Link>
           </div>
@@ -82,8 +82,8 @@ function LoginForm() {
             <Input
               id="password"
               type={showPassword ? "text" : "password"}
-              autoComplete="new-password"
-              placeholder="password"
+              autoComplete="current-password"
+              placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
               {...register("password")}
             />
             <button
@@ -104,13 +104,13 @@ function LoginForm() {
           </p>
         )}
 
-        <Button type="submit" size="lg" className="w-full text-black" loading={isSubmitting}>
+        <Button type="submit" size="lg" className="w-full" loading={isSubmitting}>
           Sign in
         </Button>
       </form>
 
       <p className="mt-8 text-center text-body-sm text-on-surface-variant">
-        Your Haven. Your Community. <span className="flicker text-critical/50 font-bold cursor-pointer hover:text-critical">Always on.</span>
+        New team members are invited by a Founder or Admin {"\u2014"} look out for an email invite.
       </p>
     </div>
   );

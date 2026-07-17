@@ -186,10 +186,10 @@ function AddCardModal({ open, onClose }: { open: boolean; onClose: () => void })
           Placeholder fields {"\u2014"} wire to your chosen provider&apos;s hosted card element so raw numbers never hit this form&apos;s submit handler.
         </p>
         <div className="flex justify-end gap-2 pt-2">
-          <Button type="button" variant="outline" size="lg" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" size="lg" className="text-black" loading={submitting}>
+          <Button type="submit" loading={submitting}>
             Save card
           </Button>
         </div>

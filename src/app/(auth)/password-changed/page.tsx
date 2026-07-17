@@ -13,7 +13,7 @@ export default function PasswordChangedPage() {
         Your password has been changed. You can now sign in with your new password.
       </p>
       <Link href="/login" className="mt-8 block">
-        <Button size="lg" className="w-full text-black">Sign in</Button>
+        <Button size="lg" className="w-full">Sign in</Button>
       </Link>
     </div>
   );

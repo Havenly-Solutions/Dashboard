@@ -5,8 +5,7 @@ import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { useTheme } from "@/lib/theme-provider";
 import { EmptyState } from "@/components/ui/empty-state";
-import { MapPinOff, Search, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { MapPinOff } from "lucide-react";
 import type { SosEvent } from "@/types";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -35,9 +34,6 @@ export function IncidentMap({
   const markersRef = useRef<Map<string, mapboxgl.Marker>>(new Map());
   const { theme } = useTheme();
   const [ready, setReady] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searching, setSearching] = useState(false);
-  const [geoDetails, setGeoDetails] = useState<any>(null);
 
   // Initialize the map once.
   useEffect(() => {
@@ -49,50 +45,13 @@ export function IncidentMap({
       style: theme === "dark" ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/light-v11",
       center: DEFAULT_CENTER,
       zoom: 11,
-      pitch: 45, // 3D angle
-      bearing: -17.6,
-      antialias: true,
       attributionControl: false,
     });
 
-    map.addControl(new mapboxgl.NavigationControl({ showCompass: true }), "top-right");
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), "top-right");
     map.addControl(new mapboxgl.AttributionControl({ compact: true }));
-
-    map.on("load", () => {
-      setReady(true);
-      // Add terrain for 3D
-      map.addSource("mapbox-dem", {
-        type: "raster-dem",
-        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
-        tileSize: 512,
-        maxzoom: 14,
-      });
-      map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
-
-      // Add 3D buildings
-      const layers = map.getStyle().layers;
-      const labelLayerId = layers.find(
-        (layer) => layer.type === "symbol" && layer.layout && (layer.layout as any)["text-field"]
-      )?.id;
-
-      map.addLayer(
-        {
-          id: "add-3d-buildings",
-          source: "composite",
-          "source-layer": "building",
-          filter: ["==", "extrude", "true"],
-          type: "fill-extrusion",
-          minzoom: 15,
-          paint: {
-            "fill-extrusion-color": "#aaa",
-            "fill-extrusion-height": ["interpolate", ["linear"], ["zoom"], 15, 0, 15.05, ["get", "height"]],
-            "fill-extrusion-base": ["interpolate", ["linear"], ["zoom"], 15, 0, 15.05, ["get", "min_height"]],
-            "fill-extrusion-opacity": 0.6,
-          },
-        },
-        labelLayerId
-      );
-    });
+    map.on("load", () => setReady(true));
+    mapRef.current = map;
 
     const markers = markersRef.current;
     return () => {
@@ -167,40 +126,6 @@ export function IncidentMap({
     }
   }, [events, ready, selectedId, onSelect]);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchQuery.trim() || !mapRef.current) return;
-
-    setSearching(true);
-    try {
-      const resp = await fetch(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-          searchQuery
-        )}.json?access_token=${MAPBOX_TOKEN}&limit=1`
-      );
-      const data = await resp.json();
-      if (data.features && data.features.length > 0) {
-        const feature = data.features[0];
-        const [lng, lat] = feature.center;
-        setGeoDetails({
-          address: feature.place_name,
-          coords: `${lat.toFixed(6)}, ${lng.toFixed(6)}`,
-          type: feature.place_type[0],
-        });
-        mapRef.current.flyTo({
-          center: [lng, lat],
-          zoom: 16,
-          pitch: 60,
-          essential: true,
-        });
-      }
-    } catch (err) {
-      console.error("Geocoding failed", err);
-    } finally {
-      setSearching(false);
-    }
-  };
-
   if (!MAPBOX_TOKEN) {
     return (
       <div className="flex h-full min-h-[320px] items-center justify-center rounded-lg bg-surface-container-low">
@@ -213,38 +138,7 @@ export function IncidentMap({
     );
   }
 
-  return (
-    <div className="relative h-full min-h-[320px] w-full overflow-hidden rounded-lg">
-      <div ref={containerRef} className="h-full w-full" />
-
-      {/* Search Overlay */}
-      <div className="absolute left-4 top-4 z-10 w-full max-w-sm space-y-2">
-        <form onSubmit={handleSearch} className="relative">
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search location..."
-            className="bg-surface-container-highest/90 pr-10 backdrop-blur-sm"
-          />
-          <button
-            type="submit"
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface"
-            disabled={searching}
-          >
-            {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-          </button>
-        </form>
-
-        {geoDetails && (
-          <div className="rounded border border-outline-variant bg-surface-container-highest/90 p-3 text-body-sm shadow-lg backdrop-blur-sm">
-            <p className="font-bold text-on-surface">{geoDetails.address}</p>
-            <p className="text-on-surface-variant">Coordinates: {geoDetails.coords}</p>
-            <p className="text-on-surface-variant capitalize">Type: {geoDetails.type}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+  return <div ref={containerRef} className="h-full min-h-[320px] w-full overflow-hidden rounded-lg" />;
 }
 
 function escapeHtml(value: string) {

@@ -17,8 +17,7 @@ export function formatCurrencyZAR(n: number): string {
   return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR", maximumFractionDigits: 0 }).format(n);
 }
 
-export function formatPercent(n: number | undefined | null, opts: { showSign?: boolean } = {}): string {
-  if (n === undefined || n === null) return "0.0%";
+export function formatPercent(n: number, opts: { showSign?: boolean } = {}): string {
   const sign = opts.showSign && n > 0 ? "+" : "";
   return `${sign}${n.toFixed(1)}%`;
 }
@@ -49,12 +48,11 @@ export function formatDuration(seconds: number): string {
   return `${m}m ${s.toString().padStart(2, "0")}s`;
 }
 
-export function initials(name?: string): string {
-  if (!name || typeof name !== "string") return "";
+export function initials(name: string): string {
   return name
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
-    .map((p) => p[0]?.toUpperCase() || "")
+    .map((p) => p[0]!.toUpperCase())
     .join("");
 }

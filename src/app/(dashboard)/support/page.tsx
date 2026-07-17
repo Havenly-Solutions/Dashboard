@@ -150,7 +150,7 @@ function ReplyModal({
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-body-base font-medium text-on-surface">{enquiry.customerName}</p>
-          <p className="text-body-base text-on-surface">{enquiry.customerEmail}</p>
+          <p className="text-body-sm text-on-surface-variant">{enquiry.customerEmail}</p>
         </div>
         <Button variant="outline" size="sm" onClick={() => onArchive(enquiry.id)}>
           Archive
@@ -182,7 +182,7 @@ function ReplyModal({
           className="w-full rounded border border-outline-variant bg-surface-container-lowest p-3 text-body-base text-on-surface placeholder:text-on-surface-variant focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary"
         />
         <div className="mt-3 flex justify-end">
-          <Button size="lg" className="text-black" onClick={send} loading={reply.isPending} disabled={!body.trim()}>
+          <Button onClick={send} loading={reply.isPending} disabled={!body.trim()}>
             Send reply
           </Button>
         </div>

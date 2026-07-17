@@ -48,7 +48,7 @@ export default function PartnersPage() {
                   <TD>{p.activeCases}</TD>
                   <TD>
                     <p className="text-on-surface">{p.contactName}</p>
-                    <p className="text-body-base text-on-surface">{p.contactEmail}</p>
+                    <p className="text-body-sm text-on-surface-variant">{p.contactEmail}</p>
                   </TD>
                   <TD>
                     <Badge tone={STATUS_TONE[p.status]}>{p.status}</Badge>

@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, apiRequestWithFallback } from "@/lib/api-client";
+import { mockHelpdeskAgents, mockHelpdeskTickets } from "@/lib/mock-data";
 import type { HelpdeskAgent, HelpdeskTicket, TicketStatus } from "@/types";
 
 export const helpdeskKeys = {
@@ -12,7 +13,7 @@ export const helpdeskKeys = {
 export function useHelpdeskTickets() {
   return useQuery({
     queryKey: helpdeskKeys.tickets,
-    queryFn: () => api.get("/helpdesk/tickets"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/helpdesk/tickets", mockHelpdeskTickets),
     refetchInterval: 30_000,
   });
 }
@@ -20,7 +21,7 @@ export function useHelpdeskTickets() {
 export function useHelpdeskAgents() {
   return useQuery({
     queryKey: helpdeskKeys.agents,
-    queryFn: () => api.get("/helpdesk/agents"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/helpdesk/agents", mockHelpdeskAgents),
   });
 }
 
@@ -28,7 +29,7 @@ export function useAssignTicket() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, agentId }: { id: string; agentId: string }) =>
-      api.patch<HelpdeskTicket>(`/helpdesk/tickets/${id}/assign`, { agentId }),
+      api.patch<HelpdeskTicket>(`/api/dashboard/helpdesk/tickets/${id}/assign`, { agentId }),
     onSettled: () => qc.invalidateQueries({ queryKey: helpdeskKeys.tickets }),
   });
 }
@@ -37,7 +38,7 @@ export function useUpdateTicketStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: TicketStatus }) =>
-      api.patch<HelpdeskTicket>(`/helpdesk/tickets/${id}/status`, { status }),
+      api.patch<HelpdeskTicket>(`/api/dashboard/helpdesk/tickets/${id}/status`, { status }),
     onMutate: async ({ id, status }) => {
       await qc.cancelQueries({ queryKey: helpdeskKeys.tickets });
       const previous = qc.getQueryData<HelpdeskTicket[]>(helpdeskKeys.tickets);

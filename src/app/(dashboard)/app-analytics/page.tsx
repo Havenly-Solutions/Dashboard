@@ -36,11 +36,11 @@ export default function AppAnalyticsPage() {
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
         <Tile className="xl:col-span-2">
           <TileHeader title="Engagement trend" subtitle="Daily active users & cumulative installs" />
-          {isLoading || !data?.trend ? (
+          {isLoading ? (
             <TileSkeleton rows={5} />
           ) : (
             <TrendLineChart
-              data={data.trend}
+              data={data!.trend}
               xKey="label"
               series={[
                 { key: "dau", color: "rgb(70 72 212)", label: "DAU" },
@@ -52,12 +52,12 @@ export default function AppAnalyticsPage() {
 
         <Tile>
           <TileHeader title="Platform split" />
-          {isLoading || !data?.platformSplit ? (
+          {isLoading ? (
             <TileSkeleton rows={3} />
           ) : (
             <>
               <ul className="space-y-4">
-                {data.platformSplit.map((p) => (
+                {data!.platformSplit.map((p) => (
                   <li key={p.platform}>
                     <div className="mb-1 flex items-center justify-between text-body-sm">
                       <span className="text-on-surface">{p.platform}</span>
@@ -86,11 +86,11 @@ export default function AppAnalyticsPage() {
 
       <Tile className="mt-widget-gap">
         <TileHeader title="Device & infrastructure health" subtitle="Fleet status across the safety network" />
-        {isLoading || !data?.deviceHealth ? (
+        {isLoading ? (
           <TileSkeleton rows={4} />
         ) : (
           <ul className="divide-y divide-outline-variant/60">
-            {data.deviceHealth.map((d) => (
+            {data!.deviceHealth.map((d) => (
               <li key={d.label} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="text-body-base font-medium text-on-surface">{d.label}</p>

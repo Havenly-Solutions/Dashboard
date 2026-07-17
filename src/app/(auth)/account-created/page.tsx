@@ -13,7 +13,7 @@ export default function AccountCreatedPage() {
         Your Havenly account is active. Sign in to reach your command center.
       </p>
       <Link href="/login" className="mt-8 block">
-        <Button size="lg" className="w-full text-black">Sign in</Button>
+        <Button size="lg" className="w-full">Sign in</Button>
       </Link>
     </div>
   );

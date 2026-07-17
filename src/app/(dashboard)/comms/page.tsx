@@ -114,7 +114,7 @@ export default function CommsHubPage() {
               />
               <FieldError>{errors.body?.message}</FieldError>
             </div>
-            <Button type="submit" size="lg" className="w-full text-black" loading={isSubmitting}>
+            <Button type="submit" className="w-full" loading={isSubmitting}>
               <Send className="mr-1.5 h-4 w-4" /> Send
             </Button>
           </form>

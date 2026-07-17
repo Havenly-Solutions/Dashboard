@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
+import { api, apiRequestWithFallback } from "@/lib/api-client";
+import { mockSosEvents, mockSosLog } from "@/lib/mock-data";
 import type { SosEvent, SosLogEntry, SosStatus } from "@/types";
 
 export const sosKeys = {
@@ -12,7 +13,7 @@ export const sosKeys = {
 export function useSosEvents() {
   return useQuery({
     queryKey: sosKeys.events,
-    queryFn: () => api.get("/sos/events"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/sos/events", mockSosEvents),
     refetchInterval: 30_000,
   });
 }
@@ -20,7 +21,7 @@ export function useSosEvents() {
 export function useSosLog() {
   return useQuery({
     queryKey: sosKeys.log,
-    queryFn: () => api.get("/sos/log"),
+    queryFn: () => apiRequestWithFallback("/api/dashboard/sos/log", mockSosLog),
     refetchInterval: 15_000,
   });
 }
@@ -36,7 +37,7 @@ export function useUpdateSosStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: SosStatus }) =>
-      api.patch<SosEvent>(`/sos/events/${id}/status`, { status }),
+      api.patch<SosEvent>(`/api/dashboard/sos/events/${id}/status`, { status }),
     onMutate: async ({ id, status }) => {
       await qc.cancelQueries({ queryKey: sosKeys.events });
       const previous = qc.getQueryData<SosEvent[]>(sosKeys.events);

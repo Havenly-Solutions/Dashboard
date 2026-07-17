@@ -11,12 +11,11 @@ import { Table, THead, TH, TBody, TR, TD } from "@/components/ui/table";
 import { TileSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Avatar } from "@/components/ui/avatar";
-import { TicketDetailModal } from "./ticket-detail-modal";
 import { useHelpdeskAgents, useHelpdeskTickets, useUpdateTicketStatus } from "@/hooks/use-helpdesk";
 import { TICKET_PRIORITY_TONE, TICKET_STATUS_TONE } from "@/components/helpdesk/status";
 import { formatRelativeTime } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
-import type { TicketCategory, TicketStatus, HelpdeskTicket } from "@/types";
+import type { TicketCategory, TicketStatus } from "@/types";
 
 const CATEGORIES: (TicketCategory | "ALL")[] = ["ALL", "TECHNICAL", "BILLING", "SECURITY", "GENERAL"];
 const STATUS_FLOW: TicketStatus[] = ["UNASSIGNED", "IN_PROGRESS", "PENDING", "RESOLVED"];
@@ -27,7 +26,6 @@ export default function HelpdeskPage() {
   const updateStatus = useUpdateTicketStatus();
   const { push } = useToast();
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("ALL");
-  const [selectedTicket, setSelectedTicket] = useState<HelpdeskTicket | null>(null);
 
   const filtered = useMemo(
     () => (tickets ?? []).filter((t) => category === "ALL" || t.category === category),
@@ -44,8 +42,7 @@ export default function HelpdeskPage() {
     ? Math.round((tickets.filter((t) => t.status === "RESOLVED").length / tickets.length) * 100)
     : null;
 
-  const advanceStatus = async (e: React.MouseEvent, id: string, current: TicketStatus) => {
-    e.stopPropagation();
+  const advanceStatus = async (id: string, current: TicketStatus) => {
     const idx = STATUS_FLOW.indexOf(current);
     const next = STATUS_FLOW[idx + 1];
     if (!next) return;
@@ -60,8 +57,6 @@ export default function HelpdeskPage() {
   return (
     <div>
       <PageHeader title="Helpdesk" description="Internal support queue across billing, technical, security & general requests." />
-
-      <TicketDetailModal ticket={selectedTicket} onClose={() => setSelectedTicket(null)} />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Active Tickets" value={isLoading ? "\u2014" : String(activeCount)} icon={Headset} />
@@ -99,11 +94,11 @@ export default function HelpdeskPage() {
                 <TH>Priority</TH>
                 <TH>Status</TH>
                 <TH>Agent</TH>
-                <TH className="text-right">Action</TH>
+                <TH className="text-right">Updated</TH>
               </THead>
               <TBody>
                 {filtered.map((t) => (
-                  <TR key={t.id} onClick={() => setSelectedTicket(t)}>
+                  <TR key={t.id} onClick={() => advanceStatus(t.id, t.status)}>
                     <TD>
                       <p className="font-medium text-on-surface">{t.subject}</p>
                       <p className="text-body-sm text-on-surface-variant">
@@ -119,21 +114,13 @@ export default function HelpdeskPage() {
                       </Badge>
                     </TD>
                     <TD>{t.assignedAgentName ?? <span className="text-on-surface-variant">Unassigned</span>}</TD>
-                    <TD className="text-right">
-                      <button
-                        onClick={(e) => advanceStatus(e, t.id, t.status)}
-                        className="text-label-md font-medium text-secondary hover:underline disabled:opacity-50"
-                        disabled={t.status === "RESOLVED"}
-                      >
-                        Advance
-                      </button>
-                    </TD>
+                    <TD className="text-right text-body-sm text-on-surface-variant">{formatRelativeTime(t.updatedAt)}</TD>
                   </TR>
                 ))}
               </TBody>
             </Table>
           )}
-          <p className="mt-3 text-label-md text-on-surface-variant">Click a row to view details, or 'Advance' to move status.</p>
+          <p className="mt-3 text-label-md text-on-surface-variant">Click a row to advance it to the next status.</p>
         </Tile>
 
         <Tile>
