@@ -1,0 +1,23 @@
+{
+  "auth": null,
+  "project": {
+    "rememberedByWorkspace": {},
+    "lastResolved": null,
+    "repositoryConnectionsByProject": {}
+  },
+  "branch": {
+    "active": "preview"
+  },
+  "app": {
+    "selectedByProject": {
+      "proj_cmraxn4oo0r7sxef9q8g1zzm3": {
+        "id": "cps_cmrlcwasb0ut3zrcoglvae7ol",
+        "name": "Backend"
+      }
+    },
+    "knownLiveDeploymentByProject": {}
+  },
+  "agent": {
+    "setupPromptDismissedAt": null
+  }
+}
