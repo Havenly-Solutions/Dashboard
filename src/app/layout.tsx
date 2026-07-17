@@ -13,8 +13,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Havenly Solutions | Dashboardr",
-  description: "Havenly Solutions command center SOS operations, helpdesk, customer support, and growth analytics.",
+  title: "Havenly Solutions | Command Center",
+  description: "Founder command center for Havenly Solutions — SOS operations, helpdesk, customer support, and growth analytics.",
   icons: { icon: "/havenly-logo.png" },
 };
 
