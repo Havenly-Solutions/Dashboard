@@ -1,222 +1,314 @@
-export enum Role {
-  GUEST = "GUEST",
-  FREE = "FREE",
-  PRO = "PRO",
-  NGO_GOLD = "NGO_GOLD",
-  ADMIN = "ADMIN",
-  FOUNDER = "FOUNDER",
-  PA = "PA",
-  MANAGER = "MANAGER",
-  DEVELOPER = "DEVELOPER",
-  INVESTOR = "INVESTOR",
-  NGO_PARTNER = "NGO_PARTNER",
-  CHIEF_OFFICER = "CHIEF_OFFICER",
-  VIDEOGRAPHER = "VIDEOGRAPHER",
-  CONTENT_CREATOR = "CONTENT_CREATOR"
-}
+// ---------------------------------------------------------------------------
+// Domain types. These mirror the Prisma schema described in the backend
+// audit (User, SOSEvent, AuditLog, Organization, PortalConfig) plus the
+// additional resources this dashboard needs (helpdesk tickets, support
+// enquiries, marketing/app analytics). Keep this file in sync with
+// havenly-backend/src/dashboard DTOs as routes are wired up.
+// ---------------------------------------------------------------------------
 
-export interface DashboardUser {
+export type Role =
+  | "FOUNDER"
+  | "CO_FOUNDER"
+  | "MANAGER"
+  | "MANAGER_VIDEOGRAPHER"
+  | "MANAGER_CONTENT_CREATOR"
+  | "DEVELOPER"
+  | "CYBERSECURITY"
+  | "MEDIA"
+  | "NGO_PARTNER"
+  | "INVESTOR";
+
+export interface AuthUser {
   id: string;
-  firstName: string;
-  surname: string;
+  name: string;
   email: string;
   role: Role;
-  department?: string;
-  createdAt?: string;
-  lastLogin?: string;
-  avatar?: string;
-  status?: string;
+  avatarUrl?: string | null;
+  organizationId?: string | null;
+  organizationName?: string | null;
+  mustChangePassword?: boolean;
+  onboardingCompletedAt?: string | null;
 }
 
-export const ROLE_PERMISSIONS: Record<string, string[]> = {
-  [Role.GUEST]: ["/dashboard", "/dashboard/settings", "/dashboard/resource-centre", "/dashboard/support-tickets"],
-  [Role.FREE]: ["/dashboard", "/dashboard/settings", "/dashboard/resource-centre", "/dashboard/support-tickets"],
-  [Role.PRO]: ["/dashboard", "/dashboard/incidents", "/dashboard/settings", "/dashboard/resource-centre", "/dashboard/support-tickets"],
-  [Role.NGO_GOLD]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/ngo-portal", "/dashboard/settings", "/dashboard/support-tickets"],
-  [Role.ADMIN]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/mesh-topology", "/dashboard/safety-logs", "/dashboard/ngo-portal", "/dashboard/pre-registrations", "/dashboard/analytics", "/dashboard/broadcast", "/dashboard/media", "/dashboard/settings", "/dashboard/support-tickets"],
-  [Role.FOUNDER]: ["*"],
-  [Role.CHIEF_OFFICER]: ["*"],
-  [Role.PA]: ["/dashboard", "/dashboard/sos-alerts", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/media", "/dashboard/approvals", "/dashboard/settings", "/dashboard/support-tickets"],
-  [Role.MANAGER]: ["/dashboard", "/dashboard/analytics", "/dashboard/team", "/dashboard/pre-registrations", "/dashboard/incidents", "/dashboard/media", "/dashboard/settings", "/dashboard/support-tickets"],
-  [Role.DEVELOPER]: ["/dashboard", "/dashboard/mesh-topology", "/dashboard/analytics", "/dashboard/settings", "/dashboard/support-tickets"],
-  [Role.INVESTOR]: ["/dashboard", "/dashboard/analytics", "/dashboard/settings", "/dashboard/support-tickets"],
-  [Role.NGO_PARTNER]: ["/dashboard/ngo-portal", "/dashboard/settings", "/dashboard/support-tickets"],
-  [Role.VIDEOGRAPHER]: [
-    "media:read", "media:write", 
-    "resource-centre:read", "resource-centre:write", 
-    "broadcast:read",
-    "/dashboard/media", "/dashboard/resource-centre", "/dashboard/settings"
-  ],
-  [Role.CONTENT_CREATOR]: [
-    "broadcast:read", "broadcast:write", 
-    "analytics:read", 
-    "pre-registrations:read", 
-    "resource-centre:read", "resource-centre:write",
-    "/dashboard/analytics", "/dashboard/pre-registrations", "/dashboard/resource-centre", "/dashboard/broadcast", "/dashboard/media", "/dashboard/settings"
-  ],
+export interface LoginResponse {
+  user: AuthUser;
+  accessToken: string;
+  accessTokenExpiresAt: string; // ISO timestamp
 }
 
-export const ROLE_LABELS: Record<string, string> = {
-  [Role.GUEST]: "Guest",
-  [Role.FREE]: "Free User",
-  [Role.PRO]: "Premium User",
-  [Role.NGO_GOLD]: "NGO Partner (Gold)",
-  [Role.ADMIN]: "Administrator",
-  [Role.FOUNDER]: "Havenly Solutions Founder",
-  [Role.CHIEF_OFFICER]: "Chief Officer",
-  [Role.PA]: "Personal Assistant (Exec)",
-  [Role.MANAGER]: "Regional Manager",
-  [Role.DEVELOPER]: "Developer",
-  [Role.INVESTOR]: "Investor",
-  [Role.NGO_PARTNER]: "NGO Partner",
-  [Role.VIDEOGRAPHER]: "Videographer",
-  [Role.CONTENT_CREATOR]: "Content Creator",
-}
+export type SosStatus = "PENDING" | "ACTIVE" | "RESOLVED" | "FALSE_ALARM";
 
-export const ROLE_BADGE_COLORS: Record<string, string> = {
-  [Role.GUEST]: "bg-gray-100 text-gray-700 border-gray-200",
-  [Role.FREE]: "bg-blue-100 text-blue-700 border-blue-200",
-  [Role.PRO]: "bg-purple-100 text-purple-700 border-purple-200",
-  [Role.NGO_GOLD]: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  [Role.ADMIN]: "bg-red-100 text-red-700 border-red-200",
-  [Role.FOUNDER]: "bg-[#1A1A2E] text-white border-[#1A1A2E]",
-  [Role.CHIEF_OFFICER]: "bg-[#C0392B] text-white border-[#C0392B]",
-  [Role.PA]: "bg-slate-800 text-white border-slate-900",
-  [Role.MANAGER]: "bg-zinc-100 text-zinc-900 border-zinc-300 font-bold",
-  [Role.DEVELOPER]: "bg-orange-100 text-orange-700 border-orange-200",
-  [Role.INVESTOR]: "bg-teal-100 text-teal-700 border-teal-200",
-  [Role.NGO_PARTNER]: "bg-emerald-50 text-emerald-600 border-emerald-100",
-  [Role.VIDEOGRAPHER]: "bg-indigo-100 text-indigo-700 border-indigo-200",
-  [Role.CONTENT_CREATOR]: "bg-rose-100 text-rose-700 border-rose-200",
-}
-
-export type IncidentSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-export type IncidentStatus = 'ACTIVE' | 'RESOLVED' | 'DISMISSED';
-
-export interface Incident {
+export interface SosEvent {
   id: string;
+  reference: string; // e.g. "SOS-4471"
+  status: SosStatus;
   title: string;
-  type: string;
-  severity: IncidentSeverity;
-  status: IncidentStatus;
-  level?: string;
-  description: string;
-  location: string;
-  lat?: number | null;
-  lng?: number | null;
+  source: string; // device / responder / system that raised it
+  latitude: number;
+  longitude: number;
+  address?: string | null;
+  responderId?: string | null;
+  responderName?: string | null;
+  responseTimeSeconds?: number | null;
+  slaTargetSeconds: number;
   createdAt: string;
   updatedAt: string;
-  userId?: string;
 }
 
-export interface AuditLog {
+export interface SosLogEntry {
   id: string;
-  action: string;
-  userId?: string | null;
-  userEmail?: string | null;
-  module: string;
-  origin: string;
-  description?: string | null;
-  hashSig?: string | null;
-  ipAddress?: string | null;
+  sosEventId?: string | null;
+  channel: "VOICE" | "SYSTEM" | "RESPONDER" | "DISPATCH";
+  message: string;
   createdAt: string;
-  user?: {
-    firstName: string;
-    surname: string;
-    email: string;
-  } | null;
 }
 
-export const SEVERITY_COLORS: Record<IncidentSeverity, string> = {
-  LOW: 'bg-blue-100 text-blue-700 border-blue-200',
-  MEDIUM: 'bg-yellow-100 text-yellow-700 border-yellow-200',
-  HIGH: 'bg-orange-100 text-orange-700 border-orange-200',
-  CRITICAL: 'bg-red-100 text-red-700 border-red-200 animate-pulse',
-};
+export type TicketStatus = "UNASSIGNED" | "IN_PROGRESS" | "PENDING" | "RESOLVED";
+export type TicketPriority = "CRITICAL" | "HIGH" | "NORMAL" | "LOW";
+export type TicketCategory = "TECHNICAL" | "BILLING" | "SECURITY" | "GENERAL";
 
-export interface MeshNode {
+export interface HelpdeskTicket {
   id: string;
-  nodeId: string;
+  ticketNumber: string;
+  subject: string;
+  requesterName: string;
+  requesterEmail: string;
+  category: TicketCategory;
+  priority: TicketPriority;
+  status: TicketStatus;
+  assignedAgentId?: string | null;
+  assignedAgentName?: string | null;
+  slaTargetMinutes: number;
+  firstResponseMinutes?: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface HelpdeskAgent {
+  id: string;
   name: string;
-  type: string;
-  status: string;
-  eventType?: string | null;
-  region?: string | null;
-  powerStatus?: string | null;
-  connections?: number | null;
-  lat?: number | null;
-  lng?: number | null;
-  batteryLevel?: number | null;
-  signalStrength?: number | null;
-  latencyLocal: number;
-  latencySat?: number | null;
-  hopCount?: number | null;
-  throughput?: number | null;
-  firmware?: string | null;
-  lastPing?: string | null;
-  createdAt: string;
-  updatedAt: string;
+  avatarUrl?: string | null;
+  activeTickets: number;
+  avgResponseMinutes: number;
+  rating: "EXCELLENT" | "GOOD" | "NEEDS_ATTENTION";
 }
 
-export type NGOStatus = 'PENDING' | 'APPROVED' | 'REJECTED' | 'SUSPENDED';
+export type EnquirySentiment = "POSITIVE" | "NEUTRAL" | "NEGATIVE";
+export type EnquiryStatus = "OPEN" | "REPLIED" | "ARCHIVED" | "FLAGGED";
 
-export interface NGOPartner {
+export interface SupportEnquiry {
   id: string;
-  orgName: string;
-  liaisonFirstName: string;
-  liaisonSurname: string;
-  liaisonPhone?: string | null;
-  orgType: string;
-  email: string;
-  regNumber?: string | null;
-  province: string;
-  missionStatement?: string | null;
-  status: NGOStatus;
-  createdAt: string;
-  updatedAt?: string;
-}
-
-export interface PreRegistration {
-  id: string;
-  firstName: string;
-  surname: string;
-  email: string;
-  phone?: string | null;
-  province: string;
-  source?: string | null;
-  tierInterest?: string | null;
-  status?: string;
-  createdAt: string;
-}
-
-export interface ProfileRequest {
-  id: string;
-  userId: string;
-  field: string;
-  oldValue: string;
-  newValue: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED';
-  reason?: string;
-  createdAt: string;
-  updatedAt: string;
-  user?: {
-    name: string;
-    email: string;
-  };
-}
-
-export interface SupportTicket {
-  id: string;
-  userId: string;
+  customerName: string;
+  customerEmail: string;
+  plan: "STARTER" | "ADVANCED" | "ENTERPRISE" | "NONE";
   subject: string;
   message: string;
-  category: 'HARDWARE' | 'SOFTWARE' | 'PROTOCOL' | 'SECURITY' | 'OTHER';
-  status: 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED';
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  sentiment: EnquirySentiment;
+  status: EnquiryStatus;
+  rating?: number | null; // 1-5 stars, optional
   createdAt: string;
-  updatedAt: string;
-  user?: {
-    name: string;
-    email: string;
-  };
+}
+
+export interface EnquiryReply {
+  id: string;
+  enquiryId: string;
+  body: string;
+  authorName: string;
+  createdAt: string;
+}
+
+export interface MarketingSnapshot {
+  rangeLabel: string;
+  visitors: number;
+  visitorsDelta: number; // percent
+  signups: number;
+  signupsDelta: number;
+  conversionRate: number; // percent
+  conversionRateDelta: number;
+  avgSessionSeconds: number;
+  topSources: { source: string; visitors: number; share: number }[];
+  funnel: { stage: string; count: number }[];
+  trend: { label: string; visitors: number; signups: number }[];
+  topPages: { path: string; views: number; avgTimeSeconds: number }[];
+}
+
+export interface AppAnalyticsSnapshot {
+  rangeLabel: string;
+  dau: number;
+  dauDelta: number;
+  mau: number;
+  wau: number;
+  activeInstalls: number;
+  installsDelta: number;
+  crashFreeRate: number;
+  avgSessionMinutes: number;
+  panicButtonActivations: number;
+  gsmUptime: number;
+  satelliteUptime: number;
+  platformSplit: { platform: "iOS" | "Android"; share: number }[];
+  trend: { label: string; dau: number; installs: number }[];
+  deviceHealth: { label: string; status: "STABLE" | "DEGRADED" | "OFFLINE"; detail: string }[];
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  status: "ACTIVE" | "INVITED" | "PENDING_APPROVAL" | "SUSPENDED";
+  organizationName?: string | null;
+  lastActiveAt?: string | null;
+  invitedAt?: string | null;
+}
+
+export interface ApprovalRequest {
+  id: string;
+  applicantName: string;
+  applicantEmail: string;
+  requestedRole: Role;
+  requestedAt: string;
+  note?: string | null;
+}
+
+export interface SecurityCampaign {
+  id: string;
+  name: string;
+  type: "PHISHING_SIMULATION" | "CREDENTIAL_TEST";
+  status: "DRAFT" | "RUNNING" | "COMPLETED";
+  targeted: number;
+  opened: number;
+  submitted: number;
+  reportedSuspicious: number;
+  startedAt?: string | null;
+  endsAt?: string | null;
+}
+
+export interface SecurityTrainingModule {
+  id: string;
+  title: string;
+  provider: string;
+  challenges: number;
+}
+
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  avatarUrl?: string | null;
+  points: number;
+  challengesSolved: number;
+  rank: number;
+}
+
+export interface BreachLogEntry {
+  id: string;
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+  summary: string;
+  system: string;
+  detectedAt: string;
+  resolvedAt?: string | null;
+}
+
+export interface FinanceSnapshot {
+  mrr: number;
+  mrrDelta: number;
+  arr: number;
+  outstandingInvoices: number;
+  churnRate: number;
+  revenueBySource: { source: string; amount: number }[];
+  trend: { label: string; revenue: number }[];
+}
+
+export interface Partner {
+  id: string;
+  name: string;
+  type: "NGO" | "MUNICIPAL" | "CORPORATE";
+  region: string;
+  activeCases: number;
+  contactName: string;
+  contactEmail: string;
+  status: "ACTIVE" | "PENDING" | "INACTIVE";
+}
+
+export interface CommsMessage {
+  id: string;
+  channel: "EMAIL" | "IN_APP";
+  fromName: string;
+  toName: string;
+  subject?: string | null;
+  body: string;
+  createdAt: string;
+  read: boolean;
+}
+
+export interface RoleGrant {
+  role: Role;
+  moduleKey: string;
+  enabled: boolean;
+}
+
+export interface UserOverride {
+  id: string;
+  userId: string;
+  userName: string;
+  userRole: Role;
+  moduleKey: string;
+  enabled: boolean;
+  reason?: string | null;
+  grantedByName: string;
+  grantedAt: string;
+}
+
+export interface AccessControlState {
+  roleGrants: RoleGrant[];
+  userOverrides: UserOverride[];
+}
+
+export interface AccessChangeLogEntry {
+  id: string;
+  summary: string;
+  actorName: string;
+  createdAt: string;
+}
+
+export type SubscriptionTier = "STARTER" | "BRONZE" | "SILVER" | "GOLD" | "ENTERPRISE";
+export type BillingStatus = "PAID" | "PENDING" | "OVERDUE";
+
+export interface OrgSubscription {
+  id: string;
+  organizationName: string;
+  tier: SubscriptionTier;
+  billingCycle: "MONTHLY" | "ANNUAL";
+  status: BillingStatus;
+  mrr: number;
+  renewsAt: string;
+  seatsUsed: number;
+  seatsAllowed: number;
+}
+
+export type PaymentProvider = "STRIPE" | "PAYSTACK" | "YOCO" | "PADDLE";
+
+export interface PaymentMethod {
+  id: string;
+  provider: PaymentProvider;
+  brand: string; // "Visa", "Mastercard", ...
+  last4: string;
+  expMonth: number;
+  expYear: number;
+  isDefault: boolean;
+}
+
+export interface InvoiceRecord {
+  id: string;
+  number: string;
+  amount: number;
+  status: "PAID" | "PENDING" | "OVERDUE";
+  issuedAt: string;
+  pdfUrl?: string | null;
+}
+
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
 }

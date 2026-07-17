@@ -1,52 +1,60 @@
-import { type ClassValue, clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-import { Role, ROLE_PERMISSIONS } from '@/types'
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
-export function hasAccess(role: Role, path: string): boolean {
-  const permissions = ROLE_PERMISSIONS[role]
-  if (permissions.includes('*')) return true
-  return permissions.some(p => path === p || path.startsWith(p + '/'))
+export function formatNumber(n: number): string {
+  return new Intl.NumberFormat("en-ZA").format(n);
 }
 
-export function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('en-ZA', {
-    day: '2-digit', month: 'short', year: 'numeric'
-  })
+export function formatCompactNumber(n: number): string {
+  return new Intl.NumberFormat("en-ZA", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 }
 
-export function formatDateTime(date: string | Date): string {
-  return new Date(date).toLocaleString('en-ZA', {
-    day: '2-digit', month: 'short', year: 'numeric',
-    hour: '2-digit', minute: '2-digit'
-  })
+export function formatCurrencyZAR(n: number): string {
+  return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR", maximumFractionDigits: 0 }).format(n);
 }
 
-export function formatTimeAgo(date: string | Date): string {
-  const now = new Date()
-  const d = new Date(date)
-  const diff = now.getTime() - d.getTime()
-  const mins = Math.floor(diff / 60000)
-  if (mins < 1) return 'just now'
-  if (mins < 60) return `${mins}m ago`
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return `${hours}h ago`
-  return `${Math.floor(hours / 24)}d ago`
+export function formatPercent(n: number | undefined | null, opts: { showSign?: boolean } = {}): string {
+  if (n === undefined || n === null) return "0.0%";
+  const sign = opts.showSign && n > 0 ? "+" : "";
+  return `${sign}${n.toFixed(1)}%`;
 }
 
-export function generateHash(): string {
-  const chars = '0123456789ABCDEF'
-  let hash = '0x'
-  for (let i = 0; i < 4; i++) hash += chars[Math.floor(Math.random() * 16)]
-  hash += '...'
-  for (let i = 0; i < 4; i++) hash += chars[Math.floor(Math.random() * 16)]
-  return hash
+export function formatRelativeTime(iso: string): string {
+  const date = new Date(iso);
+  const diffMs = Date.now() - date.getTime();
+  const diffSec = Math.round(diffMs / 1000);
+  const diffMin = Math.round(diffSec / 60);
+  const diffHr = Math.round(diffMin / 60);
+  const diffDay = Math.round(diffHr / 24);
+
+  if (diffSec < 45) return "just now";
+  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffDay < 7) return `${diffDay}d ago`;
+  return date.toLocaleDateString("en-ZA", { day: "numeric", month: "short" });
 }
 
-export function truncateHash(hash: string): string {
-  if (hash.length <= 12) return hash
-  return hash.slice(0, 6) + '...' + hash.slice(-4)
+export function formatClock(iso: string): string {
+  return new Date(iso).toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" });
+}
+
+export function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${Math.round(seconds)}s`;
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return `${m}m ${s.toString().padStart(2, "0")}s`;
+}
+
+export function initials(name?: string): string {
+  if (!name || typeof name !== "string") return "";
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() || "")
+    .join("");
 }

@@ -1,36 +1,36 @@
-import { io, Socket } from 'socket.io-client';
+"use client";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'https://api.havenly.solutions';
+import { io, type Socket } from "socket.io-client";
+
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:4000";
 
 let socket: Socket | null = null;
 
-export const getSocket = (accessToken?: string, portalId?: string, userId?: string, role?: string) => {
-  if (!socket && accessToken) {
-    socket = io(BACKEND_URL, {
-      auth: { 
-        token: accessToken,
-        portalId,
-        userId,
-        role
-      },
-      transports: ['websocket'],
-      reconnectionAttempts: 5,
-    });
-
-    socket.on('connect', () => {
-      console.log('[Socket] Connected to backend');
-    });
-
-    socket.on('connect_error', (err) => {
-      console.error('[Socket] Connection error:', err.message);
-    });
-  }
+/**
+ * Lazily creates a single shared Socket.io connection, authenticated with
+ * the current access token. Backend rooms this dashboard listens to:
+ *   - "dashboard:sos"    \u2192 SOS event created/updated/resolved
+ *   - "dashboard:comms"  \u2192 new comms hub message
+ *   - "dashboard:tickets"\u2192 helpdesk ticket created/updated
+ */
+export function getSocket(token: string | null): Socket {
+  if (socket) return socket;
+  socket = io(SOCKET_URL, {
+    autoConnect: false,
+    transports: ["websocket"],
+    auth: token ? { token } : undefined,
+  });
   return socket;
-};
+}
 
-export const disconnectSocket = () => {
-  if (socket) {
-    socket.disconnect();
-    socket = null;
-  }
-};
+export function connectSocket(token: string | null) {
+  const s = getSocket(token);
+  if (token) s.auth = { token };
+  if (!s.connected) s.connect();
+  return s;
+}
+
+export function disconnectSocket() {
+  socket?.disconnect();
+  socket = null;
+}
