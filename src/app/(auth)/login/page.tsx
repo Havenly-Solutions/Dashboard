@@ -116,7 +116,7 @@ function LoginForm() {
           </p>
         )}
 
-        <Button type="submit" size="lg" className="w-full" loading={isSubmitting}>
+        <Button type="submit" size="lg" className="w-full text-white" loading={isSubmitting}>
           Sign in
         </Button>
       </form>
