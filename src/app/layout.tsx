@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { AppProviders } from '@/providers/AppProviders';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default async function RootLayout({
         <AppProviders session={session}>
           {children}
         </AppProviders>
+        <Analytics />
       </body>
     </html>
   );
