@@ -83,7 +83,7 @@ function LoginForm() {
               id="password"
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
-              placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+              placeholder="••••••••"
               {...register("password")}
             />
             <button
@@ -110,7 +110,7 @@ function LoginForm() {
       </form>
 
       <p className="mt-8 text-center text-body-sm text-on-surface-variant">
-        New team members are invited by a Founder or Admin {"\u2014"} look out for an email invite.
+        Your Haven. Yo
       </p>
     </div>
   );
