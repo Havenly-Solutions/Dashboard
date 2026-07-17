@@ -14,7 +14,7 @@
 //   instead of silently masking a broken endpoint.
 // ---------------------------------------------------------------------------
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1/dashboard";
 export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 export class ApiError extends Error {
@@ -24,6 +24,14 @@ export class ApiError extends Error {
     this.name = "ApiError";
     this.status = status;
   }
+}
+
+/** The standard wrapper for all havenly-backend responses. */
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: { message: string; code: string; details?: unknown };
+  timestamp: string;
 }
 
 type TokenGetter = () => string | null;
@@ -71,10 +79,17 @@ async function rawRequest<T>(path: string, opts: RequestOptions, token: string |
 
   if (!res.ok) {
     const message =
-      (isJson && payload && typeof payload === "object" && "message" in payload
+      (isJson && payload && typeof payload === "object" && "error" in payload
+        ? String((payload as ApiResponse<unknown>).error?.message)
+        : isJson && payload && typeof payload === "object" && "message" in payload
         ? String((payload as { message: unknown }).message)
         : undefined) ?? `Request failed (${res.status})`;
     throw new ApiError(message, res.status);
+  }
+
+  // If it's a standard wrapped response, return just the data.
+  if (isJson && payload && typeof payload === "object" && "success" in payload && "data" in payload) {
+    return (payload as ApiResponse<T>).data;
   }
 
   return payload as T;
