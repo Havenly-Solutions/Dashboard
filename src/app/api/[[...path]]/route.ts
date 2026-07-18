@@ -4,25 +4,25 @@ import { apiProxy } from '@/lib/serverFetch'
 
 export async function GET(req: NextRequest, { params }: { params: { path?: string[] } }) {
   const path = params.path?.join('/') || ''
-  return apiProxy(req, `/api/v1/dashboard/${path}`)
+  return apiProxy(req, `/api/v1/${path}`)
 }
 
 export async function POST(req: NextRequest, { params }: { params: { path?: string[] } }) {
   const path = params.path?.join('/') || ''
-  return apiProxy(req, `/api/v1/dashboard/${path}`)
+  return apiProxy(req, `/api/v1/${path}`)
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: { path?: string[] } }) {
   const path = params.path?.join('/') || ''
-  return apiProxy(req, `/api/v1/dashboard/${path}`)
+  return apiProxy(req, `/api/v1/${path}`)
 }
 
 export async function PUT(req: NextRequest, { params }: { params: { path?: string[] } }) {
   const path = params.path?.join('/') || ''
-  return apiProxy(req, `/api/v1/dashboard/${path}`)
+  return apiProxy(req, `/api/v1/${path}`)
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: { path?: string[] } }) {
   const path = params.path?.join('/') || ''
-  return apiProxy(req, `/api/v1/dashboard/${path}`)
+  return apiProxy(req, `/api/v1/${path}`)
 }

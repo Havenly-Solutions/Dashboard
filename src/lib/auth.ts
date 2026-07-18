@@ -33,7 +33,7 @@ export const authOptions: NextAuthOptions = {
           const forwardedFor = req?.headers?.['x-forwarded-for'] || ''
           const userAgent = req?.headers?.['user-agent'] || ''
 
-          const result = await baseApiClient(`/api/v1/dashboard/auth/login`, {
+          const result = await baseApiClient(`/api/v1/app/auth/login`, {
             method: 'POST',
             headers: { 
               'x-forwarded-for': forwardedFor,

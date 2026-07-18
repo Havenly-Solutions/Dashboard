@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const doRefresh = useCallback(async (): Promise<string | null> => {
     try {
-      const res = await apiRequest<{ accessToken: string; refreshToken?: string }>("/auth/refresh", {
+      const res = await apiRequest<{ accessToken: string; refreshToken?: string }>("/api/app/auth/refresh", {
         method: "POST",
         skipAuth: true,
       });
@@ -81,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       tokenRef.current = token;
-      const me = await api.get<AuthUser>("/users/me");
+      const me = await api.get<AuthUser>("/api/dashboard/users/me");
       setUser(me);
       setStatus("authenticated");
     } catch (err) {
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await api.post<LoginResponse>("/auth/login", { email, password }, { skipAuth: true });
+    const res = await api.post<LoginResponse>("/api/app/auth/login", { email, password }, { skipAuth: true });
     tokenRef.current = res.accessToken;
     setUser(res.user);
     setStatus("authenticated");
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await api.post("/auth/logout");
+      await api.post("/api/app/auth/logout");
     } catch {
       // best-effort — clear client state regardless
     }
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const res = await api.post<LoginResponse>("/admin/test-mode/switch-role", { role });
+        const res = await api.post<LoginResponse>("/api/dashboard/admin/test-mode/switch-role", { role });
         tokenRef.current = res.accessToken;
         setUser(res.user);
         queryClient.clear();
