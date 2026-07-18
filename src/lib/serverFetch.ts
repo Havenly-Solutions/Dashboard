@@ -50,6 +50,8 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
     clearTimeout(timeoutId);
     
     const duration = Date.now() - startTime;
+    console.log(`[serverFetch] ${method} ${path} - Status: ${response.status} - Duration: ${duration}ms`);
+
     if (duration > 2000) {
       console.warn(`[serverFetch] Slow backend response from ${path}: ${duration}ms`);
     }
@@ -118,7 +120,12 @@ export async function apiProxy(req: Request, path: string) {
   } as RequestInit)
 
   if (!res) {
-    return NextResponse.json({ error: 'Gateway Timeout: Backend Unreachable' }, { status: 504 })
+    console.error(`[apiProxy] 504 Gateway Timeout on ${method} ${proxyPath} - Backend returned null`);
+    return NextResponse.json({
+      error: 'Gateway Timeout: Backend Unreachable',
+      path: proxyPath,
+      method: method
+    }, { status: 504 })
   }
 
   // Stream the response back to the client
