@@ -14,7 +14,7 @@
 //   instead of silently masking a broken endpoint.
 // ---------------------------------------------------------------------------
 
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api/v1/dashboard";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3005/api/v1/dashboard";
 export const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 export class ApiError extends Error {

@@ -12,7 +12,7 @@ export async function POST() {
     }
 
     // Call the backend to update the database
-    const response = await serverFetch('/api/v1/profile/complete-onboarding', {
+    const response = await serverFetch('/api/v1/dashboard/auth/complete-onboarding', {
       method: 'POST',
     });
 
