@@ -28,6 +28,8 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
   const userAgent = headersList.get('user-agent') || ''
 
   const url = `${BACKEND_URL}${path}`
+  console.log(`[serverFetch] Initiating ${options.method || 'GET'} to ${url}`);
+
   const headers: any = {
     'Content-Type': 'application/json',
     ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
@@ -91,7 +93,12 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
     if (error.name === 'AbortError') {
        console.error(`[serverFetch] Timeout after ${duration}ms on ${path}`);
     } else {
-       console.error(`[serverFetch] error after ${duration}ms [${path}]:`, error);
+       console.error(`[serverFetch] error after ${duration}ms [${url}]:`, {
+         name: error.name,
+         message: error.message,
+         stack: error.stack,
+         cause: error.cause
+       });
     }
     return null
   }
