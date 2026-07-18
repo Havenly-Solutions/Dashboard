@@ -50,6 +50,7 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
     clearTimeout(timeoutId);
     
     const duration = Date.now() - startTime;
+    const method = options.method || 'GET';
     console.log(`[serverFetch] ${method} ${path} - Status: ${response.status} - Duration: ${duration}ms`);
 
     if (duration > 2000) {
