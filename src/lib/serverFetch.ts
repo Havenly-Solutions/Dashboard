@@ -62,7 +62,7 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
       }
 
       if (refreshToken) {
-        const refreshRes = await fetch(`${BACKEND_URL}/api/v1/app/auth/refresh`, {
+        const refreshRes = await fetch(`${BACKEND_URL}/api/v1/dashboard/auth/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refreshToken }),

@@ -5,18 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d7dd1a51-bc36-490e-82db-05a2b450b98e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/planningMode.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/planningMode.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/[[...path]]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/[[...path]]/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/auth/change-password/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/auth/change-password/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/auth/forgot-password/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/auth/forgot-password/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/auth/reset-password/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/auth/reset-password/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/profile/complete-onboarding/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/profile/complete-onboarding/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/api/profile/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/profile/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/api-client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/api-client.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/auth-context.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/auth-context.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/lib/serverFetch.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/serverFetch.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,7 +51,7 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "staging",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/BigBossOffice/Documents/havenly-dashboard",
     "settings.editor.selected.configurable": "com.android.studio.ml.bot.mainConfigurable"

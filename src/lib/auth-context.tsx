@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const doRefresh = useCallback(async (): Promise<string | null> => {
     try {
-      const res = await apiRequest<{ accessToken: string; refreshToken?: string }>("/api/app/auth/refresh", {
+      const res = await apiRequest<{ accessToken: string; refreshToken?: string }>("/api/dashboard/auth/refresh", {
         method: "POST",
         skipAuth: true,
       });
@@ -100,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const res = await api.post<LoginResponse>("/api/app/auth/login", { email, password }, { skipAuth: true });
+    const res = await api.post<LoginResponse>("/api/dashboard/auth/login", { email, password }, { skipAuth: true });
     tokenRef.current = res.accessToken;
     setUser(res.user);
     setStatus("authenticated");
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      await api.post("/api/app/auth/logout");
+      await api.post("/api/dashboard/auth/logout");
     } catch {
       // best-effort — clear client state regardless
     }
