@@ -48,7 +48,7 @@ export function Topbar() {
               exitSimulation();
               router.push(landingPathForRole(realUser.role));
             }}
-            className="flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1.5 text-label-md font-medium text-warning hover:bg-warning/25"
+            className="flex items-center gap-1.5 rounded-full bg-warning px-3 py-1.5 text-label-md font-medium text-white hover:opacity-90"
           >
             <LogOut className="h-3.5 w-3.5" />
             Exit preview

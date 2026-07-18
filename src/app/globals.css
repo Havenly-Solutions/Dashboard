@@ -31,8 +31,10 @@
   --color-background: 248 249 250;
   --color-on-background: 25 28 29;
   --color-critical: 220 38 38;
-  --color-warning: 245 158 11;
-  --color-success: 22 163 74;
+  --color-critical-container: 153 27 27;
+  --color-warning: 217 119 6;
+  --color-success: 21 128 61;
+  --color-success-container: 20 83 45;
   --color-info: 37 99 235;
 
   --shadow-tile: 0px 4px 20px rgba(0, 0, 0, 0.03);
@@ -66,6 +68,8 @@
   --color-on-error-container: 255 180 171;
   --color-background: 11 12 14;
   --color-on-background: 242 243 244;
+  --color-critical-container: 254 226 226;
+  --color-success-container: 220 252 231;
 
   --shadow-tile: 0 8px 24px rgba(0, 0, 0, 0.45);
 }

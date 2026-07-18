@@ -3,12 +3,12 @@ import { cn } from "@/lib/utils";
 type Tone = "critical" | "warning" | "success" | "info" | "neutral" | "secondary";
 
 const toneClasses: Record<Tone, string> = {
-  critical: "bg-critical/10 text-critical",
-  warning: "bg-warning/10 text-warning",
-  success: "bg-success/10 text-success",
-  info: "bg-info/10 text-info",
+  critical: "bg-critical text-white",
+  warning: "bg-warning text-white",
+  success: "bg-success text-white",
+  info: "bg-info text-white",
   neutral: "bg-surface-container-high text-on-surface-variant",
-  secondary: "bg-secondary/10 text-secondary",
+  secondary: "bg-secondary text-white",
 };
 
 export function Badge({
@@ -37,10 +37,10 @@ export function Badge({
 }
 
 const toneDotClasses: Record<Tone, string> = {
-  critical: "bg-critical",
-  warning: "bg-warning",
-  success: "bg-success",
-  info: "bg-info",
+  critical: "bg-white",
+  warning: "bg-white",
+  success: "bg-white",
+  info: "bg-white",
   neutral: "bg-on-surface-variant",
-  secondary: "bg-secondary",
+  secondary: "bg-white",
 };

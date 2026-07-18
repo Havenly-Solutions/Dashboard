@@ -5,7 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d7dd1a51-bc36-490e-82db-05a2b450b98e" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/app/(auth)/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(auth)/login/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.production" beforeDir="false" afterPath="$PROJECT_DIR$/.env.production" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/planningMode.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/planningMode.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/HANDOFF.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/fix_ngo.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/patch_auth.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/patch_prereg.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/patch_prisma.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/patch_schemas.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/patch_team.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/puppeteer_test.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/screenshot.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/globals.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/globals.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/layout/topbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/layout/topbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/badge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/badge.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/stat-card.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/stat-card.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_invite.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test_output.html" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
