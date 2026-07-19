@@ -112,7 +112,9 @@ export async function apiProxy(req: Request, path: string) {
   const method = req.method
   const urlObj = new URL(req.url)
   const proxyPath = `${path}${urlObj.search}`
-  
+
+  console.error(`>>> [apiProxy] Processing ${method} to ${proxyPath} (BACKEND_URL: ${BACKEND_URL})`);
+
   let body: any = undefined
   if (['POST', 'PATCH', 'PUT'].includes(method)) {
     try {
@@ -126,6 +128,8 @@ export async function apiProxy(req: Request, path: string) {
     method,
     body: body ? JSON.stringify(body) : undefined,
   } as RequestInit)
+
+  console.error(`>>> [apiProxy] Result for ${proxyPath}:`, res ? `Status ${res.status}` : 'NULL');
 
   if (!res) {
     console.error(`[apiProxy] 504 Gateway Timeout on ${method} ${proxyPath} - Backend returned null`);
