@@ -9,15 +9,22 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_U
  * serverFetch
  * Securely proxies server-side requests from Dashboard to Backend
  */
-export async function serverFetch(path: string, options: RequestInit = {}) {
+export async function serverFetch(path: string, options: RequestInit & { requiresAuth?: boolean } = {}) {
+  const { requiresAuth = true, ...fetchOptions } = options;
   const headersList = getHeaders()
   let accessToken = headersList.get('x-auth-token')
   let refreshToken = null
   
-  const PUBLIC_API_PATHS = ['/api/pre-registrations/register', '/api/auth/signin', '/api/auth/signup'];
+  const PUBLIC_API_PATHS = [
+    '/api/pre-registrations/register',
+    '/api/auth/signin',
+    '/api/auth/signup',
+    '/api/v1/dashboard/auth/login',
+    '/api/v1/dashboard/auth/refresh'
+  ];
   const isPublicPath = PUBLIC_API_PATHS.some(p => path.startsWith(p));
 
-  if (!accessToken && !isPublicPath) {
+  if (!accessToken && requiresAuth && !isPublicPath) {
     const session = await getServerSession(authOptions)
     if (!session) {
       console.error(`>>> [serverFetch] Session missing for path: ${path}`);
@@ -31,14 +38,14 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
   const userAgent = headersList.get('user-agent') || ''
 
   const url = `${BACKEND_URL}${path}`
-  console.log(`[serverFetch] Initiating ${options.method || 'GET'} to ${url}`);
+  console.log(`[serverFetch] Initiating ${fetchOptions.method || 'GET'} to ${url}`);
 
   const headers: any = {
     'Content-Type': 'application/json',
     ...(accessToken ? { 'Authorization': `Bearer ${accessToken}` } : {}),
     'x-forwarded-for': forwardedFor,
     'user-agent': userAgent,
-    ...options.headers,
+    ...fetchOptions.headers,
   }
 
   const controller = new AbortController();
@@ -48,14 +55,14 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
   try {
     const response = await fetch(url, {
       cache: 'no-store',
-      ...options,
+      ...fetchOptions,
       headers,
       signal: controller.signal,
     })
     clearTimeout(timeoutId);
     
     const duration = Date.now() - startTime;
-    const method = options.method || 'GET';
+    const method = fetchOptions.method || 'GET';
     console.log(`[serverFetch] ${method} ${path} - Status: ${response.status} - Duration: ${duration}ms`);
 
     if (duration > 2000) {
@@ -130,10 +137,13 @@ export async function apiProxy(req: Request, path: string) {
     }
   }
 
+  const isAuthPath = path.includes('/auth/login') || path.includes('/auth/refresh');
+
   const res = await serverFetch(proxyPath, {
     method,
     body: body ? JSON.stringify(body) : undefined,
-  } as RequestInit)
+    requiresAuth: !isAuthPath,
+  } as any)
 
   console.error(`>>> [apiProxy] Result for ${proxyPath}:`, res ? `Status ${res.status}` : 'NULL');
 
