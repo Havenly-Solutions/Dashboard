@@ -4,7 +4,30 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d7dd1a51-bc36-490e-82db-05a2b450b98e" name="Changes" comment="" />
+    <list default="true" id="d7dd1a51-bc36-490e-82db-05a2b450b98e" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/eslint.config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.eslintrc.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/planningMode.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/planningMode.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/postcss.config.mjs" beforeDir="false" afterPath="$PROJECT_DIR$/postcss.config.mjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(dashboard)/comms/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(dashboard)/comms/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(dashboard)/overview/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(dashboard)/overview/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/(dashboard)/subscription-management/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/(dashboard)/subscription-management/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/api/profile/reset-onboarding/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/api/profile/reset-onboarding/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/onboarding/onboarding-tour.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/onboarding/onboarding-tour.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/components/ui/toast.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/components/ui/toast.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-access-control.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/use-access-control.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-helpdesk.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/use-helpdesk.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-sos.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/use-sos.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-subscriptions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/use-subscriptions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/hooks/use-team.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/hooks/use-team.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/apiClient.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/apiClient.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib/serverFetch.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib/serverFetch.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/middleware.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/middleware.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,6 +56,9 @@
   &quot;associatedIndex&quot;: 3
 }</component>
   <component name="ProjectId" id="3GVdhfE4vQbBzEkzcNEBMmv3EGT" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
