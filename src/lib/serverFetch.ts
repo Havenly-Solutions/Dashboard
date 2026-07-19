@@ -19,7 +19,10 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
 
   if (!accessToken && !isPublicPath) {
     const session = await getServerSession(authOptions)
-    if (!session) return null
+    if (!session) {
+      console.error(`>>> [serverFetch] Session missing for path: ${path}`);
+      return null
+    }
     accessToken = (session as any).accessToken
     refreshToken = (session as any).refreshToken
   }
@@ -82,6 +85,9 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
             ...options,
             headers,
           })
+        } else {
+          const errorBody = await refreshRes.text().catch(() => 'No body');
+          console.error(`>>> [serverFetch] Token refresh failed for ${path}: Status ${refreshRes.status}`, { errorBody });
         }
       }
     }
@@ -90,16 +96,16 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
   } catch (error: any) {
     clearTimeout(timeoutId);
     const duration = Date.now() - startTime;
-    if (error.name === 'AbortError') {
-       console.error(`[serverFetch] Timeout after ${duration}ms on ${path}`);
-    } else {
-       console.error(`[serverFetch] error after ${duration}ms [${url}]:`, {
-         name: error.name,
-         message: error.message,
-         stack: error.stack,
-         cause: error.cause
-       });
-    }
+    console.error('>>> RAW FETCH ERROR', {
+      path,
+      url,
+      duration,
+      name: error?.name,
+      message: error?.message,
+      cause: error?.cause,
+      code: error?.cause?.code,
+      stack: error?.stack,
+    });
     return null
   }
 }
