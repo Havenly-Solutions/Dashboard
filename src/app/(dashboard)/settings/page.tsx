@@ -35,8 +35,10 @@ export default function SettingsPage() {
   const { user, refreshUser } = useAuth();
   const { theme, toggle } = useTheme();
   const { push } = useToast();
-  const effectiveModules = useEffectiveModules();
+  const { data: effectiveModulesRaw } = useEffectiveModules(user?.id);
   const [formError, setFormError] = useState<string | null>(null);
+
+  const effectiveModules = (effectiveModulesRaw as any[]) || [];
 
   const {
     register,
@@ -49,7 +51,7 @@ export default function SettingsPage() {
   const onSubmit = async (values: FormValues) => {
     setFormError(null);
     try {
-      await api.post("/api/dashboard/auth/change-password", {
+      await api.post("/api/v1/dashboard/auth/change-password", {
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       });
@@ -83,7 +85,7 @@ export default function SettingsPage() {
             </div>
             <div className="flex justify-between">
               <dt className="text-on-surface-variant">Role</dt>
-              <dd><Badge tone="secondary">{user ? ROLE_LABELS[user.role] : "\u2014"}</Badge></dd>
+              <dd><Badge tone="secondary">{user ? ROLE_LABELS[user.role] : "—"}</Badge></dd>
             </div>
             {user?.organizationName && (
               <div className="flex justify-between">
@@ -121,18 +123,18 @@ export default function SettingsPage() {
           </div>
         </Tile>
 
-        {(effectiveModules.some((m) => m.key === "billing") || effectiveModules.some((m) => m.key === "access-control")) && (
+        {(effectiveModules.some((m: any) => m.key === "billing") || effectiveModules.some((m: any) => m.key === "access-control")) && (
           <Tile>
             <TileHeader title="Quick links" />
             <ul className="space-y-1">
-              {effectiveModules.some((m) => m.key === "billing") && (
+              {effectiveModules.some((m: any) => m.key === "billing") && (
                 <li>
                   <Link href="/billing" className="flex items-center justify-between rounded px-3 py-2.5 text-body-base text-on-surface hover:bg-surface-container-low">
                     Billing & payment method <ArrowRight className="h-4 w-4 text-on-surface-variant" />
                   </Link>
                 </li>
               )}
-              {effectiveModules.some((m) => m.key === "access-control") && (
+              {effectiveModules.some((m: any) => m.key === "access-control") && (
                 <li>
                   <Link href="/access-control" className="flex items-center justify-between rounded px-3 py-2.5 text-body-base text-on-surface hover:bg-surface-container-low">
                     Access Control Matrix <ArrowRight className="h-4 w-4 text-on-surface-variant" />

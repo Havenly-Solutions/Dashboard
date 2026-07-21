@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Siren, Headset, Users, TrendingUp, Smartphone, ArrowRight } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
@@ -13,10 +14,14 @@ import { useHelpdeskTickets } from "@/hooks/use-helpdesk";
 import { useMarketingSnapshot } from "@/hooks/use-marketing";
 import { useAppAnalyticsSnapshot } from "@/hooks/use-app-analytics";
 import { useEnquiries } from "@/hooks/use-support";
+import { usePreRegistrationSummary, usePartnersSummary } from "@/hooks/use-growth";
 import { formatCompactNumber, formatRelativeTime } from "@/lib/utils";
 import { SOS_STATUS_TONE } from "@/components/sos/status";
 import { TICKET_STATUS_TONE } from "@/components/helpdesk/status";
 import { GettingStartedChecklist } from "@/components/onboarding/getting-started-checklist";
+import { ProgressStatCard } from "@/components/growth/ProgressStatCard";
+import { GrowthTrendChart } from "@/components/growth/GrowthTrendChart";
+import { PreRegistrationTable, PartnerGrowthTable } from "@/components/growth/GrowthTables";
 
 export default function OverviewPage() {
   const { user } = useAuth();
@@ -26,9 +31,19 @@ export default function OverviewPage() {
   const app = useAppAnalyticsSnapshot();
   const enquiries = useEnquiries();
 
-  const activeSos = sos.data?.filter((e) => e.status === "ACTIVE" || e.status === "PENDING") ?? [];
-  const openTickets = tickets.data?.filter((t) => t.status !== "RESOLVED") ?? [];
-  const openEnquiries = enquiries.data?.filter((e) => e.status === "OPEN" || e.status === "FLAGGED") ?? [];
+  const preReg = usePreRegistrationSummary();
+  const partners = usePartnersSummary();
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const activeSos = (sos.data ?? []).filter((e: any) => e.status === "ACTIVE" || e.status === "PENDING");
+  const openTickets = (tickets.data ?? []).filter((t: any) => t.status !== "RESOLVED");
+  const openEnquiries = (enquiries.data ?? []).filter((e: any) => e.status === "OPEN" || e.status === "FLAGGED");
 
   return (
     <div>
@@ -52,61 +67,35 @@ export default function OverviewPage() {
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Active SOS Incidents"
-          value={sos.isLoading ? "\u2014" : String(activeSos.length)}
+          value={sos.isLoading ? "—" : String(activeSos.length)}
           icon={Siren}
         />
         <StatCard
           label="Open Helpdesk Tickets"
-          value={tickets.isLoading ? "\u2014" : String(openTickets.length)}
+          value={tickets.isLoading ? "—" : String(openTickets.length)}
           icon={Headset}
         />
-        <StatCard
-          label="Website Visitors (30d)"
-          value={marketing.isLoading ? "\u2014" : formatCompactNumber(marketing.data?.visitors ?? 0)}
-          delta={marketing.data?.visitorsDelta}
-          deltaLabel="vs previous 30d"
-          icon={TrendingUp}
+        <ProgressStatCard
+          label="Pre-registration signups"
+          value={(preReg.data as any)?.total ?? 0}
+          target={(preReg.data as any)?.target ?? 5000}
+          targetKey="PRE_REGISTRATION"
+          icon={Users}
         />
-        <StatCard
-          label="Daily Active App Users"
-          value={app.isLoading ? "\u2014" : formatCompactNumber(app.data?.dau ?? 0)}
-          delta={app.data?.dauDelta}
-          deltaLabel="vs last week"
-          icon={Smartphone}
+        <ProgressStatCard
+          label="Partners closed"
+          value={(partners.data as any)?.closed ?? 0}
+          target={(partners.data as any)?.target ?? 3}
+          targetKey="PARTNERS"
+          icon={TrendingUp}
         />
       </div>
 
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap lg:grid-cols-3">
-        <Tile className="lg:col-span-2">
-          <TileHeader
-            title="Live SOS Incidents"
-            subtitle="Requiring attention right now"
-            action={
-              <Link href="/sos" className="flex items-center gap-1 text-label-md font-medium text-secondary hover:underline">
-                Open command map <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            }
-          />
-          {sos.isLoading ? (
-            <TileSkeleton rows={3} />
-          ) : activeSos.length === 0 ? (
-            <p className="py-6 text-center text-body-sm text-on-surface-variant">No active incidents. All clear.</p>
-          ) : (
-            <ul className="divide-y divide-outline-variant/60">
-              {activeSos.slice(0, 5).map((e) => (
-                <li key={e.id} className="flex items-center justify-between gap-3 py-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-body-base font-medium text-on-surface">{e.title}</p>
-                    <p className="truncate text-body-sm text-on-surface-variant">
-                      {e.reference} &middot; {e.address ?? e.source}
-                    </p>
-                  </div>
-                  <Badge tone={SOS_STATUS_TONE[e.status]}>{e.status}</Badge>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Tile>
+        <GrowthTrendChart
+          title="Signups Trend"
+          data={(preReg.data as any)?.series ?? []}
+        />
 
         <Tile>
           <TileHeader title="Quick links" />
@@ -136,6 +125,42 @@ export default function OverviewPage() {
       </div>
 
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap lg:grid-cols-2">
+        <PreRegistrationTable />
+        <PartnerGrowthTable partners={(partners.data as any)?.pending ?? []} />
+      </div>
+
+      <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap lg:grid-cols-2">
+        <Tile>
+          <TileHeader
+            title="Live SOS Incidents"
+            subtitle="Requiring attention right now"
+            action={
+              <Link href="/sos" className="flex items-center gap-1 text-label-md font-medium text-secondary hover:underline">
+                Open command map <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            }
+          />
+          {sos.isLoading ? (
+            <TileSkeleton rows={3} />
+          ) : activeSos.length === 0 ? (
+            <p className="py-6 text-center text-body-sm text-on-surface-variant">No active incidents. All clear.</p>
+          ) : (
+            <ul className="divide-y divide-outline-variant/60">
+              {activeSos.slice(0, 5).map((e: any) => (
+                <li key={e.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-body-base font-medium text-on-surface">{e.title}</p>
+                    <p className="truncate text-body-sm text-on-surface-variant">
+                      {e.reference} &middot; {e.address ?? e.source}
+                    </p>
+                  </div>
+                  <Badge tone={SOS_STATUS_TONE[e.status as keyof typeof SOS_STATUS_TONE]}>{e.status}</Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Tile>
+
         <Tile>
           <TileHeader
             title="Helpdesk queue"
@@ -150,7 +175,7 @@ export default function OverviewPage() {
             <TileSkeleton rows={4} />
           ) : (
             <ul className="divide-y divide-outline-variant/60">
-              {(tickets.data ?? []).slice(0, 5).map((t) => (
+              {(tickets.data ?? []).slice(0, 5).map((t: any) => (
                 <li key={t.id} className="flex items-center justify-between gap-3 py-3">
                   <div className="min-w-0">
                     <p className="truncate text-body-base text-on-surface">{t.subject}</p>
@@ -158,38 +183,7 @@ export default function OverviewPage() {
                       {t.ticketNumber} &middot; {formatRelativeTime(t.createdAt)}
                     </p>
                   </div>
-                  <Badge tone={TICKET_STATUS_TONE[t.status]}>{t.status.replace("_", " ")}</Badge>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Tile>
-
-        <Tile>
-          <TileHeader
-            title="Customer support"
-            subtitle="Enquiries needing a reply"
-            action={
-              <Link href="/support" className="flex items-center gap-1 text-label-md font-medium text-secondary hover:underline">
-                View all <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            }
-          />
-          {enquiries.isLoading ? (
-            <TileSkeleton rows={4} />
-          ) : (
-            <ul className="divide-y divide-outline-variant/60">
-              {(enquiries.data ?? []).slice(0, 5).map((e) => (
-                <li key={e.id} className="flex items-center justify-between gap-3 py-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-body-base text-on-surface">{e.subject}</p>
-                    <p className="text-body-sm text-on-surface-variant">
-                      {e.customerName} &middot; {formatRelativeTime(e.createdAt)}
-                    </p>
-                  </div>
-                  <Badge tone={e.status === "FLAGGED" ? "critical" : e.status === "OPEN" ? "secondary" : "neutral"}>
-                    {e.status}
-                  </Badge>
+                  <Badge tone={TICKET_STATUS_TONE[t.status as keyof typeof TICKET_STATUS_TONE]}>{t.status.replace("_", " ")}</Badge>
                 </li>
               ))}
             </ul>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useMemo } from "react";
 import { Users, Download, ShieldCheck, Siren, Wifi, Satellite } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Tile, TileHeader } from "@/components/ui/tile";
@@ -9,6 +10,7 @@ import { TileSkeleton } from "@/components/ui/skeleton";
 import { TrendLineChart } from "@/components/charts/trend-chart";
 import { useAppAnalyticsSnapshot } from "@/hooks/use-app-analytics";
 import { formatCompactNumber, formatNumber, formatPercent } from "@/lib/utils";
+import type { AppAnalyticsSnapshot } from "@/types";
 
 const HEALTH_TONE = {
   STABLE: "success",
@@ -16,21 +18,49 @@ const HEALTH_TONE = {
   OFFLINE: "critical",
 } as const;
 
+const DEFAULT_SNAPSHOT: AppAnalyticsSnapshot = {
+  dau: 0,
+  dauDelta: 0,
+  activeInstalls: 0,
+  installsDelta: 0,
+  crashFreeRate: 0,
+  panicButtonActivations: 0,
+  rangeLabel: "Loading...",
+  trend: [],
+  platformSplit: [],
+  gsmUptime: 0,
+  satelliteUptime: 0,
+  deviceHealth: [],
+  mau: 0,
+  wau: 0,
+  avgSessionMinutes: 0,
+};
+
 export default function AppAnalyticsPage() {
   const { data, isLoading } = useAppAnalyticsSnapshot();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Use useMemo to ensure snapshot is always a valid object and avoids re-computation crashes
+  const snapshot = useMemo(() => data ?? DEFAULT_SNAPSHOT, [data]);
+
+  if (!mounted) return null;
 
   return (
     <div>
       <PageHeader
         title="App & System Analytics"
-        description={`Mobile app usage and infrastructure health \u2014 ${data?.rangeLabel ?? "last 30 days"}`}
+        description={`Mobile app usage and infrastructure health — ${snapshot.rangeLabel}`}
       />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Daily Active Users" value={isLoading ? "\u2014" : formatCompactNumber(data!.dau)} delta={data?.dauDelta} icon={Users} />
-        <StatCard label="Active Installs" value={isLoading ? "\u2014" : formatCompactNumber(data!.activeInstalls)} delta={data?.installsDelta} icon={Download} />
-        <StatCard label="Crash-Free Sessions" value={isLoading ? "\u2014" : formatPercent(data!.crashFreeRate)} icon={ShieldCheck} />
-        <StatCard label="Panic Button Activations (30d)" value={isLoading ? "\u2014" : formatNumber(data!.panicButtonActivations)} icon={Siren} />
+        <StatCard label="Daily Active Users" value={isLoading ? "—" : formatCompactNumber(snapshot.dau)} delta={snapshot.dauDelta} icon={Users} />
+        <StatCard label="Active Installs" value={isLoading ? "—" : formatCompactNumber(snapshot.activeInstalls)} delta={snapshot.installsDelta} icon={Download} />
+        <StatCard label="Crash-Free Sessions" value={isLoading ? "—" : formatPercent(snapshot.crashFreeRate)} icon={ShieldCheck} />
+        <StatCard label="Panic Button Activations (30d)" value={isLoading ? "—" : formatNumber(snapshot.panicButtonActivations)} icon={Siren} />
       </div>
 
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
@@ -40,7 +70,7 @@ export default function AppAnalyticsPage() {
             <TileSkeleton rows={5} />
           ) : (
             <TrendLineChart
-              data={data!.trend}
+              data={snapshot.trend}
               xKey="label"
               series={[
                 { key: "dau", color: "rgb(70 72 212)", label: "DAU" },
@@ -57,7 +87,7 @@ export default function AppAnalyticsPage() {
           ) : (
             <>
               <ul className="space-y-4">
-                {data!.platformSplit.map((p) => (
+                {snapshot.platformSplit.map((p) => (
                   <li key={p.platform}>
                     <div className="mb-1 flex items-center justify-between text-body-sm">
                       <span className="text-on-surface">{p.platform}</span>
@@ -72,11 +102,11 @@ export default function AppAnalyticsPage() {
               <div className="mt-6 space-y-3 border-t border-outline-variant pt-4">
                 <div className="flex items-center justify-between text-body-sm">
                   <span className="flex items-center gap-2 text-on-surface-variant"><Wifi className="h-4 w-4" /> GSM uptime</span>
-                  <span className="font-medium text-on-surface">{formatPercent(data!.gsmUptime)}</span>
+                  <span className="font-medium text-on-surface">{formatPercent(snapshot.gsmUptime)}</span>
                 </div>
                 <div className="flex items-center justify-between text-body-sm">
                   <span className="flex items-center gap-2 text-on-surface-variant"><Satellite className="h-4 w-4" /> Satellite uptime</span>
-                  <span className="font-medium text-on-surface">{formatPercent(data!.satelliteUptime)}</span>
+                  <span className="font-medium text-on-surface">{formatPercent(snapshot.satelliteUptime)}</span>
                 </div>
               </div>
             </>
@@ -90,7 +120,7 @@ export default function AppAnalyticsPage() {
           <TileSkeleton rows={4} />
         ) : (
           <ul className="divide-y divide-outline-variant/60">
-            {data!.deviceHealth.map((d) => (
+            {snapshot.deviceHealth.map((d) => (
               <li key={d.label} className="flex items-center justify-between gap-3 py-3">
                 <div>
                   <p className="text-body-base font-medium text-on-surface">{d.label}</p>

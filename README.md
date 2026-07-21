@@ -1,48 +1,79 @@
-# Havenly Solutions - Dashboard
+# Havenly Dashboard
 
-The command center for Havenly Solutions, providing multi-role access for founders, executives, managers, developers, partners, and investors.
+Founder command center for Havenly Solutions \u2014 built with Next.js 14 (App
+Router), TypeScript, Tailwind CSS, and TanStack Query. Design system sourced
+directly from the Stitch export.
 
-## Architecture
+## What's in here
 
-```mermaid
-graph TD
-    User((User)) -->|Auth| NextAuth[NextAuth.js]
-    NextAuth -->|Session| Dashboard[Next.js Dashboard App]
-    Dashboard -->|API Calls| Backend[Havenly API]
-    Dashboard -->|Real-time| Socket[Socket.io Client]
-    Socket -->|Incidents| SOS[Live SOS Command Center]
-    Dashboard -->|Analytics| PostHog[PostHog]
-    Dashboard -->|Design System| Stitch[Design Tokens]
+- **7 exclusive portals**, one per role, each with its own home screen and
+  default access \u2014 not a shared dashboard with filtered nav:
+  - **Founder Portal** (`/overview`) \u2014 full control, business + technical + team
+  - **Executive Portal** (`/executive-portal`, Co-Founder) \u2014 business focus: finance, marketing, subscriptions
+  - **Manager Portal** (`/manager-portal`) \u2014 SOS, helpdesk, support
+  - **PA Portal** (`/pa-portal`) \u2014 helpdesk, support, comms
+  - **Developer Portal** (`/developer-portal`) \u2014 app analytics, security suite
+  - **Partners Portal** (`/partners-portal`, NGO partner) \u2014 case load, funding
+  - **Investor Portal** (`/investor-portal`) \u2014 read-only growth & health metrics
+  - `/portal-switcher` (Founder only) previews any portal via a real
+    role-scoped JWT swap (`/admin/test-mode/switch-role`), not a client-side costume.
+- **Access Control Matrix** (`/access-control`, Founder only): grant or
+  revoke any module by role or by individual person, live, with an audit log.
+- **Onboarding**: forced password change on first login
+  (`/welcome/set-password`), then a 5-step guided tour that spotlights the
+  real sidebar/topbar/content \u2014 the same tour for every portal, replayable
+  from Settings.
+- **Auth**: sign in, forgot/reset password, invite-link account setup (no
+  PIN, no WhatsApp/SMS).
+- **Live SOS Command**: real-time incident queue with a live Mapbox map.
+- **Marketing Analytics**: traffic/funnel data for www.havenly.solutions.
+- **App & System Analytics**: mobile engagement + GSM/Satellite/fleet health.
+- **Helpdesk**, **Customer Support**, **Team & Approvals**.
+- **Security Suite**: GoPhish campaigns, CTFd leaderboard, breach log.
+- **Subscription Management** (customers' billing) and **Billing**
+  (Havenly's own payment method \u2014 provider-agnostic tokenized card capture,
+  works with Stripe, Yoco, Peach Payments, or Paystack).
+- **Finance Hub**, **Partners & NGOs**, **Comms Hub** (email + in-app),
+  **Settings**.
+- Light/dark theme toggle.
+
+## Getting started
+
+```bash
+npm install
+npm run dev
 ```
 
-## How it works
+Open http://localhost:3000. `.env.local` ships with
+`NEXT_PUBLIC_DEMO_MODE=true`, so every screen renders with realistic seeded
+data even with no backend running.
 
-- **Portals**: Seven distinct portals tailored to specific roles, ensuring relevant data and tools are accessible to each user type.
-- **RBAC**: Robust Role-Based Access Control managed via the DashboardShell and permissions layer.
-- **Real-time Monitoring**: Integrated Mapbox and Socket.io for live tracking of safety incidents and SOS alerts.
-- **Analytics**: Comprehensive business and technical metrics powered by PostHog and custom backend aggregations.
-- **Design**: Built on a strict design system derived from Stitch tokens, supporting both light and dark modes.
+## Wiring up havenly-backend
 
-## Where we left off
+See **[`HANDOFF.md`](./HANDOFF.md)** for the full endpoint list, request/response
+shapes, Socket.io event names, the access-control resolution order, and
+what's built vs. not yet built.
 
-- Integrated the new generalized React Email layout for all transactional and marketing communications.
-- Optimized backend Redis client usage to support high-concurrency dashboard sessions.
-- Cleaned up the project by removing sensitive hardcoded keys and redundant test scripts.
-- Standardized brand contact information (phone and logo) across the entire interface.
+## Structure
 
-## Errors found and fixed
-
-- **Secret Exposure**: Identified and removed plaintext API keys from the codebase, moving them to secure environment variables.
-- **Stale References**: Removed dead links and documentation for features that have been superseded or removed.
-- **Dependency Conflicts**: Resolved React versioning issues to ensure compatibility with the email rendering engine.
-
-## Engineer Profile
-
-The Havenly Solutions dashboard is engineered by a specialized team focused on building high-performance, secure, and intuitive interfaces for safety and civic technology. The architecture prioritizes data integrity and real-time responsiveness.
-
-## Launch Roadmap
-
-- Implement comprehensive end-to-end testing for all seven portal workflows.
-- Finalize the integration of the token service for secure unsubscribe management.
-- Complete the migration of all remaining legacy email templates to the new React system.
-- Perform a final accessibility audit to ensure compliance with international standards.
+```
+src/
+  app/
+    (auth)/           \u2014 login, password reset, invite acceptance
+    welcome/          \u2014 forced first-login password change
+    (dashboard)/       \u2014 every module and all 7 portal homes
+  components/
+    ui/               \u2014 design-system primitives
+    layout/           \u2014 Sidebar, Topbar, DashboardShell (grant-aware RBAC guard)
+    onboarding/        \u2014 guided tour + "Getting started" checklist
+    charts/           \u2014 recharts wrappers
+  hooks/               \u2014 one file per domain, TanStack Query hooks
+  lib/
+    api-client.ts     \u2014 fetch wrapper, JWT refresh handling
+    rbac.ts           \u2014 roles, portals, default module access
+    permissions.ts    \u2014 resolves role defaults + Founder grants/overrides
+    onboarding.ts     \u2014 tour steps + localStorage completion state
+    mock-data.ts      \u2014 demo-mode fallback data
+    socket.ts         \u2014 Socket.io client
+  types/               \u2014 shared domain types, mirrors backend DTOs
+```

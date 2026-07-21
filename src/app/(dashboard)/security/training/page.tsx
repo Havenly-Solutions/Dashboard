@@ -36,7 +36,7 @@ export default function TrainingPage() {
         </ul>
       )}
       <p className="mt-4 text-body-sm text-on-surface-variant">
-        Wire this list to <code className="rounded bg-surface-container-low px-1.5 py-0.5">GET /api/dashboard/security/training</code> once
+        Wire this list to <code className="rounded bg-surface-container-low px-1.5 py-0.5">GET /api/v1/dashboard/security/training</code> once
         the CTFd integration is live on havenly-backend.
       </p>
     </Tile>

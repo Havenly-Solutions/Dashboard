@@ -13,14 +13,17 @@ import { useSosEvents } from "@/hooks/use-sos";
 import { formatCompactNumber, formatCurrencyZAR, formatDuration } from "@/lib/utils";
 import { useAuth } from "@/lib/auth-context";
 import { GettingStartedChecklist } from "@/components/onboarding/getting-started-checklist";
+import { MarketingSnapshot } from "@/types";
 
 export default function InvestorPortalPage() {
   const { user } = useAuth();
   const { data: finance, isLoading: financeLoading } = useFinanceSnapshot();
-  const { data: marketing } = useMarketingSnapshot();
+  const { data: marketingRaw } = useMarketingSnapshot();
   const { data: app } = useAppAnalyticsSnapshot();
   const { data: partners } = usePartners();
   const { data: sos } = useSosEvents();
+
+  const marketing = marketingRaw as MarketingSnapshot | undefined;
 
   const resolved = (sos ?? []).filter((e) => e.responseTimeSeconds != null);
   const avgResponse = resolved.length
@@ -50,20 +53,20 @@ export default function InvestorPortalPage() {
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Monthly Recurring Revenue"
-          value={financeLoading ? "\u2014" : formatCurrencyZAR(finance!.mrr)}
+          value={financeLoading ? "—" : formatCurrencyZAR(finance?.mrr ?? 0)}
           delta={finance?.mrrDelta}
           icon={TrendingUp}
         />
         <StatCard
           label="Active App Users"
-          value={app ? formatCompactNumber(app.activeInstalls) : "\u2014"}
+          value={app ? formatCompactNumber(app.activeInstalls) : "—"}
           delta={app?.installsDelta}
           icon={Users}
         />
-        <StatCard label="Network Partners" value={partners ? String(partners.length) : "\u2014"} icon={Handshake} />
+        <StatCard label="Network Partners" value={partners ? String(partners.length) : "—"} icon={Handshake} />
         <StatCard
           label="Avg. Emergency Response"
-          value={avgResponse ? formatDuration(avgResponse) : "\u2014"}
+          value={avgResponse ? formatDuration(avgResponse) : "—"}
           icon={ShieldCheck}
         />
       </div>
@@ -75,7 +78,7 @@ export default function InvestorPortalPage() {
             <TileSkeleton rows={5} />
           ) : (
             <TrendAreaChart
-              data={finance!.trend}
+              data={finance?.trend ?? []}
               xKey="label"
               series={[{ key: "revenue", color: "rgb(70 72 212)", label: "Revenue" }]}
             />
@@ -87,21 +90,21 @@ export default function InvestorPortalPage() {
           <ul className="space-y-4">
             <li className="flex justify-between text-body-sm">
               <span className="text-on-surface-variant">Panic activations (30d)</span>
-              <span className="font-medium text-on-surface">{app?.panicButtonActivations ?? "\u2014"}</span>
+              <span className="font-medium text-on-surface">{app?.panicButtonActivations ?? "—"}</span>
             </li>
             <li className="flex justify-between text-body-sm">
               <span className="text-on-surface-variant">Website visitors (30d)</span>
               <span className="font-medium text-on-surface">
-                {marketing ? formatCompactNumber(marketing.visitors) : "\u2014"}
+                {marketing ? formatCompactNumber(marketing.visitors) : "—"}
               </span>
             </li>
             <li className="flex justify-between text-body-sm">
               <span className="text-on-surface-variant">Signup conversion</span>
-              <span className="font-medium text-on-surface">{marketing ? `${marketing.conversionRate}%` : "\u2014"}</span>
+              <span className="font-medium text-on-surface">{marketing ? `${marketing.conversionRate}%` : "—"}</span>
             </li>
             <li className="flex justify-between text-body-sm">
               <span className="text-on-surface-variant">GSM network uptime</span>
-              <span className="font-medium text-on-surface">{app ? `${app.gsmUptime}%` : "\u2014"}</span>
+              <span className="font-medium text-on-surface">{app ? `${app.gsmUptime}%` : "—"}</span>
             </li>
           </ul>
         </Tile>

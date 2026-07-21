@@ -1,6 +1,7 @@
 "use client";
 
-import { ExternalLink, Users, UserPlus, Percent, Clock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ExternalLink, Users, UserPlus, Percent, Search } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Tile, TileHeader } from "@/components/ui/tile";
 import { StatCard } from "@/components/ui/stat-card";
@@ -10,55 +11,99 @@ import { TileSkeleton } from "@/components/ui/skeleton";
 import { TrendAreaChart } from "@/components/charts/trend-chart";
 import { useMarketingSnapshot } from "@/hooks/use-marketing";
 import { formatCompactNumber, formatNumber, formatPercent } from "@/lib/utils";
+import { cn } from "@/lib/utils";
+import { MarketingSnapshot } from "@/types";
+
+const INITIAL_SNAPSHOT: MarketingSnapshot = {
+  visitors: 0,
+  visitorsDelta: 0,
+  signups: 0,
+  signupsDelta: 0,
+  conversionRate: 0,
+  conversionRateDelta: 0,
+  avgSessionSeconds: 0,
+  rangeLabel: "...",
+  funnel: [],
+  trend: [],
+  topSources: [],
+  topPages: [],
+  seo: { organicVisitors: 0, organicVisitorsDelta: 0, topOrganicSources: [] }
+};
 
 export default function MarketingAnalyticsPage() {
-  const { data, isLoading } = useMarketingSnapshot();
+  const [granularity, setGranularity] = useState("day");
+  const { data, isLoading } = useMarketingSnapshot("30d", granularity);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const snapshot = (data as MarketingSnapshot) || INITIAL_SNAPSHOT;
+  const maxFunnel = snapshot.funnel[0]?.count ?? 1;
   const siteUrl = process.env.NEXT_PUBLIC_MARKETING_SITE_URL ?? "https://havenly.io";
-  const maxFunnel = data?.funnel[0]?.count ?? 1;
 
   return (
     <div>
       <PageHeader
         title="Marketing Analytics"
-        description={`havenly-marketing website performance \u2014 ${data?.rangeLabel ?? "last 30 days"}`}
+        description={`havenly-marketing website performance — ${snapshot.rangeLabel}`}
         action={
-          <a href={siteUrl} target="_blank" rel="noreferrer">
-            <Button variant="outline" size="sm">
-              View live site <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
-            </Button>
-          </a>
+          <div className="flex items-center gap-3">
+            <div className="flex rounded bg-surface-container-low p-1">
+              {["day", "week", "month"].map((g) => (
+                <button
+                  key={g}
+                  onClick={() => setGranularity(g)}
+                  className={cn(
+                    "rounded px-3 py-1 text-label-sm font-medium transition-colors capitalize",
+                    granularity === g
+                      ? "bg-surface-container-lowest text-secondary shadow-sm"
+                      : "text-on-surface-variant hover:text-on-surface"
+                  )}
+                >
+                  {g}
+                </button>
+              ))}
+            </div>
+            <a href={siteUrl} target="_blank" rel="noreferrer">
+              <Button variant="outline" size="sm">
+                View live site <ExternalLink className="ml-1.5 h-3.5 w-3.5" />
+              </Button>
+            </a>
+          </div>
         }
       />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Visitors" value={isLoading ? "\u2014" : formatCompactNumber(data!.visitors)} delta={data?.visitorsDelta} icon={Users} />
-        <StatCard label="Signups" value={isLoading ? "\u2014" : formatNumber(data!.signups)} delta={data?.signupsDelta} icon={UserPlus} />
+        <StatCard label="Visitors" value={isLoading ? "—" : formatCompactNumber(snapshot.visitors)} delta={snapshot.visitorsDelta} icon={Users} />
+        <StatCard label="Organic (SEO)" value={isLoading ? "—" : formatCompactNumber(snapshot.seo?.organicVisitors ?? 0)} delta={snapshot.seo?.organicVisitorsDelta} icon={Search} />
+        <StatCard label="Signups" value={isLoading ? "—" : formatNumber(snapshot.signups)} delta={snapshot.signupsDelta} icon={UserPlus} />
         <StatCard
           label="Conversion Rate"
-          value={isLoading ? "\u2014" : formatPercent(data!.conversionRate)}
-          delta={data?.conversionRateDelta}
+          value={isLoading ? "—" : formatPercent(snapshot.conversionRate)}
+          delta={snapshot.conversionRateDelta}
           icon={Percent}
-        />
-        <StatCard
-          label="Avg. Session"
-          value={isLoading ? "\u2014" : `${Math.round((data?.avgSessionSeconds ?? 0) / 60)}m ${Math.round((data?.avgSessionSeconds ?? 0) % 60)}s`}
-          icon={Clock}
         />
       </div>
 
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
         <Tile className="xl:col-span-2">
-          <TileHeader title="Visitors & signups" subtitle="Weekly trend" />
+          <TileHeader title="Growth Traction" subtitle={`${granularity === 'day' ? 'Daily' : granularity === 'week' ? 'Weekly' : 'Monthly'} trend`} />
           {isLoading ? (
             <TileSkeleton rows={5} />
           ) : (
             <TrendAreaChart
-              data={data!.trend}
+              data={snapshot.trend}
               xKey="label"
               series={[
-                { key: "visitors", color: "rgb(70 72 212)", label: "Visitors" },
+                { key: "visitors", color: "rgb(70 72 212)", label: "Total Visitors" },
+                { key: "organic", color: "rgb(234 179 8)", label: "Organic Search" },
                 { key: "signups", color: "rgb(22 163 74)", label: "Signups" },
               ]}
+              height={320}
             />
           )}
         </Tile>
@@ -69,7 +114,7 @@ export default function MarketingAnalyticsPage() {
             <TileSkeleton rows={5} />
           ) : (
             <ul className="space-y-3">
-              {data!.topSources.map((s) => (
+              {snapshot.topSources.map((s) => (
                 <li key={s.source}>
                   <div className="mb-1 flex items-center justify-between text-body-sm">
                     <span className="text-on-surface">{s.source}</span>
@@ -87,12 +132,33 @@ export default function MarketingAnalyticsPage() {
 
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
         <Tile>
+          <TileHeader title="SEO Performance" subtitle="Top organic search sources" />
+          {isLoading ? (
+            <TileSkeleton rows={5} />
+          ) : (
+            <ul className="space-y-3">
+              {(snapshot.seo?.topOrganicSources || []).map((s: any) => (
+                <li key={s.source}>
+                  <div className="mb-1 flex items-center justify-between text-body-sm">
+                    <span className="text-on-surface">{s.source}</span>
+                    <span className="text-on-surface-variant">{formatNumber(s.visitors)}</span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-high">
+                    <div className="h-full rounded-full bg-yellow-500" style={{ width: `${s.share}%` }} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Tile>
+
+        <Tile>
           <TileHeader title="Conversion funnel" />
           {isLoading ? (
             <TileSkeleton rows={5} />
           ) : (
             <ul className="space-y-2.5">
-              {data!.funnel.map((f) => (
+              {snapshot.funnel.map((f) => (
                 <li key={f.stage}>
                   <div className="mb-1 flex items-center justify-between text-body-sm">
                     <span className="text-on-surface">{f.stage}</span>
@@ -110,7 +176,7 @@ export default function MarketingAnalyticsPage() {
           )}
         </Tile>
 
-        <Tile className="xl:col-span-2">
+        <Tile>
           <TileHeader title="Top pages" />
           {isLoading ? (
             <TileSkeleton rows={5} />
@@ -119,14 +185,12 @@ export default function MarketingAnalyticsPage() {
               <THead>
                 <TH>Page</TH>
                 <TH>Views</TH>
-                <TH>Avg. time</TH>
               </THead>
               <TBody>
-                {data!.topPages.map((p) => (
+                {snapshot.topPages.map((p) => (
                   <TR key={p.path}>
-                    <TD className="font-mono text-body-sm">{p.path}</TD>
+                    <TD className="font-mono text-body-xs">{p.path}</TD>
                     <TD>{formatNumber(p.views)}</TD>
-                    <TD>{Math.round(p.avgTimeSeconds / 60) > 0 ? `${Math.round(p.avgTimeSeconds / 60)}m ` : ""}{p.avgTimeSeconds % 60}s</TD>
                   </TR>
                 ))}
               </TBody>

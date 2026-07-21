@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
   const onSubmit = async (values: FormValues) => {
     // Backend should always respond 200 here regardless of whether the
     // email exists, to avoid leaking which addresses are registered.
-    await api.post("/api/dashboard/auth/forgot-password", values, { skipAuth: true }).catch(() => {});
+    await api.post("/api/v1/dashboard/auth/forgot-password", values, { skipAuth: true }).catch(() => {});
     router.push(`/check-email?email=${encodeURIComponent(values.email)}&type=reset`);
   };
 

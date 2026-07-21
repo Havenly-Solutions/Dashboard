@@ -1,14 +1,14 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiRequestWithFallback } from "@/lib/api-client";
-import { mockAppAnalyticsSnapshot } from "@/lib/mock-data";
+import { apiRequest } from "@/lib/api-client";
+import { AppAnalyticsSnapshot } from "@/types";
 
 export function useAppAnalyticsSnapshot(range: string = "30d") {
   return useQuery({
-    queryKey: ["app-analytics", "snapshot", range],
+    queryKey: ["analytics", "app", range],
     queryFn: () =>
-      apiRequestWithFallback(`/api/dashboard/analytics/app?range=${range}`, mockAppAnalyticsSnapshot),
+      apiRequest<AppAnalyticsSnapshot>(`/api/v1/dashboard/analytics/app?range=${range}`),
     staleTime: 60_000,
   });
 }

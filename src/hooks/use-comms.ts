@@ -1,26 +1,30 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, apiRequestWithFallback } from "@/lib/api-client";
-import { mockCommsMessages } from "@/lib/mock-data";
-import type { CommsMessage } from "@/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api, apiRequest } from "@/lib/api-client";
+import { CommsMessage } from "@/types";
 
-export const commsKeys = { messages: ["comms", "messages"] as const };
+export const commsKeys = {
+  all: ["comms"] as const,
+  messages: () => [...commsKeys.all, "messages"] as const,
+};
 
 export function useCommsMessages() {
   return useQuery({
-    queryKey: commsKeys.messages,
-    queryFn: () => apiRequestWithFallback("/api/dashboard/comms/messages", mockCommsMessages),
-    refetchInterval: 20_000,
+    queryKey: commsKeys.messages(),
+    queryFn: () => apiRequest<CommsMessage[]>("/api/v1/dashboard/comms/messages"),
   });
 }
 
-/** Email or in-app only \u2014 WhatsApp/SMS channels have been removed. */
-export function useSendCommsMessage() {
-  const qc = useQueryClient();
+export function useSendMessage() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { channel: "EMAIL" | "IN_APP"; toEmail: string; subject?: string; body: string }) =>
-      api.post<CommsMessage>("/api/dashboard/comms/messages", payload),
-    onSettled: () => qc.invalidateQueries({ queryKey: commsKeys.messages }),
+    mutationFn: (data: { audience: string; channel: string; message: string; title?: string }) =>
+      api.post("/api/v1/dashboard/comms/broadcast", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: commsKeys.messages() });
+    },
   });
 }
+
+export const useSendCommsMessage = useSendMessage;

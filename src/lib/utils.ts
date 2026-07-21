@@ -5,19 +5,23 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatNumber(n: number): string {
+export function formatNumber(n: number | undefined | null): string {
+  if (n === undefined || n === null) return "0";
   return new Intl.NumberFormat("en-ZA").format(n);
 }
 
-export function formatCompactNumber(n: number): string {
+export function formatCompactNumber(n: number | undefined | null): string {
+  if (n === undefined || n === null) return "0";
   return new Intl.NumberFormat("en-ZA", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 }
 
-export function formatCurrencyZAR(n: number): string {
+export function formatCurrencyZAR(n: number | undefined | null): string {
+  if (n === undefined || n === null) return "R 0";
   return new Intl.NumberFormat("en-ZA", { style: "currency", currency: "ZAR", maximumFractionDigits: 0 }).format(n);
 }
 
-export function formatPercent(n: number, opts: { showSign?: boolean } = {}): string {
+export function formatPercent(n: number | undefined | null, opts: { showSign?: boolean } = {}): string {
+  if (n === undefined || n === null) return "0.0%";
   const sign = opts.showSign && n > 0 ? "+" : "";
   return `${sign}${n.toFixed(1)}%`;
 }
@@ -41,7 +45,8 @@ export function formatClock(iso: string): string {
   return new Date(iso).toLocaleTimeString("en-ZA", { hour: "2-digit", minute: "2-digit" });
 }
 
-export function formatDuration(seconds: number): string {
+export function formatDuration(seconds: number | undefined | null): string {
+  if (seconds === undefined || seconds === null) return "0s";
   if (seconds < 60) return `${Math.round(seconds)}s`;
   const m = Math.floor(seconds / 60);
   const s = Math.round(seconds % 60);

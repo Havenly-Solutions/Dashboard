@@ -10,7 +10,6 @@ export type Role =
   | "FOUNDER"
   | "CO_FOUNDER"
   | "MANAGER"
-  | "PA"
   | "DEVELOPER"
   | "NGO_PARTNER"
   | "INVESTOR";
@@ -124,8 +123,13 @@ export interface MarketingSnapshot {
   avgSessionSeconds: number;
   topSources: { source: string; visitors: number; share: number }[];
   funnel: { stage: string; count: number }[];
-  trend: { label: string; visitors: number; signups: number }[];
+  trend: { label: string; visitors: number; signups: number; organic: number }[];
   topPages: { path: string; views: number; avgTimeSeconds: number }[];
+  seo?: {
+    organicVisitors: number;
+    organicVisitorsDelta: number;
+    topOrganicSources: { source: string; visitors: number; share: number }[];
+  };
 }
 
 export interface AppAnalyticsSnapshot {
@@ -148,12 +152,13 @@ export interface AppAnalyticsSnapshot {
 
 export interface TeamMember {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: Role;
   status: "ACTIVE" | "INVITED" | "PENDING_APPROVAL" | "SUSPENDED";
   organizationName?: string | null;
-  lastActiveAt?: string | null;
+  lastLoginAt?: string | null;
   invitedAt?: string | null;
 }
 
@@ -295,8 +300,23 @@ export interface InvoiceRecord {
   pdfUrl?: string | null;
 }
 
+export interface PreRegistration {
+  id: string;
+  email: string;
+  firstName: string;
+  surname: string;
+  phone?: string | null;
+  province: string;
+  tierInterest: string;
+  leadStatus: "NEW" | "CONTACTED" | "CONVERTED" | "UNRESPONSIVE";
+  notes?: string | null;
+  source: string;
+  createdAt: string;
+}
+
 export interface Paginated<T> {
   items: T[];
+  rows?: T[]; // Added for compatibility with growth API
   total: number;
   page: number;
   pageSize: number;

@@ -47,7 +47,7 @@ export default function HelpdeskPage() {
     const next = STATUS_FLOW[idx + 1];
     if (!next) return;
     try {
-      await updateStatus.mutateAsync({ id, status: next });
+      await updateStatus.mutateAsync({ ticketId: id, status: next });
       push(`Ticket moved to ${next.replace("_", " ")}.`);
     } catch {
       push("Couldn't update the ticket.", "error");

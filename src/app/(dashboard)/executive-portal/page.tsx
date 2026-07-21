@@ -12,12 +12,15 @@ import { useFinanceSnapshot } from "@/hooks/use-finance";
 import { useMarketingSnapshot } from "@/hooks/use-marketing";
 import { usePartners } from "@/hooks/use-partners";
 import { formatCompactNumber, formatCurrencyZAR } from "@/lib/utils";
+import { MarketingSnapshot } from "@/types";
 
 export default function ExecutivePortalPage() {
   const { user } = useAuth();
   const { data: finance, isLoading: financeLoading } = useFinanceSnapshot();
-  const { data: marketing } = useMarketingSnapshot();
+  const { data: marketingRaw } = useMarketingSnapshot();
   const { data: partners } = usePartners();
+
+  const marketing = marketingRaw as MarketingSnapshot | undefined;
 
   return (
     <div>
@@ -32,13 +35,13 @@ export default function ExecutivePortalPage() {
         />
       )}
 
-      <PageHeader title="Executive Portal" description={`Business overview${user ? ` \u2014 ${user.name}` : ""}.`} />
+      <PageHeader title="Executive Portal" description={`Business overview${user ? ` — ${user.name}` : ""}.`} />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Monthly Recurring Revenue" value={financeLoading ? "\u2014" : formatCurrencyZAR(finance!.mrr)} delta={finance?.mrrDelta} icon={Wallet} />
-        <StatCard label="Website Visitors (30d)" value={marketing ? formatCompactNumber(marketing.visitors) : "\u2014"} delta={marketing?.visitorsDelta} icon={TrendingUp} />
-        <StatCard label="Outstanding Invoices" value={financeLoading ? "\u2014" : String(finance!.outstandingInvoices)} icon={CreditCard} />
-        <StatCard label="Network Partners" value={partners ? String(partners.length) : "\u2014"} icon={Handshake} />
+        <StatCard label="Monthly Recurring Revenue" value={financeLoading ? "—" : formatCurrencyZAR(finance?.mrr ?? 0)} delta={finance?.mrrDelta} icon={Wallet} />
+        <StatCard label="Website Visitors (30d)" value={marketing ? formatCompactNumber(marketing.visitors) : "—"} delta={marketing?.visitorsDelta} icon={TrendingUp} />
+        <StatCard label="Outstanding Invoices" value={financeLoading ? "—" : String(finance?.outstandingInvoices ?? 0)} icon={CreditCard} />
+        <StatCard label="Network Partners" value={partners ? String(partners.length) : "—"} icon={Handshake} />
       </div>
 
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
@@ -55,7 +58,7 @@ export default function ExecutivePortalPage() {
             <TileSkeleton rows={3} />
           ) : (
             <ul className="space-y-3">
-              {finance!.revenueBySource.map((r) => (
+              {(finance?.revenueBySource ?? []).map((r) => (
                 <li key={r.source} className="flex justify-between text-body-sm">
                   <span className="text-on-surface-variant">{r.source}</span>
                   <span className="font-medium text-on-surface">{formatCurrencyZAR(r.amount)}</span>

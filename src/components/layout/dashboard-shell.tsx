@@ -17,7 +17,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   useRealtimeSync();
-  const allowed = useCanAccessModule(moduleKeyForPath(pathname));
+  const allowed = useCanAccessModule(moduleKeyForPath(pathname) || "");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -59,7 +59,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <p className="text-headline-md text-on-surface">You don&apos;t have access to this module.</p>
         <p className="text-body-base text-on-surface-variant">
           Your role ({user.role}) doesn&apos;t include this section. Ask your Founder to grant it in the
-          Access Control Matrix if you need it. Redirecting you somewhere you can see{"\u2026"}
+          Access Control Matrix if you need it. Redirecting you somewhere you can see{"…"}
         </p>
         <RedirectHome />
       </div>
@@ -73,7 +73,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         {isSimulating && realUser && (
           <div className="flex items-center justify-center gap-2 bg-warning/15 px-4 py-1.5 text-label-md font-medium text-warning">
             <Eye className="h-3.5 w-3.5" />
-            Founder preview mode {"\u2014"} viewing Havenly as {ROLE_LABELS[user.role]}. Nothing you do here affects real data
+            Founder preview mode — viewing Havenly as {ROLE_LABELS[user.role]}. Nothing you do here affects real data
             differently than that role would.
           </div>
         )}

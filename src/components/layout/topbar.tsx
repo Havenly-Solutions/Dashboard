@@ -12,7 +12,7 @@ import { MobileNav } from "@/components/layout/mobile-nav";
 import type { Role } from "@/types";
 
 export function Topbar() {
-  const { user, logout, isSimulating, realUser, switchRole, exitSimulation } = useAuth();
+  const { user, logout, isSimulating, realUser, simulateRole, stopSimulation } = useAuth();
   const { theme, toggle } = useTheme();
   const router = useRouter();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -36,7 +36,7 @@ export function Topbar() {
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant" />
         <input
           type="search"
-          placeholder="Search tickets, SOS refs, members\u2026"
+          placeholder="Search tickets, SOS refs, members…"
           className="h-10 w-full rounded-full border border-outline-variant bg-surface-container-low pl-9 pr-4 text-body-sm text-on-surface placeholder:text-on-surface-variant focus:border-secondary focus:outline-none"
         />
       </div>
@@ -44,18 +44,18 @@ export function Topbar() {
       <div data-tour="topbar-utility" className="ml-auto flex items-center gap-1.5">
         {isSimulating && realUser && (
           <button
-            onClick={() => {
-              exitSimulation();
+            onClick={async () => {
+              await stopSimulation();
               router.push(landingPathForRole(realUser.role));
             }}
-            className="flex items-center gap-1.5 rounded-full bg-warning px-3 py-1.5 text-label-md font-medium text-white hover:opacity-90"
+            className="flex items-center gap-1.5 rounded-full bg-warning/15 px-3 py-1.5 text-label-md font-medium text-warning hover:bg-warning/25"
           >
             <LogOut className="h-3.5 w-3.5" />
             Exit preview
           </button>
         )}
 
-        {/* Founder test-mode role switcher \u2014 mirrors POST /admin/test-mode/switch-role */}
+        {/* Founder test-mode role switcher — mirrors POST /admin/test-mode/switch-role */}
         {(user?.role === "FOUNDER" || (isSimulating && realUser?.role === "FOUNDER")) && (
           <div className="relative">
             <button
@@ -77,7 +77,7 @@ export function Topbar() {
                       setRoleSwitchOpen(false);
                       setSwitching(r);
                       try {
-                        const simulatedUser = await switchRole(r);
+                        const simulatedUser = await simulateRole(r);
                         router.push(landingPathForRole(simulatedUser.role));
                       } finally {
                         setSwitching(null);

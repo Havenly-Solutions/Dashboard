@@ -24,9 +24,6 @@ import { formatRelativeTime } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
 import type { Role } from "@/types";
 
-// The matrix covers everything except Settings (universal, not grantable)
-// and the portal-home screens themselves (a role's own home is never
-// optional \u2014 what IS grantable is everything else they can reach from it).
 const GRANTABLE_MODULES = NAV_MODULES.filter((m) => !m.hideFromNav && m.key !== "settings" && m.key !== "access-control");
 const GRANTABLE_ROLES: Role[] = ROLES.filter((r) => r !== "FOUNDER");
 
@@ -58,7 +55,7 @@ export default function AccessControlPage() {
   const toggle = async (role: Role, moduleKey: string) => {
     const next = !isEnabled(role, moduleKey);
     try {
-      await setRoleGrant.mutateAsync({ role, moduleKey, enabled: next });
+      await setRoleGrant.mutateAsync({ role, module: moduleKey, accessLevel: next ? "ENABLED" : "DISABLED" });
     } catch {
       push("Couldn't update access. Try again.", "error");
     }
@@ -67,16 +64,14 @@ export default function AccessControlPage() {
   const submitOverride = async () => {
     const member = members?.find((m) => m.id === overrideUserId);
     if (!member || !overrideModule) return;
+    const fullName = `${member.firstName} ${member.lastName || ""}`.trim();
     try {
       await setUserOverride.mutateAsync({
         userId: member.id,
-        userName: member.name,
-        userRole: member.role,
-        moduleKey: overrideModule,
-        enabled: true,
-        reason: overrideReason || undefined,
+        module: overrideModule,
+        accessLevel: "ENABLED",
       });
-      push(`Granted ${member.name} access to ${NAV_MODULES.find((m) => m.key === overrideModule)?.label}.`);
+      push(`Granted ${fullName} access to ${NAV_MODULES.find((m) => m.key === overrideModule)?.label}.`);
       setAddingOverride(false);
       setOverrideReason("");
     } catch {
@@ -151,10 +146,10 @@ export default function AccessControlPage() {
             <div>
               <Label htmlFor="override-user">Team member</Label>
               <Select id="override-user" value={overrideUserId} onChange={(e) => setOverrideUserId(e.target.value)}>
-                <option value="">Select a person\u2026</option>
+                <option value="">Select a person…</option>
                 {(members ?? []).map((m) => (
                   <option key={m.id} value={m.id}>
-                    {m.name} ({ROLE_LABELS[m.role]})
+                    {m.firstName} {m.lastName} ({ROLE_LABELS[m.role]})
                   </option>
                 ))}
               </Select>
@@ -171,7 +166,7 @@ export default function AccessControlPage() {
             </div>
             <div className="sm:col-span-2">
               <Label htmlFor="override-reason">Reason (optional, for the audit log)</Label>
-              <Input id="override-reason" value={overrideReason} onChange={(e) => setOverrideReason(e.target.value)} placeholder="Covering for\u2026" />
+              <Input id="override-reason" value={overrideReason} onChange={(e) => setOverrideReason(e.target.value)} placeholder="Covering for…" />
             </div>
             <div className="sm:col-span-2">
               <Button onClick={submitOverride} disabled={!overrideUserId} loading={setUserOverride.isPending}>
@@ -195,7 +190,7 @@ export default function AccessControlPage() {
                   </p>
                   <p className="text-body-sm text-on-surface-variant">
                     {o.enabled ? "Granted" : "Revoked"} {NAV_MODULES.find((m) => m.key === o.moduleKey)?.label ?? o.moduleKey}
-                    {o.reason ? ` \u2014 "${o.reason}"` : ""} &middot; {formatRelativeTime(o.grantedAt)}
+                    {o.reason ? ` — "${o.reason}"` : ""} &middot; {formatRelativeTime(o.grantedAt)}
                   </p>
                 </div>
                 <button

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Wallet, TrendingUp, FileWarning, PercentCircle } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Tile, TileHeader } from "@/components/ui/tile";
@@ -11,17 +12,25 @@ import { formatCurrencyZAR } from "@/lib/utils";
 
 export default function FinancePage() {
   const { data, isLoading } = useFinanceSnapshot();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const totalRevenue = data?.revenueBySource.reduce((s, r) => s + r.amount, 0) ?? 0;
+
+  if (!mounted) return null;
 
   return (
     <div>
       <PageHeader title="Finance Hub" description="Recurring revenue, invoicing, and churn at a glance." />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="MRR" value={isLoading ? "\u2014" : formatCurrencyZAR(data!.mrr)} delta={data?.mrrDelta} icon={Wallet} />
-        <StatCard label="ARR" value={isLoading ? "\u2014" : formatCurrencyZAR(data!.arr)} icon={TrendingUp} />
-        <StatCard label="Outstanding Invoices" value={isLoading ? "\u2014" : String(data!.outstandingInvoices)} icon={FileWarning} />
-        <StatCard label="Churn Rate" value={isLoading ? "\u2014" : `${data!.churnRate}%`} icon={PercentCircle} invertDelta />
+        <StatCard label="MRR" value={isLoading ? "—" : formatCurrencyZAR(data?.mrr ?? 0)} delta={data?.mrrDelta} icon={Wallet} />
+        <StatCard label="ARR" value={isLoading ? "—" : formatCurrencyZAR(data?.arr ?? 0)} icon={TrendingUp} />
+        <StatCard label="Outstanding Invoices" value={isLoading ? "—" : String(data?.outstandingInvoices ?? 0)} icon={FileWarning} />
+        <StatCard label="Churn Rate" value={isLoading ? "—" : `${data?.churnRate ?? 0}%`} icon={PercentCircle} invertDelta />
       </div>
 
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
@@ -31,7 +40,7 @@ export default function FinancePage() {
             <TileSkeleton rows={5} />
           ) : (
             <TrendAreaChart
-              data={data!.trend}
+              data={data?.trend ?? []}
               xKey="label"
               series={[{ key: "revenue", color: "rgb(70 72 212)", label: "Revenue" }]}
             />
@@ -44,7 +53,7 @@ export default function FinancePage() {
             <TileSkeleton rows={3} />
           ) : (
             <ul className="space-y-4">
-              {data!.revenueBySource.map((r) => (
+              {(data?.revenueBySource ?? []).map((r) => (
                 <li key={r.source}>
                   <div className="mb-1 flex items-center justify-between text-body-sm">
                     <span className="text-on-surface">{r.source}</span>

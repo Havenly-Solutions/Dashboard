@@ -50,9 +50,9 @@ export default function SubscriptionManagementPage() {
       />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-3">
-        <StatCard label="Total MRR" value={isLoading ? "\u2014" : formatCurrencyZAR(totalMrr)} icon={Wallet} />
-        <StatCard label="Overdue Accounts" value={isLoading ? "\u2014" : String(overdue)} icon={AlertTriangle} />
-        <StatCard label="Total Seats In Use" value={isLoading ? "\u2014" : String(totalSeats)} icon={Users} />
+        <StatCard label="Total MRR" value={isLoading ? "—" : formatCurrencyZAR(totalMrr)} icon={Wallet} />
+        <StatCard label="Overdue Accounts" value={isLoading ? "—" : String(overdue)} icon={AlertTriangle} />
+        <StatCard label="Total Seats In Use" value={isLoading ? "—" : String(totalSeats)} icon={Users} />
       </div>
 
       <Tile className="mt-widget-gap">
@@ -79,7 +79,7 @@ export default function SubscriptionManagementPage() {
                       value={o.tier}
                       onChange={async (e) => {
                         try {
-                          await updateTier.mutateAsync({ id: o.id, tier: e.target.value as SubscriptionTier });
+                          await updateTier.mutateAsync({ subId: o.id, tier: e.target.value as SubscriptionTier });
                           push(`${o.organizationName} moved to ${e.target.value}.`);
                         } catch {
                           push("Couldn't update the tier.", "error");
@@ -100,7 +100,7 @@ export default function SubscriptionManagementPage() {
                       value={o.status}
                       onChange={async (e) => {
                         try {
-                          await overrideStatus.mutateAsync({ id: o.id, status: e.target.value as BillingStatus });
+                          await overrideStatus.mutateAsync({ subId: o.id, status: e.target.value as BillingStatus });
                           push(`Billing status overridden to ${e.target.value}.`);
                         } catch {
                           push("Couldn't update billing status.", "error");
@@ -127,7 +127,7 @@ export default function SubscriptionManagementPage() {
         )}
         <p className="mt-4 flex items-center gap-1.5 text-body-sm text-on-surface-variant">
           <CreditCard className="h-3.5 w-3.5" /> Tier and status changes apply immediately. This manages your{" "}
-          <em>customers&apos;</em> subscriptions {"\u2014"} for Havenly&apos;s own payment method, see Settings &rarr; Billing.
+          <em>customers&apos;</em> subscriptions — for Havenly&apos;s own payment method, see Settings &rarr; Billing.
         </p>
       </Tile>
     </div>

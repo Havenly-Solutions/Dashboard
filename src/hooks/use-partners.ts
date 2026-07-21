@@ -1,12 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiRequestWithFallback } from "@/lib/api-client";
-import { mockPartners } from "@/lib/mock-data";
+import { apiRequest } from "@/lib/api-client";
+import { Partner } from "@/types";
 
 export function usePartners() {
   return useQuery({
     queryKey: ["partners"],
-    queryFn: () => apiRequestWithFallback("/api/dashboard/partners", mockPartners),
+    queryFn: () => apiRequest<Partner[]>("/api/v1/dashboard/partners"),
   });
 }

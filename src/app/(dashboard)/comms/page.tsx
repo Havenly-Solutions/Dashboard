@@ -39,7 +39,12 @@ export default function CommsHubPage() {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      await send.mutateAsync(values);
+      await send.mutateAsync({
+        audience: values.toEmail,
+        channel: values.channel,
+        message: values.body,
+        title: values.subject
+      });
       push("Message sent.");
       reset({ channel: values.channel, toEmail: "", subject: "", body: "" });
     } catch {

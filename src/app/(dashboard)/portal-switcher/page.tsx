@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import type { Role } from "@/types";
 
 export default function PortalSwitcherPage() {
-  const { user, realUser, switchRole, exitSimulation } = useAuth();
+  const { user, realUser, simulateRole, stopSimulation } = useAuth();
   const router = useRouter();
   const [switching, setSwitching] = useState<Role | null>(null);
 
@@ -23,11 +23,11 @@ export default function PortalSwitcherPage() {
     setSwitching(role);
     try {
       if (role === "FOUNDER") {
-        if (realUser) exitSimulation();
+        if (realUser) await stopSimulation();
         router.push(landingPathForRole("FOUNDER"));
         return;
       }
-      const simulatedUser = await switchRole(role);
+      const simulatedUser = await simulateRole(role);
       router.push(landingPathForRole(simulatedUser.role));
     } finally {
       setSwitching(null);
@@ -38,7 +38,7 @@ export default function PortalSwitcherPage() {
     <div>
       <PageHeader
         title="Switch Portal"
-        description="Preview Havenly exactly as each role sees it \u2014 its own exclusive home, its own default access. You'll stay signed in as Founder underneath; use Exit preview to come back."
+        description="Preview Havenly exactly as each role sees it — its own exclusive home, its own default access. You'll stay signed in as Founder underneath; use Exit preview to come back."
       />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-3">

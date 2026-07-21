@@ -17,7 +17,7 @@ import { formatClock, formatDuration, formatRelativeTime } from "@/lib/utils";
 import { useToast } from "@/components/ui/toast";
 import type { SosEvent, SosStatus } from "@/types";
 
-// mapbox-gl is a ~500KB library and touches `window` directly \u2014 load it only
+// mapbox-gl is a ~500KB library and touches `window` directly — load it only
 // on the client, only when this page renders, so it never blocks or bloats
 // any other route's bundle.
 const IncidentMap = dynamic(() => import("@/components/sos/incident-map").then((m) => m.IncidentMap), {
@@ -54,7 +54,7 @@ export default function SosCommandPage() {
     const next = NEXT_STATUS[event.status];
     if (!next) return;
     try {
-      await updateStatus.mutateAsync({ id: event.id, status: next });
+      await updateStatus.mutateAsync({ sosEventId: event.id, status: next });
       push(`${event.reference} moved to ${SOS_STATUS_LABEL[next]}.`);
     } catch {
       push("Couldn't update the incident. Try again.", "error");
@@ -69,19 +69,19 @@ export default function SosCommandPage() {
       />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Active Incidents" value={isLoading ? "\u2014" : String(active.length)} icon={Radio} />
-        <StatCard label="Pending Triage" value={isLoading ? "\u2014" : String(pending.length)} icon={Timer} />
-        <StatCard label="Units Responding" value={isLoading ? "\u2014" : String(responding)} icon={Users2} />
+        <StatCard label="Active Incidents" value={isLoading ? "—" : String(active.length)} icon={Radio} />
+        <StatCard label="Pending Triage" value={isLoading ? "—" : String(pending.length)} icon={Timer} />
+        <StatCard label="Units Responding" value={isLoading ? "—" : String(responding)} icon={Users2} />
         <StatCard
           label="Avg Response Time"
-          value={avgResponse ? formatDuration(avgResponse) : "\u2014"}
+          value={avgResponse ? formatDuration(avgResponse) : "—"}
           icon={CheckCircle2}
         />
       </div>
 
       <div className="mt-widget-gap grid grid-cols-1 gap-widget-gap xl:grid-cols-3">
         <Tile className="flex flex-col xl:col-span-2">
-          <TileHeader title="Incident Map" subtitle="Live positions \u2014 click a marker or row to see details" />
+          <TileHeader title="Incident Map" subtitle="Live positions — click a marker or row to see details" />
           <div className="min-h-[320px] flex-1">
             <IncidentMap events={events ?? []} selectedId={selected?.id} onSelect={setSelected} />
           </div>
@@ -166,7 +166,7 @@ export default function SosCommandPage() {
                             ev.stopPropagation();
                             handleAdvance(e);
                           }}
-                          loading={updateStatus.isPending && updateStatus.variables?.id === e.id}
+                          loading={updateStatus.isPending && (updateStatus.variables as any)?.sosEventId === e.id}
                         >
                           {NEXT_STATUS_LABEL[e.status]}
                         </Button>
@@ -187,7 +187,7 @@ export default function SosCommandPage() {
       {selected && (
         <Tile className="mt-widget-gap">
           <TileHeader
-            title={`${selected.reference} \u2014 ${selected.title}`}
+            title={`${selected.reference} — ${selected.title}`}
             subtitle="Incident detail"
             action={
               <Button variant="ghost" size="sm" onClick={() => setSelected(null)}>

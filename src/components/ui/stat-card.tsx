@@ -31,10 +31,10 @@ export function StatCard({
       </div>
       <div className="mt-3 text-stat-xl text-on-surface">{value}</div>
       {delta !== undefined && (
-        <div className={cn("mt-2 flex items-center gap-1 text-body-sm font-bold", positive ? "text-success-container bg-success/10 px-1.5 py-0.5 rounded" : "text-critical-container bg-critical/10 px-1.5 py-0.5 rounded")}>
+        <div className={cn("mt-2 flex items-center gap-1 text-body-sm font-medium", positive ? "text-success" : "text-critical")}>
           {positive ? <ArrowUpRight className="h-3.5 w-3.5" /> : <ArrowDownRight className="h-3.5 w-3.5" />}
           <span>{formatPercent(delta, { showSign: true })}</span>
-          {deltaLabel && <span className="font-normal text-on-surface-variant ml-1">{deltaLabel}</span>}
+          {deltaLabel && <span className="font-normal text-on-surface-variant">{deltaLabel}</span>}
         </div>
       )}
     </div>

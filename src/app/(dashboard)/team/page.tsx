@@ -38,9 +38,10 @@ const MEMBER_STATUS_TONE: Record<TeamMember["status"], "success" | "info" | "war
 };
 
 const inviteSchema = z.object({
-  name: z.string().min(2, "Enter a full name"),
+  firstName: z.string().min(1, "First name is required"),
+  surname: z.string().min(1, "Surname is required"),
   email: z.string().email("Enter a valid email"),
-  role: z.enum(["FOUNDER", "CO_FOUNDER", "MANAGER", "PA", "DEVELOPER", "NGO_PARTNER", "INVESTOR"]),
+  role: z.enum(["FOUNDER", "CO_FOUNDER", "MANAGER", "DEVELOPER", "NGO_PARTNER", "INVESTOR"]),
 });
 type InviteValues = z.infer<typeof inviteSchema>;
 
@@ -60,7 +61,7 @@ export default function TeamPage() {
     <div>
       <PageHeader
         title="Team & Approvals"
-        description="Invite members, approve access requests, and manage roles. No PIN required \u2014 approval sends a secure email invite link."
+        description="Invite members, approve access requests, and manage roles. No PIN required — approval sends a secure email invite link."
         action={
           <Button onClick={() => setInviteOpen(true)}>
             <UserPlus className="mr-1.5 h-4 w-4" /> Invite member
@@ -69,18 +70,18 @@ export default function TeamPage() {
       />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-3">
-        <StatCard label="Active Members" value={isLoading ? "\u2014" : String(activeCount)} icon={Users} />
-        <StatCard label="Pending Approvals" value={approvalsLoading ? "\u2014" : String((approvals ?? []).length)} icon={ShieldQuestion} />
+        <StatCard label="Active Members" value={isLoading ? "—" : String(activeCount)} icon={Users} />
+        <StatCard label="Pending Approvals" value={approvalsLoading ? "—" : String((approvals ?? []).length)} icon={ShieldQuestion} />
         <StatCard
           label="Awaiting Invite Acceptance"
-          value={isLoading ? "\u2014" : String((members ?? []).filter((m) => m.status === "INVITED").length)}
+          value={isLoading ? "—" : String((members ?? []).filter((m) => m.status === "INVITED").length)}
           icon={Clock3}
         />
       </div>
 
       {approvals && approvals.length > 0 && (
         <Tile className="mt-widget-gap">
-          <TileHeader title="Pending approvals" subtitle="Approving sends an email invite link \u2014 no PIN is issued" />
+          <TileHeader title="Pending approvals" subtitle="Approving sends an email invite link — no PIN is issued" />
           <ul className="divide-y divide-outline-variant/60">
             {approvals.map((req) => (
               <li key={req.id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
@@ -108,7 +109,7 @@ export default function TeamPage() {
                     loading={approve.isPending}
                     onClick={async () => {
                       try {
-                        await approve.mutateAsync({ id: req.id, role: req.requestedRole });
+                        await approve.mutateAsync(req.id);
                         push(`Invite email sent to ${req.applicantEmail}.`);
                       } catch {
                         push("Couldn't approve this request.", "error");
@@ -132,50 +133,53 @@ export default function TeamPage() {
           <EmptyState icon={Users} title="No team members yet" />
         ) : (
           <ul className="divide-y divide-outline-variant/60">
-            {members.map((m) => (
-              <li key={m.id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
-                <div className="flex items-center gap-3">
-                  <Avatar name={m.name} />
-                  <div>
-                    <p className="text-body-base font-medium text-on-surface">{m.name}</p>
-                    <p className="text-body-sm text-on-surface-variant">
-                      {m.email} &middot; {ROLE_LABELS[m.role]}
-                      {m.organizationName ? ` \u2014 ${m.organizationName}` : ""}
-                    </p>
+            {members.map((m) => {
+              const fullName = `${m.firstName} ${m.lastName || ""}`.trim();
+              return (
+                <li key={m.id} className="flex flex-wrap items-center justify-between gap-3 py-3.5">
+                  <div className="flex items-center gap-3">
+                    <Avatar name={fullName} />
+                    <div>
+                      <p className="text-body-base font-medium text-on-surface">{fullName}</p>
+                      <p className="text-body-sm text-on-surface-variant">
+                        {m.email} &middot; {ROLE_LABELS[m.role]}
+                        {m.organizationName ? ` — ${m.organizationName}` : ""}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Badge tone={MEMBER_STATUS_TONE[m.status]} dot>
-                    {m.status.replace("_", " ")}
-                  </Badge>
-                  {m.status === "INVITED" && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={async () => {
-                        await resend.mutateAsync(m.id);
-                        push("Invite resent.");
-                      }}
-                    >
-                      Resend invite
-                    </Button>
-                  )}
-                  {m.status !== "SUSPENDED" && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-critical"
-                      onClick={async () => {
-                        await suspend.mutateAsync(m.id);
-                        push("Access suspended.");
-                      }}
-                    >
-                      Suspend
-                    </Button>
-                  )}
-                </div>
-              </li>
-            ))}
+                  <div className="flex items-center gap-2">
+                    <Badge tone={MEMBER_STATUS_TONE[m.status]} dot>
+                      {m.status.replace("_", " ")}
+                    </Badge>
+                    {m.status === "INVITED" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={async () => {
+                          await resend.mutateAsync(m.id);
+                          push("Invite resent.");
+                        }}
+                      >
+                        Resend invite
+                      </Button>
+                    )}
+                    {m.status !== "SUSPENDED" && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-critical"
+                        onClick={async () => {
+                          await suspend.mutateAsync(m.id);
+                          push("Access suspended.");
+                        }}
+                      >
+                        Suspend
+                      </Button>
+                    )}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
       </Tile>
@@ -193,7 +197,7 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<InviteValues>({ resolver: zodResolver(inviteSchema), defaultValues: { role: "PA" } });
+  } = useForm<InviteValues>({ resolver: zodResolver(inviteSchema), defaultValues: { role: "MANAGER" } });
 
   const onSubmit = async (values: InviteValues) => {
     try {
@@ -209,10 +213,17 @@ function InviteModal({ open, onClose }: { open: boolean; onClose: () => void }) 
   return (
     <Modal open={open} onClose={onClose} title="Invite a team member">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-        <div>
-          <Label htmlFor="name">Full name</Label>
-          <Input id="name" {...register("name")} />
-          <FieldError>{errors.name?.message}</FieldError>
+        <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="firstName">First name</Label>
+              <Input id="firstName" {...register("firstName")} />
+              <FieldError>{errors.firstName?.message}</FieldError>
+            </div>
+            <div>
+              <Label htmlFor="surname">Surname</Label>
+              <Input id="surname" {...register("surname")} />
+              <FieldError>{errors.surname?.message}</FieldError>
+            </div>
         </div>
         <div>
           <Label htmlFor="email">Work email</Label>

@@ -1,51 +1,53 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, apiRequestWithFallback } from "@/lib/api-client";
-import { mockEnquiries, mockEnquiryReplies } from "@/lib/mock-data";
-import type { EnquiryReply, EnquiryStatus, SupportEnquiry } from "@/types";
-
-export const supportKeys = {
-  enquiries: ["support", "enquiries"] as const,
-  replies: (id: string) => ["support", "replies", id] as const,
-};
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api, apiRequest } from "@/lib/api-client";
+import { SupportEnquiry, EnquiryReply } from "@/types";
 
 export function useEnquiries() {
   return useQuery({
-    queryKey: supportKeys.enquiries,
-    queryFn: () => apiRequestWithFallback("/api/dashboard/support/enquiries", mockEnquiries),
-    refetchInterval: 45_000,
+    queryKey: ["support-enquiries"],
+    queryFn: () => apiRequest<SupportEnquiry[]>("/api/v1/dashboard/support/enquiries"),
+  });
+}
+
+export function useEnquiryDetail(enquiryId: string | null) {
+  return useQuery({
+    queryKey: ["support-enquiry", enquiryId],
+    queryFn: () => apiRequest<SupportEnquiry>(`/api/v1/dashboard/support/enquiries/${enquiryId}`),
+    enabled: !!enquiryId,
   });
 }
 
 export function useEnquiryReplies(enquiryId: string | null) {
   return useQuery({
-    queryKey: supportKeys.replies(enquiryId ?? ""),
+    queryKey: ["support-enquiry-replies", enquiryId],
     queryFn: () =>
-      apiRequestWithFallback(`/api/dashboard/support/enquiries/${enquiryId}/replies`, () =>
-        mockEnquiryReplies(enquiryId ?? "")
-      ),
+      apiRequest<EnquiryReply[]>(`/api/v1/dashboard/support/enquiries/${enquiryId}/replies`),
     enabled: !!enquiryId,
   });
 }
 
-export function useReplyToEnquiry() {
-  const qc = useQueryClient();
+export function useAddEnquiryReply() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, body }: { id: string; body: string }) =>
-      api.post<EnquiryReply>(`/api/dashboard/support/enquiries/${id}/replies`, { body }),
-    onSuccess: (_data, vars) => {
-      qc.invalidateQueries({ queryKey: supportKeys.replies(vars.id) });
-      qc.invalidateQueries({ queryKey: supportKeys.enquiries });
+    mutationFn: ({ enquiryId, body }: { enquiryId: string; body: string }) =>
+      api.post(`/api/v1/dashboard/support/enquiries/${enquiryId}/replies`, { body }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["support-enquiry-replies", variables.enquiryId] });
     },
   });
 }
 
+export const useReplyToEnquiry = useAddEnquiryReply;
+
 export function useUpdateEnquiryStatus() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: EnquiryStatus }) =>
-      api.patch<SupportEnquiry>(`/api/dashboard/support/enquiries/${id}/status`, { status }),
-    onSettled: () => qc.invalidateQueries({ queryKey: supportKeys.enquiries }),
+    mutationFn: ({ enquiryId, status }: { enquiryId: string; status: string }) =>
+      api.patch(`/api/v1/dashboard/support/enquiries/${enquiryId}`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["support-enquiries"] });
+    },
   });
 }

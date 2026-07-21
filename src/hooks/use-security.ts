@@ -1,26 +1,28 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { apiRequestWithFallback } from "@/lib/api-client";
-import { mockBreachLogs, mockLeaderboard, mockSecurityCampaigns } from "@/lib/mock-data";
+import { apiRequest } from "@/lib/api-client";
+import { SecurityCampaign, LeaderboardEntry, BreachLogEntry } from "@/types";
 
 export function useSecurityCampaigns() {
   return useQuery({
     queryKey: ["security", "campaigns"],
-    queryFn: () => apiRequestWithFallback("/api/dashboard/security/campaigns", mockSecurityCampaigns),
+    queryFn: () => apiRequest<SecurityCampaign[]>("/api/v1/dashboard/security/campaigns"),
   });
 }
 
-export function useLeaderboard() {
+export function useSecurityLeaderboard() {
   return useQuery({
     queryKey: ["security", "leaderboard"],
-    queryFn: () => apiRequestWithFallback("/api/dashboard/security/leaderboard", mockLeaderboard),
+    queryFn: () => apiRequest<LeaderboardEntry[]>("/api/v1/dashboard/security/leaderboard"),
   });
 }
+
+export const useLeaderboard = useSecurityLeaderboard;
 
 export function useBreachLogs() {
   return useQuery({
     queryKey: ["security", "breach-logs"],
-    queryFn: () => apiRequestWithFallback("/api/dashboard/security/breach-logs", mockBreachLogs),
+    queryFn: () => apiRequest<BreachLogEntry[]>("/api/v1/dashboard/security/breach-logs"),
   });
 }

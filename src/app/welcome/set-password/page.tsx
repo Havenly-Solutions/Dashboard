@@ -41,7 +41,7 @@ export default function SetPasswordPage() {
   const onSubmit = async (values: FormValues) => {
     setFormError(null);
     try {
-      await api.post("/api/dashboard/auth/change-password", {
+      await api.post("/api/v1/dashboard/auth/change-password", {
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       });

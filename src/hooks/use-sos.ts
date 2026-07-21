@@ -1,54 +1,44 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, apiRequestWithFallback } from "@/lib/api-client";
-import { mockSosEvents, mockSosLog } from "@/lib/mock-data";
-import type { SosEvent, SosLogEntry, SosStatus } from "@/types";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api, apiRequest } from "@/lib/api-client";
+import { SosEvent, SosLogEntry } from "@/types";
 
 export const sosKeys = {
-  events: ["sos", "events"] as const,
-  log: ["sos", "log"] as const,
+  all: ["sos"] as const,
+  events: () => [...sosKeys.all, "events"] as const,
+  log: () => [...sosKeys.all, "log"] as const,
 };
 
 export function useSosEvents() {
   return useQuery({
-    queryKey: sosKeys.events,
-    queryFn: () => apiRequestWithFallback("/api/dashboard/sos/events", mockSosEvents),
-    refetchInterval: 30_000,
+    queryKey: sosKeys.events(),
+    queryFn: () => apiRequest<SosEvent[]>("/api/v1/dashboard/sos/events"),
+    refetchInterval: 5000,
   });
 }
 
 export function useSosLog() {
   return useQuery({
-    queryKey: sosKeys.log,
-    queryFn: () => apiRequestWithFallback("/api/dashboard/sos/log", mockSosLog),
-    refetchInterval: 15_000,
+    queryKey: sosKeys.log(),
+    queryFn: () => apiRequest<SosLogEntry[]>("/api/v1/dashboard/sos/log"),
   });
 }
 
-/** Count of PENDING + ACTIVE incidents, used for the sidebar/topbar badge. */
-export function useSosActiveCount(): number {
-  const { data } = useSosEvents();
-  if (!data) return 0;
-  return data.filter((e) => e.status === "PENDING" || e.status === "ACTIVE").length;
-}
-
-export function useUpdateSosStatus() {
-  const qc = useQueryClient();
+export function useResolveSos() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: SosStatus }) =>
-      api.patch<SosEvent>(`/api/dashboard/sos/events/${id}/status`, { status }),
-    onMutate: async ({ id, status }) => {
-      await qc.cancelQueries({ queryKey: sosKeys.events });
-      const previous = qc.getQueryData<SosEvent[]>(sosKeys.events);
-      qc.setQueryData<SosEvent[]>(sosKeys.events, (old) =>
-        old?.map((e) => (e.id === id ? { ...e, status, updatedAt: new Date().toISOString() } : e))
-      );
-      return { previous };
+    mutationFn: ({ sosEventId, status }: { sosEventId: string; status: string }) =>
+      api.patch(`/api/v1/dashboard/sos/events/${sosEventId}/resolve`, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: sosKeys.all });
     },
-    onError: (_err, _vars, ctx) => {
-      if (ctx?.previous) qc.setQueryData(sosKeys.events, ctx.previous);
-    },
-    onSettled: () => qc.invalidateQueries({ queryKey: sosKeys.events }),
   });
+}
+
+export const useUpdateSosStatus = useResolveSos;
+
+export function useSosActiveCount() {
+    const { data } = useSosEvents();
+    return (data ?? []).filter(e => e.status === "ACTIVE" || e.status === "PENDING").length;
 }

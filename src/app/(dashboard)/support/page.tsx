@@ -57,10 +57,10 @@ export default function CustomerSupportPage() {
       <PageHeader title="Customer Support" description="Feedback, enquiries, and reviews from every plan tier." />
 
       <div className="grid grid-cols-1 gap-widget-gap sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Open Enquiries" value={isLoading ? "\u2014" : String(open)} icon={MessageSquareText} />
-        <StatCard label="Flagged" value={isLoading ? "\u2014" : String(flagged)} icon={Frown} />
-        <StatCard label="Avg. Rating" value={avgRating ? `${avgRating} / 5` : "\u2014"} icon={Star} />
-        <StatCard label="Total This Period" value={isLoading ? "\u2014" : String((enquiries ?? []).length)} icon={MessageSquareText} />
+        <StatCard label="Open Enquiries" value={isLoading ? "—" : String(open)} icon={MessageSquareText} />
+        <StatCard label="Flagged" value={isLoading ? "—" : String(flagged)} icon={Frown} />
+        <StatCard label="Avg. Rating" value={avgRating ? `${avgRating} / 5` : "—"} icon={Star} />
+        <StatCard label="Total This Period" value={isLoading ? "—" : String((enquiries ?? []).length)} icon={MessageSquareText} />
       </div>
 
       <Tile className="mt-widget-gap">
@@ -106,7 +106,7 @@ export default function CustomerSupportPage() {
         onClose={() => setActive(null)}
         onArchive={async (id) => {
           try {
-            await updateStatus.mutateAsync({ id, status: "ARCHIVED" });
+            await updateStatus.mutateAsync({ enquiryId: id, status: "ARCHIVED" });
             push("Enquiry archived.");
             setActive(null);
           } catch {
@@ -137,7 +137,7 @@ function ReplyModal({
   const send = async () => {
     if (!body.trim()) return;
     try {
-      await reply.mutateAsync({ id: enquiry.id, body: body.trim() });
+      await reply.mutateAsync({ enquiryId: enquiry.id, body: body.trim() });
       setBody("");
       push("Reply sent.");
     } catch {
@@ -178,7 +178,7 @@ function ReplyModal({
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={3}
-          placeholder="Write a reply\u2026"
+          placeholder="Write a reply…"
           className="w-full rounded border border-outline-variant bg-surface-container-lowest p-3 text-body-base text-on-surface placeholder:text-on-surface-variant focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary"
         />
         <div className="mt-3 flex justify-end">

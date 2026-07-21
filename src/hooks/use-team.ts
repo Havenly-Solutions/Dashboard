@@ -1,70 +1,77 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, apiRequestWithFallback } from "@/lib/api-client";
-import { mockApprovalRequests, mockTeamMembers } from "@/lib/mock-data";
-import type { ApprovalRequest, Role, TeamMember } from "@/types";
-
-export const teamKeys = {
-  members: ["team", "members"] as const,
-  approvals: ["team", "approvals"] as const,
-};
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api, apiRequest } from "@/lib/api-client";
+import { TeamMember, ApprovalRequest } from "@/types";
 
 export function useTeamMembers() {
   return useQuery({
-    queryKey: teamKeys.members,
-    queryFn: () => apiRequestWithFallback("/api/dashboard/admin/team", mockTeamMembers),
+    queryKey: ["admin", "team"],
+    queryFn: () => apiRequest<TeamMember[]>("/api/v1/dashboard/admin/team"),
   });
 }
 
 export function useApprovalRequests() {
   return useQuery({
-    queryKey: teamKeys.approvals,
-    queryFn: () => apiRequestWithFallback("/api/dashboard/admin/approvals", mockApprovalRequests),
-    refetchInterval: 60_000,
+    queryKey: ["admin", "approvals"],
+    queryFn: () => apiRequest<ApprovalRequest[]>("/api/v1/dashboard/admin/approvals"),
   });
 }
 
-/** Founder/Admin approves \u2192 backend generates an invite link and emails it. No PIN, no SMS/WhatsApp. */
-export function useApproveRequest() {
-  const qc = useQueryClient();
+export function useInviteMember() {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, role }: { id: string; role: Role }) =>
-      api.post(`/api/dashboard/admin/approvals/${id}/approve`, { role }),
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: teamKeys.approvals });
-      qc.invalidateQueries({ queryKey: teamKeys.members });
+    mutationFn: (data: { email: string; role: string; firstName: string; surname: string; organizationId?: string }) =>
+      api.post("/api/v1/dashboard/admin/team/invite", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "team"] });
+    },
+  });
+}
+
+export function useUpdateMemberRole() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, role }: { userId: string; role: string }) =>
+      api.patch(`/api/v1/dashboard/admin/team/${userId}/role`, { role }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "team"] });
+    },
+  });
+}
+
+export function useApproveRequest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/api/v1/dashboard/admin/approvals/${id}/approve`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "approvals"] });
     },
   });
 }
 
 export function useDenyRequest() {
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => api.post(`/api/dashboard/admin/approvals/${id}/deny`),
-    onSettled: () => qc.invalidateQueries({ queryKey: teamKeys.approvals }),
-  });
-}
-
-export function useInviteMember() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: { name: string; email: string; role: Role }) =>
-      api.post<TeamMember>("/api/dashboard/admin/team/invite", payload),
-    onSettled: () => qc.invalidateQueries({ queryKey: teamKeys.members }),
-  });
-}
-
-export function useSuspendMember() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => api.post(`/api/dashboard/admin/team/${id}/suspend`),
-    onSettled: () => qc.invalidateQueries({ queryKey: teamKeys.members }),
+    mutationFn: (id: string) => api.post(`/api/v1/dashboard/admin/approvals/${id}/deny`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "approvals"] });
+    },
   });
 }
 
 export function useResendInvite() {
   return useMutation({
-    mutationFn: (id: string) => api.post(`/api/dashboard/admin/team/${id}/resend-invite`),
+    mutationFn: (id: string) => api.post(`/api/v1/dashboard/admin/team/${id}/resend-invite`),
+  });
+}
+
+export function useSuspendMember() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.post(`/api/v1/dashboard/admin/team/${id}/suspend`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin", "team"] });
+    },
   });
 }

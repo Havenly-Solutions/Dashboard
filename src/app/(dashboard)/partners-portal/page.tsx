@@ -15,9 +15,9 @@ export default function PartnersPortalPage() {
   const { user } = useAuth();
   const { data: partners, isLoading } = usePartners();
 
-  // Until havenly-backend scopes /api/dashboard/partners by the caller's
+  // Until havenly-backend scopes /api/v1/dashboard/partners by the caller's
   // organizationId, this previews the first partner record as "your org."
-  // Swap for GET /api/dashboard/partners/me once that route exists.
+  // Swap for GET /api/v1/dashboard/partners/me once that route exists.
   const myOrg = partners?.[0];
   const otherPartners = (partners ?? []).filter((p) => p.id !== myOrg?.id);
 
