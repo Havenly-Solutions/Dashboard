@@ -22,7 +22,7 @@ export function Sidebar() {
   const { data: effectiveModulesRaw } = useEffectiveModules(user?.id);
 
   // Fallback to NAV_MODULES filtered by role if effectiveModules fails/is empty
-  const userRole = user?.role || ("PA" as const);
+  const userRole = user?.role || ("INVESTOR" as const);
   const fallbackModules = NAV_MODULES.filter((m) => m.roles.includes(userRole));
   const effectiveModules = (effectiveModulesRaw as any[])?.length ? (effectiveModulesRaw as any[]) : fallbackModules;
 

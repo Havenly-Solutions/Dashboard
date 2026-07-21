@@ -20,7 +20,7 @@ export function MobileNav({ open, onClose }: { open: boolean; onClose: () => voi
   const { data: effectiveModulesRaw } = useEffectiveModules(user?.id);
   const activeSosCount = useSosActiveCount();
 
-  const userRole = user?.role || ("PA" as const);
+  const userRole = user?.role || ("INVESTOR" as const);
   const fallbackModules = NAV_MODULES.filter((m) => m.roles.includes(userRole));
   const effectiveModules = (effectiveModulesRaw as any[])?.length
     ? (effectiveModulesRaw as any[])
