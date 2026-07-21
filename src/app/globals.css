@@ -2,136 +2,176 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    /* GSC Color Palette */
-    --background: 210 17% 95%; /* #f1f3f4 */
-    --foreground: 225 6% 13%; /* #202124 */
-    --primary: 217 89% 51%; /* #1a73e8 */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 213 6% 39%; /* #5f6368 */
-    --secondary-foreground: 0 0% 100%;
-    --muted: 210 17% 95%; /* #f1f3f4 */
-    --muted-foreground: 210 7% 52%; /* #80868b */
-    --accent: 214 82% 96%; /* #e8f0fe */
-    --accent-foreground: 217 89% 51%; /* #1a73e8 */
-    --border: 214 9% 87%; /* #dadce0 */
-    --input: 214 9% 87%; /* #dadce0 */
-    --ring: 217 89% 51% / 0.2; /* #1a73e8 with alpha */
-    --destructive: 5 81% 56%; /* #ea4335 */
-    --destructive-foreground: 0 0% 100%;
-    --radius: 4px;
+:root {
+  --color-surface: 248 249 250;
+  --color-surface-dim: 217 218 219;
+  --color-surface-bright: 248 249 250;
+  --color-surface-container-lowest: 255 255 255;
+  --color-surface-container-low: 243 244 245;
+  --color-surface-container: 237 238 239;
+  --color-surface-container-high: 231 232 233;
+  --color-surface-container-highest: 225 227 228;
+  --color-on-surface: 25 28 29;
+  --color-on-surface-variant: 68 71 72;
+  --color-outline: 116 120 120;
+  --color-outline-variant: 196 199 199;
+  --color-primary: 0 0 0;
+  --color-on-primary: 255 255 255;
+  --color-primary-container: 28 27 27;
+  --color-on-primary-container: 133 131 131;
+  --color-secondary: 70 72 212;
+  --color-on-secondary: 255 255 255;
+  --color-secondary-container: 96 99 238;
+  --color-on-secondary-container: 255 251 255;
+  --color-secondary-fixed: 225 224 255;
+  --color-error: 186 26 26;
+  --color-on-error: 255 255 255;
+  --color-error-container: 255 218 214;
+  --color-on-error-container: 147 0 10;
+  --color-background: 248 249 250;
+  --color-on-background: 25 28 29;
+  --color-critical: 220 38 38;
+  --color-critical-container: 153 27 27;
+  --color-warning: 217 119 6;
+  --color-success: 21 128 61;
+  --color-success-container: 20 83 45;
+  --color-info: 37 99 235;
 
-    /* Extra colors */
-    --success: 140 52% 43%; /* #34a853 */
-    --warning: 45 97% 50%; /* #fbbc04 */
-    
-    /* Legacy override */
-    --havenly-red: #ea4335;
-    --havenly-navy: #202124;
-    --havenly-green: #34a853;
+  --shadow-tile: 0px 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.dark {
+  --color-surface: 11 12 14;
+  --color-surface-dim: 0 0 0;
+  --color-surface-bright: 44 46 50;
+  --color-surface-container-lowest: 0 0 0;
+  --color-surface-container-low: 20 21 23;
+  --color-surface-container: 27 29 32;
+  --color-surface-container-high: 32 34 38;
+  --color-surface-container-highest: 43 45 49;
+  --color-on-surface: 242 243 244;
+  --color-on-surface-variant: 167 171 174;
+  --color-outline: 58 61 66;
+  --color-outline-variant: 42 44 48;
+  --color-primary: 255 255 255;
+  --color-on-primary: 11 12 14;
+  --color-primary-container: 225 227 228;
+  --color-on-primary-container: 27 29 32;
+  --color-secondary: 122 125 255;
+  --color-on-secondary: 5 6 20;
+  --color-secondary-container: 70 72 212;
+  --color-on-secondary-container: 232 232 255;
+  --color-secondary-fixed: 38 40 107;
+  --color-error: 255 107 107;
+  --color-on-error: 58 0 0;
+  --color-error-container: 74 20 20;
+  --color-on-error-container: 255 180 171;
+  --color-background: 11 12 14;
+  --color-on-background: 242 243 244;
+  --color-critical-container: 254 226 226;
+  --color-success-container: 220 252 231;
+
+  --shadow-tile: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+* {
+  border-color: rgb(var(--color-outline-variant));
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background-color: rgb(var(--color-background));
+  color: rgb(var(--color-on-background));
+}
+
+/* Visible keyboard focus everywhere, respects the brand indigo */
+:focus-visible {
+  outline: 2px solid rgb(var(--color-secondary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-@layer base {
-  * { @apply border-border; }
-  body { 
-    @apply bg-[#f1f3f4] text-foreground; 
-    font-family: 'Google Sans', 'Roboto', 'Inter', system-ui, -apple-system, sans-serif;
-    line-height: 1.5;
+/* Widget tile \u2014 the core container used across every dashboard screen */
+.tile {
+  background-color: rgb(var(--color-surface-container-lowest));
+  border: 1px solid rgb(var(--color-outline-variant) / 0.5);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-tile);
+}
+.dark .tile {
+  border-top-color: rgb(255 255 255 / 0.05);
+}
+
+/* Thin scrollbars for dense data panels (comms log, activity feed) */
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--color-outline-variant));
+  border-radius: 9999px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Active sidebar nav indicator bar */
+.active-nav-glow {
+  position: relative;
+}
+.active-nav-glow::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background-color: rgb(var(--color-secondary));
+}
+
+/* Pulsing marker for ACTIVE incidents on the SOS map */
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+  50% { box-shadow: 0 0 0 8px rgba(220, 38, 38, 0); }
+}
+
+.mapboxgl-popup-content {
+  background-color: rgb(var(--color-surface-container-lowest));
+  color: rgb(var(--color-on-surface));
+  border-radius: 8px;
+  box-shadow: var(--shadow-tile);
+}
+.mapboxgl-popup-tip {
+  border-top-color: rgb(var(--color-surface-container-lowest)) !important;
+}
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
   }
-  
-  h1 {
-    @apply text-[22px] font-normal text-[#202124] leading-normal;
-  }
-  
-  h2 {
-    @apply text-[16px] font-medium text-[#202124] leading-normal;
+  20%, 22%, 24%, 55% {
+    opacity: 0.2;
   }
 }
 
-.sidebar-nav-item {
-  @apply flex items-center gap-4 px-6 h-[40px] rounded-r-full text-[14px] font-normal transition-all duration-200 cursor-pointer;
-}
-.sidebar-nav-item:hover { @apply bg-[#f1f3f4] text-[#202124]; }
-.sidebar-nav-item.active { @apply bg-[#e8f0fe] text-[#1a73e8] font-medium; }
-.sidebar-nav-item.inactive { @apply text-[#202124] hover:bg-[#f1f3f4]; }
-.sidebar-nav-item svg { @apply w-5 h-5; }
-
-.stat-card, .card {
-  @apply bg-white rounded-lg border border-[#dadce0] p-6 shadow-none transition-shadow duration-200;
-}
-.stat-card:hover, .card:hover {
-  @apply shadow-[0_1px_3px_rgba(60,64,67,0.3),0_4px_8px_rgba(60,64,67,0.15)];
-}
-
-.severity-critical { @apply text-[#ea4335] bg-[#fce8e6] border-[#fad2cf]; }
-.severity-warning { @apply text-[#fbbc04] bg-[#fef7e0] border-[#feefc3]; }
-.severity-advisory { @apply text-[#1a73e8] bg-[#e8f0fe] border-[#d2e3fc]; }
-.severity-info { @apply text-[#5f6368] bg-[#f8f9fa] border-[#dadce0]; }
-
-.havenly-btn-red {
-  @apply px-6 py-2 bg-[#1a73e8] text-white rounded-[4px] text-sm font-medium hover:bg-[#1557b0] transition-colors shadow-none;
-}
-
-.portal-container {
-  @apply bg-white border border-[#dadce0] rounded-lg shadow-none;
-}
-
-.glass-card {
-  @apply bg-white border border-[#dadce0] rounded-lg p-6 shadow-none;
-}
-
-/* Tables */
-table {
-  @apply w-full border-collapse;
-}
-thead tr {
-  @apply bg-[#f8f9fa] border-b border-[#dadce0];
-}
-th {
-  @apply px-4 py-3 text-[12px] font-medium text-[#5f6368] text-left normal-case tracking-normal;
-}
-
-tbody tr {
-  @apply border-b border-[#f1f3f4] hover:bg-[#f8f9fa] transition-colors;
-}
-td {
-  @apply px-4 py-3 text-[14px] text-[#202124];
-}
-
-/* Inputs */
-input:not([type="checkbox"]):not([type="radio"]), select, textarea {
-  @apply border border-[#dadce0] rounded-[4px] px-3 py-2 text-[14px] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 transition-all;
-}
-
-/* Progress Bar */
-.loading-bar {
-  @apply h-1 bg-[#e8f0fe] overflow-hidden relative w-full;
-}
-.loading-bar-inner {
-  @apply h-full bg-[#1a73e8] absolute top-0 left-0;
-  animation: progress 1.5s ease-in-out infinite;
-}
-@keyframes progress {
-  0% { left: -100%; width: 100%; }
-  100% { left: 100%; width: 100%; }
-}
-
-
-/* Custom Scrollbar Utilities */
-@layer utilities {
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-  }
-  .scrollbar-track-transparent::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .scrollbar-thumb-gray-200::-webkit-scrollbar-thumb {
-    background: #e5e7eb;
-    border-radius: 10px;
-  }
-  .hover\:scrollbar-thumb-gray-300:hover::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-  }
+.flicker {
+  animation: flicker 3s infinite;
 }

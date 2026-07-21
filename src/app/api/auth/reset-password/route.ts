@@ -2,5 +2,5 @@ import { NextRequest } from 'next/server'
 import { apiProxy } from '@/lib/serverFetch'
 
 export async function POST(req: NextRequest) {
-  return apiProxy(req, '/api/auth/reset-password')
+  return apiProxy(req, '/api/v1/dashboard/auth/reset-password')
 }

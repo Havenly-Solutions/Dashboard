@@ -1,24 +1,26 @@
-import { getServerSession } from 'next-auth/next'
-import { redirect } from 'next/navigation'
-import { authOptions } from '@/lib/auth'
-import LoginForm from '@/components/auth/LoginForm'
-import { ROLE_PERMISSIONS } from '@/types'
+"use client";
 
-interface PageProps {
-  searchParams: { error?: string }
-}
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { landingPathForRole } from "@/lib/rbac";
 
-export default async function RootLoginPage({ searchParams }: PageProps) {
-  const session = await getServerSession(authOptions)
+export default function RootPage() {
+  const { status, user } = useAuth();
+  const router = useRouter();
 
-  // Only redirect if a session exists AND there isn't an unauthorized error in the URL
-  // Also verify the user has a valid role that exists in our permissions map
-  if (session && searchParams.error !== 'unauthorized') {
-    const role = (session.user as any)?.role
-    if (role && ROLE_PERMISSIONS[role]) {
-      redirect('/dashboard')
+  useEffect(() => {
+    if (status === "authenticated" && user) {
+      router.replace(landingPathForRole(user.role));
+    } else if (status === "unauthenticated") {
+      router.replace("/login");
     }
-  }
+  }, [status, user, router]);
 
-  return <LoginForm />
+  return (
+    <div className="flex h-dvh items-center justify-center bg-background">
+      <Loader2 className="h-6 w-6 animate-spin text-secondary" />
+    </div>
+  );
 }

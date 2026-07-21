@@ -22,7 +22,7 @@ export async function baseApiClient(endpoint: string, options: any = {}) {
   const { responseType = 'json', token, timeout = 60000, ...fetchOptions } = options;
   
   const isBrowser = typeof window !== 'undefined';
-  const baseUrl = isBrowser ? window.location.origin : (process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || '');
+  const baseUrl = isBrowser ? window.location.origin : (process.env.NEXT_PUBLIC_API_URL || process.env.BACKEND_API_URL || 'https://api.havenly.solutions');
   const url = endpoint.startsWith('http') ? endpoint : `${baseUrl}${endpoint}`;
 
   const headers = new Headers(fetchOptions.headers || {});

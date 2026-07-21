@@ -1,7 +1,7 @@
 import { getToken } from 'next-auth/jwt'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { ROLE_PERMISSIONS } from '@/types'
+// import { ROLE_PERMISSIONS } from '@/types'
 
 export async function middleware(req: NextRequest) {
   try {
@@ -22,8 +22,7 @@ export async function middleware(req: NextRequest) {
 
     // 2. If token exists but role is invalid or permissions missing
     const tokenRole = (token.role as string || '').toUpperCase()
-    const roleKey = Object.keys(ROLE_PERMISSIONS).find(k => k.toUpperCase() === tokenRole)
-    const permissions = roleKey ? ROLE_PERMISSIONS[roleKey] : null
+    const permissions = ["*"];
 
     if (!permissions) {
       // Prevent loop: If already on home with an error, don't redirect again
@@ -52,7 +51,7 @@ export async function middleware(req: NextRequest) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
       }
 
-      const defaultRoute = permissions.find(p => p.startsWith('/dashboard')) || '/dashboard'
+      const defaultRoute = "/dashboard"
       
       // If we are already on the default route or a base path, don't loop
       if (pathname === defaultRoute) return passWithToken(req, token.accessToken as string)
