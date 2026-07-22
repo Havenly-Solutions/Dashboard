@@ -53,10 +53,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       onRefresh: async () => {
         try {
           // skipAuth: true is CRITICAL here to prevent recursion if the refresh call itself 401s
-          const res = await apiRequest<LoginResponse>("/api/v1/dashboard/auth/refresh", { method: "POST", skipAuth: true });
+          const res = await apiRequest<{ accessToken: string }>("/api/v1/dashboard/auth/refresh", { method: "POST", skipAuth: true });
           tokenRef.current = res.accessToken;
-          setUser(res.user);
-          if (!isSimulating) setRealUser(res.user);
           return res.accessToken;
         } catch {
           return null;

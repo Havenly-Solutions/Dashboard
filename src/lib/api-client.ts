@@ -21,6 +21,8 @@ let getToken: TokenGetter = () => null;
 let onRefresh: RefreshHandler = async () => null;
 let onUnauthorized: UnauthorizedHandler = () => {};
 
+let refreshPromise: Promise<string | null> | null = null;
+
 /** Wired up once by AuthProvider on mount. */
 export function configureApiClient(opts: {
   getToken: TokenGetter;
@@ -86,7 +88,12 @@ export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Pr
     return await rawRequest<T>(path, opts, token);
   } catch (err) {
     if (err instanceof ApiError && err.status === 401 && !opts.skipAuth) {
-      const refreshed = await onRefresh();
+      if (!refreshPromise) {
+        refreshPromise = onRefresh().finally(() => {
+          refreshPromise = null;
+        });
+      }
+      const refreshed = await refreshPromise;
       if (refreshed) {
         return await rawRequest<T>(path, opts, refreshed);
       }
